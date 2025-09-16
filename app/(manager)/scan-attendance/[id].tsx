@@ -1,0 +1,319 @@
+import {
+  addNewWalkInParticipant,
+  AddNewWalkInParticipantRequestDto,
+  list2,
+  scanQr,
+  ScanQrRequestDto,
+  ScanQrResponseDto,
+} from "@/__generated-client/http-client-integration";
+import QrScanPreview from "@/components/app/QrScanPreview";
+import { useGlobalLoading } from "@/components/GlobalLoading";
+import {
+  Actionsheet,
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetFlatList,
+  ActionsheetItem,
+  ActionsheetItemText,
+} from "@/components/ui/actionsheet";
+import { Badge } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
+import { VStack } from "@/components/ui/vstack";
+import { formatTime } from "@/hooks/date-formatter";
+import { QrPayload } from "@/models/qr";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { DateTime } from "luxon";
+import React, { useRef } from "react";
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  PanResponder,
+  Platform,
+  View,
+} from "react-native";
+
+type AttendanceRecord = {
+  id: string;
+  name: string;
+  attendAt: string;
+};
+
+const ScanAttendance = () => {
+  // 1) Navigation & utilities
+  const { id } = useLocalSearchParams();
+  const router = useRouter();
+  const toast = useToast();
+  const loading = useGlobalLoading();
+
+  // 2) UI state
+  const [showActionsheet, setShowActionsheet] = React.useState(false);
+  const [showAttendanceSheet, setShowAttendanceSheet] = React.useState(false);
+  const [attendanceSheetHeight, setAttendanceSheetHeight] = React.useState(
+    screenHeight * 0.3
+  );
+
+  // 3) Data state
+  const [attendanceRecords, setAttendanceRecords] = React.useState<
+    AttendanceRecord[]
+  >([]);
+  const [scanQrResponseDto, setScanQrResponseDto] =
+    React.useState<ScanQrResponseDto>();
+
+  // 4) Flags
+  const [isScanningInProgress, setIsScanningInProgress] = React.useState(false);
+
+  // 5) Refs
+  const panY = useRef(attendanceSheetHeight);
+
+  // 6) Gestures - PanResponder for drag-to-resize (works on iOS/Android)
+  const panResponder = React.useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onPanResponderGrant: (_) => {
+          panY.current = attendanceSheetHeight;
+        },
+        onPanResponderMove: (_, gestureState) => {
+          if (gestureState.dy > 0) {
+            setAttendanceSheetHeight(screenHeight * 0.3);
+          } else {
+            // let newHeight = panY.current - gestureState.dy;
+            // newHeight = Math.max(
+            //   screenHeight * 0.2,
+            //   Math.min(newHeight, screenHeight * 0.7)
+            // );
+            setAttendanceSheetHeight(screenHeight * 0.7);
+          }
+        },
+      }),
+    [attendanceSheetHeight]
+  );
+
+  // 7) Helpers
+  const handleCloseActionSheet = () => setShowActionsheet(false);
+  const handleCloseAttendanceSheet = () => setShowAttendanceSheet(false);
+
+  const showNewToast = (
+    message = "",
+    action: "error" | "warning" | "success" = "success"
+  ) => {
+    const newId = Math.random();
+
+    toast.show({
+      id: newId.toString(),
+      placement: "top",
+      duration: 3000,
+      render: ({ id }) => {
+        const uniqueToastId = "toast-" + id;
+        return (
+          <Toast nativeID={uniqueToastId} action={action} variant="solid">
+            <ToastTitle>{message}</ToastTitle>
+          </Toast>
+        );
+      },
+    });
+  };
+
+  // 8) Item renderer
+  const Item = React.useCallback(
+    ({ name, attendAt }: AttendanceRecord) => (
+      <ActionsheetItem className="border-t border-gray-300 justify-between">
+        <ActionsheetItemText className="font-bold text-lg">
+          {name}
+        </ActionsheetItemText>
+        <ActionsheetItemText className="text-gray-700 text-lg">
+          {attendAt}
+        </ActionsheetItemText>
+      </ActionsheetItem>
+    ),
+    []
+  );
+
+  // 9) Handlers
+  const onQrScanned = async (data: string) => {
+    if (isScanningInProgress) {
+      return;
+    }
+    setIsScanningInProgress(true);
+    const parsedData: QrPayload = JSON.parse(data);
+
+    const payload: ScanQrRequestDto = {
+      activityId: id as string,
+      activityQrDto: {
+        ...parsedData,
+        generatedAt: DateTime.fromSeconds(parsedData.generatedAt)
+          .toUTC()
+          .toISO()!,
+        validUntil: DateTime.fromSeconds(parsedData.validUntil)
+          .toUTC()
+          .toISO()!,
+      },
+    };
+    try {
+      loading.show("Loading activities...");
+
+      const result = await scanQr(payload, {
+        headers: { "x-disable-global-loading": "true" },
+      });
+
+      if (result.newParticipant) {
+        setScanQrResponseDto(result);
+        setShowActionsheet(true);
+      } else {
+        const participantsResp = await list2(id as string, {
+          pageNumber: 1,
+          pageSize: 1000,
+          attendanceStatus: "PRESENT",
+        });
+        setAttendanceRecords(
+          participantsResp.data?.map((p) => ({
+            id: p.userId!,
+            name: p.name!,
+            attendAt: p.addedAt!,
+          })) ?? []
+        );
+        setShowAttendanceSheet(true);
+      }
+    } catch (error: any) {
+      showNewToast(error.message || "Error scanning QR", "error");
+    } finally {
+      loading.hide();
+    }
+    setIsScanningInProgress(false);
+  };
+
+  const handleAddNewParticipant = async () => {
+    const payload: AddNewWalkInParticipantRequestDto = {
+      activityId: id as string,
+      newParticipantUserId: scanQrResponseDto?.userId || "",
+    };
+    try {
+      await addNewWalkInParticipant(payload);
+
+      const participantsResp = await list2(id as string, {
+        pageNumber: 1,
+        pageSize: 1000,
+        attendanceStatus: "PRESENT",
+      });
+      setAttendanceRecords(
+        participantsResp.data?.map((p) => ({
+          id: p.userId!,
+          name: p.name!,
+          attendAt: formatTime(p.addedAt!),
+        })) ?? []
+      );
+      setShowAttendanceSheet(true);
+    } catch (error: any) {
+      showNewToast(error.message || "Error adding new participant", "error");
+    }
+  };
+
+  return (
+    <>
+      <View className="relative" style={{ minHeight: screenHeight }}>
+        <QrScanPreview onQrScanned={onQrScanned} />
+        <Pressable
+          className="absolute top-16 left-4"
+          onPress={() => router.back()}
+        >
+          <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
+        </Pressable>
+      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Actionsheet isOpen={showActionsheet} onClose={handleCloseActionSheet}>
+          <ActionsheetBackdrop />
+          <ActionsheetContent className="">
+            <ActionsheetDragIndicatorWrapper>
+              <ActionsheetDragIndicator />
+            </ActionsheetDragIndicatorWrapper>
+            <VStack
+              className="w-full py-5 justify-between"
+              style={{ height: screenHeight * 0.3 }}
+            >
+              <Heading size="xl" className="font-bold">
+                New participant
+              </Heading>
+              <Text size="lg" className="">
+                {scanQrResponseDto?.userName} is not in the participant list, do
+                you want to add him/her?
+              </Text>
+
+              <Divider className="my-4 bg-transparent" />
+
+              <VStack space="xl">
+                <Button
+                  size="lg"
+                  variant="solid"
+                  action="negative"
+                  onPress={() => handleAddNewParticipant()}
+                >
+                  <ButtonText className="text-white">CONFIRM</ButtonText>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  action="secondary"
+                  onPress={handleCloseActionSheet}
+                >
+                  <ButtonText>CANCEL</ButtonText>
+                </Button>
+              </VStack>
+            </VStack>
+          </ActionsheetContent>
+        </Actionsheet>
+        <Actionsheet
+          isOpen={showAttendanceSheet}
+          onClose={handleCloseAttendanceSheet}
+        >
+          <ActionsheetBackdrop />
+          <ActionsheetContent className="">
+            <ActionsheetDragIndicatorWrapper {...panResponder.panHandlers}>
+              <ActionsheetDragIndicator />
+            </ActionsheetDragIndicatorWrapper>
+            <Box
+              className="w-full py-5"
+              style={{ height: attendanceSheetHeight }}
+            >
+              <Heading size="xl" className="font-bold">
+                Registered attendance
+              </Heading>
+              <HStack className="items-center gap-2">
+                <Text size="md" className="">
+                  You have taken attendance of
+                </Text>
+                <Badge action="success">
+                  <Text>{attendanceRecords.length} attendee(s)</Text>
+                </Badge>
+              </HStack>
+              <Divider className="my-4 bg-transparent" />
+
+              <ActionsheetFlatList
+                data={attendanceRecords}
+                renderItem={({ item }) => (
+                  <Item {...(item as AttendanceRecord)} />
+                )}
+                keyExtractor={(item, _index) => (item as AttendanceRecord).id}
+              />
+            </Box>
+          </ActionsheetContent>
+        </Actionsheet>
+      </KeyboardAvoidingView>
+    </>
+  );
+};
+
+export default ScanAttendance;
+
+const screenHeight = Dimensions.get("window").height;
