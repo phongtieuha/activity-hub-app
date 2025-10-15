@@ -4,7 +4,7 @@ import axios, { type AxiosRequestConfig } from "axios";
 import { serializeToQueryString } from "./forms";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: "http://192.168.1.174:9100",
+  baseURL: "http://192.168.1.150:9100",
 }); // use your own URL here or environment variable
 AXIOS_INSTANCE.defaults.xsrfCookieName = undefined;
 AXIOS_INSTANCE.defaults.xsrfHeaderName = undefined;
@@ -91,7 +91,7 @@ AXIOS_INSTANCE.interceptors.response.use(
   },
 
   (error: any) => {
-    console.error("Error response:", error, error.response);
+    // console.error("Error response:", error, error.response);
     // hide loader if we showed it
     try {
       const config = error?.config || {};

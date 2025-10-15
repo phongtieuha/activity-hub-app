@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tonytieuhaphong.onensbookingdemoapp"
+      "bundleIdentifier": "com.tonytieuhaphong.onensbookingdemoapp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan QR codes for attendance tracking."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -27,6 +30,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "This app uses the camera to scan QR codes for attendance tracking."
+        }
+      ],
       [
         "expo-splash-screen",
         {

@@ -4,7 +4,6 @@ import {
   getById,
 } from "@/__generated-client/http-client-integration";
 import DetailsCard from "@/components/app/DetailsCard";
-import { useGlobalLoading } from "@/components/GlobalLoading";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {
   Actionsheet,
@@ -27,6 +26,7 @@ import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { differenceInHours } from "@/hooks/date-formatter";
@@ -40,25 +40,23 @@ import {
   FileIcon,
   LoaderIcon,
   QrCodeIcon,
-  ScanQrCodeIcon,
   ScrollTextIcon,
-  UserPenIcon,
 } from "lucide-react-native";
 import { DateTime } from "luxon";
 import React, { useEffect, useMemo } from "react";
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, ScrollView, StyleSheet } from "react-native";
 
 const ViewActivity = () => {
   // 1) Navigation & globals
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const loading = useGlobalLoading();
 
   // 2) Refs (device brightness)
   const originalBrightnessRef = React.useRef<number | null>(null);
 
   // 3) UI state
   const [refreshing, setRefreshing] = React.useState(false);
+  const [isFetchingData, setIsFetchingData] = React.useState(false);
   const [showQRActionsheet, setShowQRActionsheet] = React.useState(false);
 
   // 4) Data state
@@ -109,14 +107,14 @@ const ViewActivity = () => {
 
   // Extract fetch logic for reuse
   const fetchData = React.useCallback(async () => {
-    loading.show("Loading activity...");
+    setIsFetchingData(true);
     try {
       const detailResp = await getById(id as string);
       setActivityDetails(detailResp?.data);
     } finally {
-      loading.hide();
+      setIsFetchingData(false);
     }
-  }, [id, loading]);
+  }, [id]);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
@@ -165,11 +163,10 @@ const ViewActivity = () => {
   return (
     <>
       <ParallaxScrollView
-        className="bg-gray-900"
         contentContainerClassName="relative flex-1"
         headerImage={
           <Image
-            source={require("@/assets/images/soliders-outdoor.png")}
+            source={require("@/assets/images/soliders-outdoor-dark-2.png")}
             style={styles.reactLogo}
           />
         }
@@ -182,100 +179,131 @@ const ViewActivity = () => {
         >
           <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
         </Pressable>
+
+        <Image
+          source={require("@/assets/images/soliders-outdoor-dark-bg.png")}
+          style={{
+            width: screenWidth,
+            height: screenHeight,
+            position: "absolute",
+            top: screenHeight * 0.3 - 50,
+            left: 0,
+          }}
+        />
+
         {activityDetails && (
-          <Box style={styles.contentCard}>
+          <AnimatedCard
+            style={styles.contentCard}
+            className="rounded-3xl bg-white flex-1 pb-8 p-4"
+          >
             <DetailsCard activityDetails={activityDetails} />
-          </Box>
+
+            <Divider className="h-8 bg-transparent" />
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <AnimatedCard delay={cardFadeDelay}>
+                <HStack space="xl" className=" justify-start">
+                  <Pressable
+                    onPress={handleRegisterAttendance}
+                    className="min-w-[31.5%]"
+                  >
+                    <VStack className="py-4 px-6 border border-gray-200 items-center justify-center rounded-3xl gap-2">
+                      <Center className="bg-red-100 p-2 rounded-full">
+                        <Icon
+                          as={QrCodeIcon}
+                          className="text-red-600 !size-5"
+                        />
+                      </Center>
+                      <Center>
+                        <Text className="text-gray-900 font-semibold">
+                          Generate
+                        </Text>
+                        <Text className="text-gray-900 font-semibold">QR</Text>
+                      </Center>
+                    </VStack>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => router.push(`../documents/${id}`)}
+                    className="min-w-[31.5%]"
+                  >
+                    <VStack className="py-4 px-6 border border-gray-200 items-center justify-center rounded-3xl gap-2">
+                      <Center className="bg-red-100 p-2 rounded-full">
+                        <Icon as={FileIcon} className="text-red-600 !size-5" />
+                      </Center>
+                      <Center>
+                        <Text className="text-gray-900 font-semibold">
+                          View
+                        </Text>
+                        <Text className="text-gray-900 font-semibold">
+                          Documents
+                        </Text>
+                      </Center>
+                    </VStack>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => router.push(`../manage-activity/${id}`)}
+                    className="min-w-[31.5%]"
+                  >
+                    <VStack className="py-4 px-6 border border-gray-200 items-center justify-center rounded-3xl gap-2">
+                      <Center className="bg-red-100 p-2 rounded-full">
+                        <Icon
+                          as={ScrollTextIcon}
+                          className="text-red-600 !size-5"
+                        />
+                      </Center>
+                      <Center>
+                        <Text className="text-gray-900 font-semibold">
+                          Manage
+                        </Text>
+                        <Text className="text-gray-900 font-semibold">
+                          Activity
+                        </Text>
+                      </Center>
+                    </VStack>
+                  </Pressable>
+                </HStack>
+              </AnimatedCard>
+            </ScrollView>
+
+            <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
+              <VStack space="xl">
+                <Pressable
+                  onPress={() => router.push(`../scan-attendance/${id}`)}
+                >
+                  <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                    {/* <Icon
+                      as={ScanQrCodeIcon}
+                      className="text-red-600 !size-5"
+                    /> */}
+                    <Text className="text-red-600 font-semibold">Scan QR</Text>
+                  </HStack>
+                </Pressable>
+                <Pressable
+                  onPress={() => router.push(`../update-attendance/${id}`)}
+                >
+                  <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                    {/* <Icon as={UserPenIcon} className="text-white !size-5" /> */}
+                    <Text className="text-white font-semibold">
+                      Update Attendance
+                    </Text>
+                  </HStack>
+                </Pressable>
+              </VStack>
+            </AnimatedCard>
+          </AnimatedCard>
         )}
-        <Divider className="my-4 bg-transparent" />
-        <VStack space="4xl" className="px-4" style={styles.buttonSection}>
-          <AnimatedCard delay={cardFadeDelay}>
-            <HStack space="4xl" className=" justify-start">
-              <Button
-                size="sm"
-                variant="link"
-                action="secondary"
-                className="flex flex-col h-fit"
-                onPress={() => router.push(`../documents/${id}`)}
-              >
-                <Box className="rounded-full bg-gray-300/90 p-3">
-                  <Icon as={FileIcon} className="size-10 text-gray-700" />
-                </Box>
 
-                <VStack className=" items-center">
-                  <ButtonText className="text-gray-300">View</ButtonText>
-                  <ButtonText className="text-gray-300">Documents</ButtonText>
-                </VStack>
-              </Button>
-              <Button
-                size="sm"
-                variant="link"
-                action="secondary"
-                className="flex flex-col h-fit"
-                onPress={() => router.push(`../manage-activity/${id}`)}
-              >
-                <Box className="rounded-full bg-gray-300/90 p-3">
-                  <Icon as={ScrollTextIcon} className="size-10 text-gray-700" />
-                </Box>
-                <VStack className=" items-center">
-                  <ButtonText className="text-gray-300">Manage</ButtonText>
-                  <ButtonText className="text-gray-300">Activity</ButtonText>
-                </VStack>
-              </Button>
-            </HStack>
+        {isFetchingData && (
+          <AnimatedCard
+            style={styles.contentCard}
+            className="rounded-3xl bg-white flex-1 pb-8 gap-5 p-4"
+          >
+            <Skeleton className="h-[100px] rounded-3xl" />
+            <SkeletonText _lines={10} className="h-5 rounded-3xl" />
           </AnimatedCard>
-          <Divider />
-          <AnimatedCard delay={cardFadeDelay * 2}>
-            <HStack className="justify-start pl-4 gap-10">
-              <Button
-                size="sm"
-                variant="link"
-                action="secondary"
-                className="flex flex-col h-fit"
-                onPress={() => router.push(`../scan-attendance/${id}`)}
-              >
-                <Box className="rounded-full bg-gray-300/90 p-3">
-                  <Icon as={ScanQrCodeIcon} className="size-10 text-gray-700" />
-                </Box>
-                <VStack className=" items-center">
-                  <ButtonText className="text-gray-300">Scan</ButtonText>
-                  <ButtonText className="text-gray-300">QR</ButtonText>
-                </VStack>
-              </Button>
-              <Button
-                size="sm"
-                variant="link"
-                action="secondary"
-                className="flex flex-col h-fit"
-                onPress={handleRegisterAttendance}
-              >
-                <Box className="rounded-full bg-gray-300/90 p-3">
-                  <Icon as={QrCodeIcon} className="size-10 text-gray-700" />
-                </Box>
-                <VStack className=" items-center">
-                  <ButtonText className="text-gray-300">Generate</ButtonText>
-                  <ButtonText className="text-gray-300">QR</ButtonText>
-                </VStack>
-              </Button>
-              <Button
-                size="sm"
-                variant="link"
-                action="secondary"
-                className="flex flex-col h-fit"
-                onPress={() => router.push(`../update-attendance/${id}`)}
-              >
-                <Box className="rounded-full bg-gray-300/90 p-3">
-                  <Icon as={UserPenIcon} className="size-10 text-gray-700" />
-                </Box>
-
-                <VStack className=" items-center">
-                  <ButtonText className="text-gray-300">Update</ButtonText>
-                  <ButtonText className="text-gray-300">Attendance</ButtonText>
-                </VStack>
-              </Button>
-            </HStack>
-          </AnimatedCard>
-        </VStack>
+        )}
       </ParallaxScrollView>
 
       <Actionsheet
@@ -292,7 +320,7 @@ const ViewActivity = () => {
               Attendance QR Code
             </Heading>
             <Text size="md" className="text-center">
-              For participants to scan test
+              For participants to scan
             </Text>
             <Divider className="my-4 bg-transparent" />
             <Box className="relative">
@@ -328,11 +356,10 @@ const ViewActivity = () => {
             <Button
               onPress={handleCloseQRActionsheet}
               size="lg"
-              className=""
               variant="outline"
               action="secondary"
             >
-              <ButtonText>CLOSE</ButtonText>
+              <ButtonText>Close</ButtonText>
             </Button>
           </VStack>
         </ActionsheetContent>
@@ -348,13 +375,11 @@ const screenWidth = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   contentCard: {
-    position: "absolute",
     width: screenWidth,
-    top: screenHeight * (0.3 / 2),
-    left: 0,
+    marginTop: -(screenHeight * 0.1),
   },
   buttonSection: {
-    marginTop: screenHeight * (0.3 / 2),
+    //marginTop: screenHeight * (0.3 / 2),
   },
   reactLogo: {
     height: screenHeight * 0.3,

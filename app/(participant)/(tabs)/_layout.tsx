@@ -3,6 +3,7 @@ import { Icon } from "@/components/ui/icon";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useTabBar } from "@/hooks/useTabBar";
 import { Tabs } from "expo-router";
 import {
   FolderIcon,
@@ -15,6 +16,7 @@ import { Platform } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { tabBarBottom } = useTabBar();
 
   return (
     <Tabs
@@ -27,6 +29,18 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: "absolute",
+            width: "70%",
+            height: 55,
+            marginBottom: 20,
+            marginLeft: "15%",
+            borderColor: "transparent",
+            bottom: tabBarBottom,
+
+            shadowColor: "#222",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.35,
+            shadowRadius: 14,
+            elevation: 12,
           },
           default: {},
         }),

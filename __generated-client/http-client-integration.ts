@@ -143,6 +143,7 @@ export interface ActivityResponseDto {
   name?: string;
   slug?: string;
   description?: string;
+  remarks?: string;
   startDate?: string;
   endDate?: string;
   location?: string;

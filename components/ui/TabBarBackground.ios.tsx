@@ -9,8 +9,15 @@ export default function BlurTabBarBackground() {
       // and matches the native tab bar appearance on iOS.
       tint="light"
       intensity={100}
-      style={[StyleSheet.absoluteFill, { borderColor: "transparent" }]}
-    />
+      style={[
+        StyleSheet.absoluteFill,
+        { borderColor: "transparent" },
+        {
+          borderRadius: 27,
+          overflow: "hidden",
+        },
+      ]}
+    ></BlurView>
   );
 }
 

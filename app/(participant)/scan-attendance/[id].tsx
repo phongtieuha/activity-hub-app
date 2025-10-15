@@ -20,8 +20,8 @@ import { Heading } from "@/components/ui/heading";
 import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
 import { formatDate, formatTime } from "@/hooks/date-formatter";
+import { useNotification } from "@/hooks/useNotification";
 import { QrPayload } from "@/models/qr";
 import { useRouter } from "expo-router";
 import { CheckCircleIcon } from "lucide-react-native";
@@ -32,7 +32,7 @@ import { Dimensions, KeyboardAvoidingView, Platform, View } from "react-native";
 const ScanAttendance = () => {
   // 1) Navigation & utilities
   const router = useRouter();
-  const toast = useToast();
+  const { showNotification } = useNotification();
 
   // 2) State
   const [showActionsheet, setShowActionsheet] = React.useState(false);
@@ -42,28 +42,6 @@ const ScanAttendance = () => {
 
   // 3) Handlers
   const handleCloseActionSheet = () => setShowActionsheet(false);
-
-  // 4) Helpers
-  const showNewToast = (
-    message = "",
-    action: "error" | "warning" | "success" = "success"
-  ) => {
-    const newId = Math.random();
-
-    toast.show({
-      id: newId.toString(),
-      placement: "top",
-      duration: 3000,
-      render: ({ id }) => {
-        const uniqueToastId = "toast-" + id;
-        return (
-          <Toast nativeID={uniqueToastId} action={action} variant="solid">
-            <ToastTitle>{message}</ToastTitle>
-          </Toast>
-        );
-      },
-    });
-  };
 
   // 5) QR scan handler
   const onQrScanned = async (data: string) => {
@@ -90,7 +68,7 @@ const ScanAttendance = () => {
       setScanQrResponseDto(result);
       setShowActionsheet(true);
     } catch (error: any) {
-      showNewToast(error.message || "Error scanning QR", "error");
+      showNotification(error.message || "Error scanning QR", "error");
     }
     setIsScanningInProgress(false);
   };
@@ -143,16 +121,7 @@ const ScanAttendance = () => {
                   {formatTime(scanQrResponseDto?.attendanceTakenAt!)}
                 </Heading>
               </AnimatedCard>
-              {/* 
-              <AnimatedCard delay={cardFadeDelay * 3}>
-                <Divider className="my-4 bg-transparent" />
-                <Text
-                  size="xl"
-                  className="font-semibold text-center text-white"
-                >
-                  Maju Camp
-                </Text>
-              </AnimatedCard> */}
+
               <Divider className="my-4 bg-transparent" />
 
               <Box className="mt-auto w-full">
@@ -161,9 +130,9 @@ const ScanAttendance = () => {
                     onPress={() => router.back()}
                     size="lg"
                     variant="outline"
-                    action="secondary"
+                    action="default"
                   >
-                    <ButtonText className="text-white">CLOSE</ButtonText>
+                    <ButtonText className="text-white">Close</ButtonText>
                   </Button>
                 </AnimatedCard>
               </Box>

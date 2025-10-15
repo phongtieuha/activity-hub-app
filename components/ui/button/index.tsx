@@ -37,7 +37,7 @@ cssInterop(PrimitiveIcon, {
 });
 
 const buttonStyle = tva({
-  base: "group/button rounded bg-primary-500 flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2",
+  base: "group/button rounded-3xl bg-primary-500 flex-row items-center justify-center data-[focus-visible=true]:web:outline-none data-[focus-visible=true]:web:ring-2 data-[disabled=true]:opacity-40 gap-2",
   variants: {
     action: {
       primary:
@@ -49,7 +49,7 @@ const buttonStyle = tva({
       negative:
         "bg-error-500 border-error-300 data-[hover=true]:bg-error-600 data-[hover=true]:border-error-400 data-[active=true]:bg-error-700 data-[active=true]:border-error-500 data-[focus-visible=true]:web:ring-indicator-info",
       default:
-        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent",
+        "bg-transparent data-[hover=true]:bg-background-50 data-[active=true]:bg-transparent border border-gray-300",
     },
     variant: {
       link: "px-0",
@@ -119,7 +119,7 @@ const buttonStyle = tva({
 });
 
 const buttonTextStyle = tva({
-  base: "text-typography-0 font-semibold web:select-none",
+  base: "font-semibold web:select-none",
   parentVariants: {
     action: {
       primary:
@@ -134,8 +134,7 @@ const buttonTextStyle = tva({
     variant: {
       link: "data-[hover=true]:underline data-[active=true]:underline",
       outline: "",
-      solid:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+      solid: "",
     },
     size: {
       xs: "text-xs",
@@ -192,7 +191,7 @@ const buttonTextStyle = tva({
       variant: "outline",
       action: "negative",
       class:
-        "text-primary-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-500",
+        "text-error-500 data-[hover=true]:text-error-500 data-[active=true]:text-error-500",
     },
   ],
 });

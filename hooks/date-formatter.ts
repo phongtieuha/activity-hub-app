@@ -1,5 +1,41 @@
 import { DateTime } from "luxon";
 
+/**
+ * Groups activities by all the single dates between startDate and endDate (inclusive),
+ * then orders the groups by date key ascending.
+ */
+export function groupActivitiesByDateRangeOrdered<
+  T extends { startDate?: string; endDate?: string }
+>(scheduledActivities: T[]): Record<string, T[]> {
+  const grouped: Record<string, T[]> = {};
+  scheduledActivities.forEach((activity) => {
+    const startDate = activity.startDate!.split("T")[0];
+    const endDate = activity.endDate!.split("T")[0];
+
+    const currentDate = new Date(startDate);
+    const end = new Date(endDate);
+
+    while (currentDate <= end) {
+      const dateKey = currentDate.toISOString().split("T")[0];
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(activity);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  });
+  const ordered = Object.entries(grouped)
+    .sort(
+      ([dateA], [dateB]) =>
+        new Date(dateA).getTime() - new Date(dateB).getTime()
+    )
+    .reduce((acc, [date, activities]) => {
+      acc[date] = activities;
+      return acc;
+    }, {} as Record<string, T[]>);
+  return ordered;
+}
+
 export const DATE_FORMAT = "dd LLL yyyy";
 export const DATE_TIME_FORMAT = "dd LLL yyyy hh':'mm a";
 export const DATE_FULL_FORMAT = "dd LLLL yyyy";
@@ -7,6 +43,10 @@ export const DATEPICKER_FORMAT = "yyyy-LL-dd";
 
 export function formatDate(date: string) {
   return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat(DATE_FORMAT);
+}
+
+export function formatShortDate(date: string) {
+  return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("dd LLL");
 }
 
 export function formatDateTime(date: string) {
@@ -51,6 +91,13 @@ export function formatDayInWord(date: string): string {
     .toUpperCase();
 }
 
+export function formatDayInFullWord(date: string): string {
+  return DateTime.fromISO(date)
+    .setZone("Asia/Singapore")
+    .toFormat("cccc")
+    .toUpperCase();
+}
+
 export function formatMonth(date: string): string {
   return DateTime.fromISO(date)
     .setZone("Asia/Singapore")
@@ -60,6 +107,12 @@ export function formatMonth(date: string): string {
 
 export function formatTime(date: string): string {
   return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("hh:mm a");
+}
+
+export function formatSlotTime(date: string): string {
+  return DateTime.fromJSDate(
+    new Date(date.endsWith("Z") ? date.slice(0, -1) : date)
+  ).toFormat("hh:mm a");
 }
 
 export function differenceInHours(d1: DateTime, d2: DateTime): string {

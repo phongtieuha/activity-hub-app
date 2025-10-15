@@ -125,7 +125,7 @@ export default function TabFourScreen() {
   return (
     <>
       <SafeAreaView className="px-4">
-        <Card>
+        <Card className="rounded-3xl">
           <ActionsheetSectionList
             sections={DATA}
             keyExtractor={(item, index) => (item as SectionItem).title + index}
@@ -185,11 +185,10 @@ export default function TabFourScreen() {
               <Button
                 onPress={handleCloseQRActionsheet}
                 size="lg"
-                className=""
                 variant="outline"
-                action="secondary"
+                action="default"
               >
-                <ButtonText>CLOSE</ButtonText>
+                <ButtonText>Close</ButtonText>
               </Button>
             </VStack>
           </ActionsheetContent>

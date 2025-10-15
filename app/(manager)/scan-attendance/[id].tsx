@@ -7,7 +7,6 @@ import {
   ScanQrResponseDto,
 } from "@/__generated-client/http-client-integration";
 import QrScanPreview from "@/components/app/QrScanPreview";
-import { useGlobalLoading } from "@/components/GlobalLoading";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -27,9 +26,9 @@ import { HStack } from "@/components/ui/hstack";
 import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
 import { formatTime } from "@/hooks/date-formatter";
+import { useNotification } from "@/hooks/useNotification";
 import { QrPayload } from "@/models/qr";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { DateTime } from "luxon";
@@ -52,8 +51,7 @@ const ScanAttendance = () => {
   // 1) Navigation & utilities
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const toast = useToast();
-  const loading = useGlobalLoading();
+  const { showNotification } = useNotification();
 
   // 2) UI state
   const [showActionsheet, setShowActionsheet] = React.useState(false);
@@ -103,27 +101,6 @@ const ScanAttendance = () => {
   const handleCloseActionSheet = () => setShowActionsheet(false);
   const handleCloseAttendanceSheet = () => setShowAttendanceSheet(false);
 
-  const showNewToast = (
-    message = "",
-    action: "error" | "warning" | "success" = "success"
-  ) => {
-    const newId = Math.random();
-
-    toast.show({
-      id: newId.toString(),
-      placement: "top",
-      duration: 3000,
-      render: ({ id }) => {
-        const uniqueToastId = "toast-" + id;
-        return (
-          <Toast nativeID={uniqueToastId} action={action} variant="solid">
-            <ToastTitle>{message}</ToastTitle>
-          </Toast>
-        );
-      },
-    });
-  };
-
   // 8) Item renderer
   const Item = React.useCallback(
     ({ name, attendAt }: AttendanceRecord) => (
@@ -160,11 +137,7 @@ const ScanAttendance = () => {
       },
     };
     try {
-      loading.show("Loading activities...");
-
-      const result = await scanQr(payload, {
-        headers: { "x-disable-global-loading": "true" },
-      });
+      const result = await scanQr(payload);
 
       if (result.newParticipant) {
         setScanQrResponseDto(result);
@@ -185,9 +158,7 @@ const ScanAttendance = () => {
         setShowAttendanceSheet(true);
       }
     } catch (error: any) {
-      showNewToast(error.message || "Error scanning QR", "error");
-    } finally {
-      loading.hide();
+      showNotification(error.message || "Error scanning QR", "error");
     }
     setIsScanningInProgress(false);
   };
@@ -214,7 +185,10 @@ const ScanAttendance = () => {
       );
       setShowAttendanceSheet(true);
     } catch (error: any) {
-      showNewToast(error.message || "Error adding new participant", "error");
+      showNotification(
+        error.message || "Error adding new participant",
+        "error"
+      );
     }
   };
 
@@ -259,15 +233,15 @@ const ScanAttendance = () => {
                   action="negative"
                   onPress={() => handleAddNewParticipant()}
                 >
-                  <ButtonText className="text-white">CONFIRM</ButtonText>
+                  <ButtonText className="text-white">Confirm</ButtonText>
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  action="secondary"
+                  action="default"
                   onPress={handleCloseActionSheet}
                 >
-                  <ButtonText>CANCEL</ButtonText>
+                  <ButtonText>Cancel</ButtonText>
                 </Button>
               </VStack>
             </VStack>

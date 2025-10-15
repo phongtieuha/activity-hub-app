@@ -1,17 +1,14 @@
 import { ActivityListItemDto } from "@/__generated-client/http-client-integration";
+import { formatDate, formatTime } from "@/hooks/date-formatter";
 import {
-  formatDate,
-  formatDay,
-  formatMonth,
-  formatTime,
-} from "@/hooks/date-formatter";
-import { CalendarDaysIcon, MapPinIcon } from "lucide-react-native";
+  ArrowUpRight,
+  CalendarDaysIcon,
+  ClockIcon,
+  MapPinIcon,
+} from "lucide-react-native";
 import React from "react";
 import { Box } from "../ui/box";
 import { Card } from "../ui/card";
-import { Center } from "../ui/center";
-import { Divider } from "../ui/divider";
-import { Heading } from "../ui/heading";
 import { HStack } from "../ui/hstack";
 import { Icon } from "../ui/icon";
 import { Pressable } from "../ui/pressable";
@@ -26,56 +23,56 @@ interface IProps {
 const ScheduledCard: React.FC<IProps> = ({ onPress, activity }) => {
   return (
     <Pressable onPress={onPress}>
-      <Card size="md" variant="elevated" className="shadow-sm">
-        <HStack space="md">
-          <Card
-            size="sm"
-            variant="filled"
-            className="bg-gray-500 rounded-lg p-0 overflow-hidden"
-          >
-            <Center className="flex-1">
-              <Text
-                size="2xl"
-                className="font-bold text-white tracking-wide text-center"
-              >
-                {formatDay(activity.startDate!)}
-              </Text>
-              <Text size="md" className="font-bold text-white tracking-wide">
-                {formatMonth(activity.startDate!)}
-              </Text>
-            </Center>
-            <Box className="bg-black mt-auto px-2 py-1 font-semibold">
-              <Text size="sm" className="text-white">
-                {formatTime(activity.startDate!)}
-              </Text>
-            </Box>
-          </Card>
+      <Card
+        size="md"
+        variant="elevated"
+        className="rounded-3xl bg-gray-50"
+        style={{ position: "relative" }}
+      >
+        <ArrowUpRight
+          color="#9ca3af"
+          style={{ position: "absolute", right: 16, bottom: 16 }}
+        />
+        <VStack className="gap-[2px]">
+          <HStack space="sm" className="text-typography-500 items-center">
+            <Icon as={ClockIcon} className="text-typography-500 !size-4 " />
+            <Text size="sm" className="font-semibold">
+              {formatTime(activity.startDate!)} -{" "}
+              {formatTime(activity.endDate!)}
+            </Text>
+          </HStack>
+
           <Box>
-            <Text
-              size="sm"
-              className="font-bold text-typography-600 tracking-wide"
-            >
+            <HStack space="sm" className="text-typography-300 items-center">
+              <Box className="size-2 rounded-full bg-blue-600 mx-1" />
+              <Text size="sm" className="font-bold text-blue-600 tracking-wide">
+                {activity.timeline}
+              </Text>
+            </HStack>
+
+            <Text size="md" className="font-extrabold text-typography-900">
               {activity.name}
             </Text>
-            <Heading size="md" className="font-extrabold">
-              {activity.timeline}
-            </Heading>
-            <Divider className="my-1 bg-transparent" />
-            <VStack space="xs">
-              <HStack space="sm" className="text-typography-500">
-                <Icon as={CalendarDaysIcon} className="text-typography-500" />
-                <Text size="sm">
-                  {formatDate(activity.startDate!)} -{" "}
-                  {formatDate(activity.endDate!)}
-                </Text>
-              </HStack>
-              <HStack space="sm" className="text-typography-500">
-                <Icon className="text-typography-500" as={MapPinIcon} />
-                <Text size="sm">{activity.location}</Text>
-              </HStack>
-            </VStack>
           </Box>
-        </HStack>
+
+          <HStack space="sm" className="text-typography-500 items-center">
+            <Icon
+              as={CalendarDaysIcon}
+              className="text-typography-500 !size-4"
+            />
+            <Text size="sm">
+              {formatDate(activity.startDate!)}
+              {formatDate(activity.endDate!) !== formatDate(activity.startDate!)
+                ? ` - ${formatDate(activity.endDate!)}`
+                : ""}
+            </Text>
+          </HStack>
+
+          <HStack space="sm" className="text-typography-500 items-center">
+            <Icon className="text-typography-500 !size-4" as={MapPinIcon} />
+            <Text size="sm">{activity.location}</Text>
+          </HStack>
+        </VStack>
       </Card>
     </Pressable>
   );
