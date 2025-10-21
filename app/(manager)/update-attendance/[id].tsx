@@ -172,7 +172,7 @@ const UpdateAttendance = () => {
         payloadAttendanceStatus = EditAttendanceRequestDtoNewStatus.EXCUSED;
         break;
       case AttendanceStatus.FALL_OUT:
-        payloadAttendanceStatus = EditAttendanceRequestDtoNewStatus.FALLOUT;
+        payloadAttendanceStatus = EditAttendanceRequestDtoNewStatus.LATE;
         break;
       case AttendanceStatus.UNMARKED:
         payloadAttendanceStatus = EditAttendanceRequestDtoNewStatus.UNMARKED;
@@ -236,7 +236,7 @@ const UpdateAttendance = () => {
             case ActivityParticipantListItemDtoAttendanceStatus.EXCUSED:
               attendanceStatus = AttendanceStatus.EXCUSED;
               break;
-            case ActivityParticipantListItemDtoAttendanceStatus.FALLOUT:
+            case ActivityParticipantListItemDtoAttendanceStatus.LATE:
               attendanceStatus = AttendanceStatus.FALL_OUT;
               break;
             case ActivityParticipantListItemDtoAttendanceStatus.UNMARKED:

@@ -1,11 +1,14 @@
 import {
   ActivityResponseDto,
   ActivitySlotDto,
-  book,
-  change,
+  bookForSelf,
+  cancelBooking,
+  changeBooking,
   generateQr,
   getById,
+  getMe,
   listActivitiesAttended,
+  UserDto,
 } from "@/__generated-client/http-client-integration";
 import CalendarScreen from "@/components/app/Calendar";
 import DetailsCard from "@/components/app/DetailsCard";
@@ -84,6 +87,7 @@ const ViewActivity = () => {
   const [qrBase64String, setQrBase64String] = React.useState("");
   const [activityDetails, setActivityDetails] =
     React.useState<ActivityResponseDto>();
+  const [userDetails, setUserDetails] = React.useState<UserDto>();
   const [refreshing, setRefreshing] = React.useState(false);
   const [isFetchingData, setIsFetchingData] = React.useState(false);
   const [qrData, setQrData] = React.useState<QrPayload>();
@@ -93,9 +97,7 @@ const ViewActivity = () => {
   const [selectedSlots, setSelectedSlots] = React.useState<ActivitySlotDto>();
   const [selectedBookingDate, setSelectedBookingDate] =
     React.useState<string>();
-  const [bookingStep, setBookingStep] = React.useState<
-    "select" | "confirm" | "success"
-  >();
+  const [bookingStep, setBookingStep] = React.useState<"select" | "success">();
 
   const bookingSlotsGroupedByDateOrderedByDateKey = React.useMemo(() => {
     if (activityDetails?.bookingWindowRequired) {
@@ -142,14 +144,12 @@ const ViewActivity = () => {
         (slot) => slot.bookedByMe
       );
       if (!!existingBooking) {
-        await change({
-          activityId: id as string,
-          activitySlotId: selectedSlots?.activitySlotId!,
-          cancelActivityBookingId: existingBooking?.activitySlotId!,
-          cancelOnly: false,
+        await changeBooking(existingBooking?.activitySlotId!, {
+          newActivitySlotId: selectedSlots?.activitySlotId!,
+          userId: userDetails?.userId!,
         });
       } else {
-        await book({
+        await bookForSelf({
           activityId: id as string,
           activitySlotId: selectedSlots?.activitySlotId!,
         });
@@ -164,20 +164,16 @@ const ViewActivity = () => {
 
   const handleCancelBookingSheet = async (slot: ActivitySlotDto) => {
     try {
-      await change({
-        activityId: id as string,
-        cancelActivityBookingId: slot?.activitySlotId!,
-        cancelOnly: true,
-      });
+      await cancelBooking(slot?.activitySlotId!);
       await fetchData();
     } catch (error: any) {
       showNotification(error.message, "error");
     }
   };
 
-  const handleSelectBookingSheet = () => {
-    setBookingStep("confirm");
-  };
+  // const handleSelectBookingSheet = () => {
+  //   setBookingStep("confirm");
+  // };
 
   const onBookingDateSelected = (date: string) => {
     setSelectedBookingDate(date);
@@ -210,6 +206,9 @@ const ViewActivity = () => {
       const qrResp = await generateQr({
         type: "PARTICIPANT",
         activityId: id as string,
+        activitySlotId:
+          activityDetails?.slots?.find((x) => x.bookedByMe)?.activitySlotId ||
+          "",
       });
       setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
       setShowQRActionsheet(true);
@@ -237,6 +236,9 @@ const ViewActivity = () => {
         (x) => x.activityId === id && x.attendanceStatus === "PRESENT"
       );
       setHasAttendanceTaken(hasAttendanceTaken ?? false);
+
+      const userResp = await getMe();
+      setUserDetails(userResp);
     } finally {
       setIsFetchingData(false);
     }
@@ -320,9 +322,11 @@ const ViewActivity = () => {
           >
             <DetailsCard
               activityDetails={activityDetails}
-              showBookNowButton={registrationRequired && !alreadyRegistered}
+              showBookNowButton={true}
               showBookedSlots
-              showCancelButton={!hasAttendanceTaken}
+              showCancelButton={
+                activityDetails.participationType === "ELECTIVE"
+              }
               onBookNowPress={handlepOpenBookingSheet}
               onCancelBookingPress={handleCancelBookingSheet}
             />
@@ -461,72 +465,47 @@ const ViewActivity = () => {
                 space="xl"
                 style={{ height: screenHeight * 0.85 }}
               >
-                {bookingStep === "select" && (
-                  <>
-                    <Heading size="xl" className="font-bold">
-                      Select a date
-                    </Heading>
-                    <CalendarScreen
-                      enabledDates={enabledDates}
-                      selectedDate={selectedBookingDate}
-                      onDateSelected={onBookingDateSelected}
-                      highAvailabilityDates={[enabledDates[0]]}
-                      lowAvailabilityDates={[enabledDates[1]]}
-                      minDate={(() => {
-                        const keys = Object.keys(
-                          bookingSlotsGroupedByDateOrderedByDateKey
-                        );
-                        if (keys.length === 0) return undefined;
-                        const firstDate = keys[0];
-                        return (
-                          DateTime.fromISO(firstDate)
-                            .startOf("month")
-                            .toISODate() || undefined
-                        );
-                      })()}
-                      maxDate={(() => {
-                        const keys = Object.keys(
-                          bookingSlotsGroupedByDateOrderedByDateKey
-                        );
-                        if (keys.length === 0) return undefined;
-                        const lastDate = keys[keys.length - 1];
-                        return (
-                          DateTime.fromISO(lastDate)
-                            .endOf("month")
-                            .toISODate() || undefined
-                        );
-                      })()}
-                    />
-                    <VStack space="md" className="mt-auto">
-                      <Button
-                        size="lg"
-                        action={!selectedBookingDate ? "secondary" : "negative"}
-                        onPress={handleSelectBookingSheet}
-                        disabled={!selectedBookingDate}
-                      >
-                        <ButtonText className="">Continue</ButtonText>
-                      </Button>
-                      <Button
-                        size="lg"
-                        action="default"
-                        onPress={handlepCloseBookingSheet}
-                      >
-                        <ButtonText>Cancel</ButtonText>
-                      </Button>
-                    </VStack>
-                  </>
-                )}
-
-                {bookingStep === "confirm" && (
-                  <>
-                    <Heading size="xl" className="font-bold">
-                      Select a slot
-                    </Heading>
-
-                    <ScrollView
-                      className="w-full h-1/2"
-                      stickyHeaderIndices={[0]}
-                    >
+                <Heading size="xl" className="font-bold">
+                  Select a slot
+                </Heading>
+                <ScrollView
+                  className="flex-1"
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  showsVerticalScrollIndicator={true}
+                >
+                  <CalendarScreen
+                    enabledDates={enabledDates}
+                    selectedDate={selectedBookingDate}
+                    onDateSelected={onBookingDateSelected}
+                    highAvailabilityDates={[enabledDates[0]]}
+                    lowAvailabilityDates={[enabledDates[1]]}
+                    minDate={(() => {
+                      const keys = Object.keys(
+                        bookingSlotsGroupedByDateOrderedByDateKey
+                      );
+                      if (keys.length === 0) return undefined;
+                      const firstDate = keys[0];
+                      return (
+                        DateTime.fromISO(firstDate)
+                          .startOf("month")
+                          .toISODate() || undefined
+                      );
+                    })()}
+                    maxDate={(() => {
+                      const keys = Object.keys(
+                        bookingSlotsGroupedByDateOrderedByDateKey
+                      );
+                      if (keys.length === 0) return undefined;
+                      const lastDate = keys[keys.length - 1];
+                      return (
+                        DateTime.fromISO(lastDate).endOf("month").toISODate() ||
+                        undefined
+                      );
+                    })()}
+                  />
+                  {selectedBookingDate && (
+                    <>
+                      <Divider className="h-4 bg-transparent" />
                       <Text size="md" className="font-bold bg-white py-2 ">
                         {formatDayInWord(selectedBookingDate!)},{" "}
                         {formatDate(selectedBookingDate!)}
@@ -610,29 +589,28 @@ const ViewActivity = () => {
                           )}
                         />
                       </RadioGroup>
-                    </ScrollView>
+                    </>
+                  )}
+                </ScrollView>
 
-                    <VStack space="md" className="mt-auto">
-                      <Button
-                        size="lg"
-                        variant="solid"
-                        action={!selectedSlots ? "secondary" : "negative"}
-                        onPress={handleBookBookingSheet}
-                        disabled={!selectedSlots?.activitySlotId}
-                      >
-                        <ButtonText className="">Book</ButtonText>
-                      </Button>
-                      <Button
-                        size="lg"
-                        action="default"
-                        onPress={handlepCloseBookingSheet}
-                      >
-                        <ButtonText>Cancel</ButtonText>
-                      </Button>
-                    </VStack>
-                  </>
-                )}
-                <Divider className="h-4 bg-transparent" />
+                <VStack space="md" className="mt-auto">
+                  <Button
+                    size="lg"
+                    variant="solid"
+                    action={!selectedSlots ? "secondary" : "negative"}
+                    onPress={handleBookBookingSheet}
+                    disabled={!selectedSlots?.activitySlotId}
+                  >
+                    <ButtonText className="">Book</ButtonText>
+                  </Button>
+                  <Button
+                    size="lg"
+                    action="default"
+                    onPress={handlepCloseBookingSheet}
+                  >
+                    <ButtonText>Cancel</ButtonText>
+                  </Button>
+                </VStack>
               </VStack>
             </ActionsheetContent>
           ) : (

@@ -1,10 +1,9 @@
 import {
-  addNewWalkInParticipant,
-  AddNewWalkInParticipantRequestDto,
   list2,
   scanQr,
   ScanQrRequestDto,
   ScanQrResponseDto,
+  scanWalkInQr,
 } from "@/__generated-client/http-client-integration";
 import QrScanPreview from "@/components/app/QrScanPreview";
 import {
@@ -31,7 +30,6 @@ import { formatTime } from "@/hooks/date-formatter";
 import { useNotification } from "@/hooks/useNotification";
 import { QrPayload } from "@/models/qr";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { DateTime } from "luxon";
 import React, { useRef } from "react";
 import {
   Dimensions,
@@ -59,6 +57,7 @@ const ScanAttendance = () => {
   const [attendanceSheetHeight, setAttendanceSheetHeight] = React.useState(
     screenHeight * 0.3
   );
+  const [scannedQrString, setScannedQrString] = React.useState("");
 
   // 3) Data state
   const [attendanceRecords, setAttendanceRecords] = React.useState<
@@ -118,6 +117,7 @@ const ScanAttendance = () => {
 
   // 9) Handlers
   const onQrScanned = async (data: string) => {
+    setScannedQrString(data);
     if (isScanningInProgress) {
       return;
     }
@@ -125,16 +125,7 @@ const ScanAttendance = () => {
     const parsedData: QrPayload = JSON.parse(data);
 
     const payload: ScanQrRequestDto = {
-      activityId: id as string,
-      activityQrDto: {
-        ...parsedData,
-        generatedAt: DateTime.fromSeconds(parsedData.generatedAt)
-          .toUTC()
-          .toISO()!,
-        validUntil: DateTime.fromSeconds(parsedData.validUntil)
-          .toUTC()
-          .toISO()!,
-      },
+      token: data,
     };
     try {
       const result = await scanQr(payload);
@@ -164,12 +155,10 @@ const ScanAttendance = () => {
   };
 
   const handleAddNewParticipant = async () => {
-    const payload: AddNewWalkInParticipantRequestDto = {
-      activityId: id as string,
-      newParticipantUserId: scanQrResponseDto?.userId || "",
-    };
     try {
-      await addNewWalkInParticipant(payload);
+      await scanWalkInQr({
+        token: scannedQrString,
+      });
 
       const participantsResp = await list2(id as string, {
         pageNumber: 1,

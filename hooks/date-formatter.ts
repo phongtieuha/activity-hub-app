@@ -116,6 +116,11 @@ export function formatSlotTime(date: string): string {
 }
 
 export function differenceInHours(d1: DateTime, d2: DateTime): string {
+  console.log(
+    d1.setZone("Asia/Singapore").toFormat(DATE_TIME_FORMAT),
+    d2.setZone("Asia/Singapore").toFormat(DATE_TIME_FORMAT)
+  );
+
   const diff = d2.diff(d1, ["hours", "minutes", "seconds"]).toObject();
   const pad = (n: number) => n.toString().padStart(2, "0");
   const intMinutes = diff.minutes !== undefined ? Math.floor(diff.minutes) : 0;
@@ -125,4 +130,37 @@ export function differenceInHours(d1: DateTime, d2: DateTime): string {
   )}`;
 
   return diffStr;
+}
+
+/**
+ * Compares two dates and returns appropriate time display:
+ * - If event has passed (any date): returns "NOW"
+ * - If on the same date and time hasn't passed: returns "XH" (hours remaining)
+ * - If not on the same date and in future: returns "XD" (days remaining)
+ */
+export function getTimeUntilEvent(
+  eventDate: DateTime,
+  currentDate: DateTime
+): string {
+  // Ensure both dates are in Singapore timezone
+  const eventSGT = eventDate.setZone("Asia/Singapore");
+  const currentSGT = currentDate.setZone("Asia/Singapore");
+
+  // Check if event has passed (regardless of date)
+  if (eventSGT <= currentSGT) {
+    return "NOW";
+  }
+
+  // Check if they're on the same date
+  const sameDate = eventSGT.hasSame(currentSGT, "day");
+
+  if (sameDate) {
+    // Event is later today - return hours
+    const hoursDiff = Math.ceil(eventSGT.diff(currentSGT, "hours").hours);
+    return `IN ${hoursDiff}H`;
+  } else {
+    // Different dates - return days
+    const daysDiff = Math.ceil(eventSGT.diff(currentSGT, "days").days);
+    return `IN ${daysDiff}D`;
+  }
 }

@@ -159,6 +159,13 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
   }
   return (
     <>
+      <Badge action="error" size="lg" className="justify-center">
+        <BadgeText className="text-center">
+          This activity is {props.activityDetails.participationType}
+        </BadgeText>
+      </Badge>
+      <Divider className="h-1 bg-transparent" />
+
       <HStack className="items-center justify-between">
         <HStack space="sm" className="text-typography-300 items-center">
           <Box className="size-2 rounded-full bg-blue-600 mx-1" />
@@ -222,11 +229,11 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
 
         <Card className="p-4 rounded-3xl border border-gray-200 gap-3">
           <HStack className="justify-between">
-            <Heading className="font-semibold">Booking Status</Heading>
+            <Heading className="font-semibold">Booking Required</Heading>
 
             {props.activityDetails.bookingWindowRequired && (
               <Badge action="error">
-                <BadgeText>Required</BadgeText>
+                <BadgeText>Yes</BadgeText>
               </Badge>
             )}
             {!props.activityDetails.bookingWindowRequired && (
@@ -235,6 +242,7 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
               </Badge>
             )}
           </HStack>
+
           {props.activityDetails.bookingWindowRequired && (
             <>
               <Divider className="border border-gray-200 border-dashed bg-transparent" />
@@ -248,64 +256,59 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
                       props.activityDetails.bookingWindowStartDate!,
                       props.activityDetails.bookingWindowEndDate!
                     ))}
+            </>
+          )}
 
-              {props.showBookedSlots && (
-                <>
-                  <Divider className="border border-gray-200 border-dashed bg-transparent" />
-                  <VStack className="text-typography-300 items-start justify-center">
-                    <Text className="">Booked slot</Text>
-                    {bookedSlots.map((slot) => (
-                      <HStack
-                        key={slot.activitySlotId}
-                        className="justify-between items-center self-stretch"
+          {props.showBookedSlots && (
+            <>
+              <Divider className="border border-gray-200 border-dashed bg-transparent" />
+              <VStack className="text-typography-300 items-start justify-center">
+                <Text className="">Booked slot</Text>
+                {bookedSlots.map((slot) => (
+                  <HStack
+                    key={slot.activitySlotId}
+                    className="justify-between items-center self-stretch"
+                  >
+                    <Text className="text-typography-900 font-semibold text-base">
+                      {formatDayInWord(slot.startDate)},{" "}
+                      {formatShortDate(slot.startDate)},{" "}
+                      {formatSlotTime(slot.startDate)} -{" "}
+                      {formatSlotTime(slot.endDate)}
+                    </Text>
+                    {props.showCancelButton && (
+                      <Button
+                        size="xs"
+                        variant="outline"
+                        action="negative"
+                        onPress={() => handleCancelBooking(slot)}
                       >
-                        <Text className="text-typography-900 font-semibold text-base">
-                          {formatDayInWord(slot.startDate)},{" "}
-                          {formatShortDate(slot.startDate)},{" "}
-                          {formatSlotTime(slot.startDate)} -{" "}
-                          {formatSlotTime(slot.endDate)}
-                        </Text>
-                        {props.showCancelButton && (
-                          <Button
-                            size="xs"
-                            variant="outline"
-                            action="negative"
-                            onPress={() => handleCancelBooking(slot)}
-                          >
-                            <ButtonText>Cancel Booking</ButtonText>
-                          </Button>
-                        )}
-                      </HStack>
-                    ))}
-                    {bookedSlots.length === 0 && (
-                      <Text className="text-typography-900 font-semibold text-base">
-                        -
-                      </Text>
+                        <ButtonText>Cancel Booking</ButtonText>
+                      </Button>
                     )}
-                  </VStack>
-                </>
-              )}
+                  </HStack>
+                ))}
+                {bookedSlots.length === 0 && (
+                  <Text className="text-typography-900 font-semibold text-base">
+                    -
+                  </Text>
+                )}
+              </VStack>
+            </>
+          )}
 
-              {props.showBookNowButton && (
-                <>
-                  <Divider className="border border-gray-200 border-dashed bg-transparent" />
-                  <Pressable onPress={props.onBookNowPress}>
-                    <HStack className="bg-red-200 py-2 px-4 items-center justify-between rounded-3xl gap-2">
-                      <Icon
-                        as={BookCheckIcon}
-                        className="text-gray-900 !size-4"
-                      />
-                      <Text className="text-gray-900 font-semibold">
-                        Book now
-                      </Text>
-                      <Icon
-                        as={ChevronsRightIcon}
-                        className="text-gray-900 !size-5"
-                      />
-                    </HStack>
-                  </Pressable>
-                </>
-              )}
+          {props.showBookNowButton && (
+            <>
+              <Divider className="border border-gray-200 border-dashed bg-transparent" />
+              <Pressable onPress={props.onBookNowPress}>
+                <HStack className="bg-red-200 py-2 px-4 items-center justify-between rounded-3xl gap-2">
+                  <Icon as={BookCheckIcon} className="text-gray-900 !size-4" />
+                  <Text className="text-gray-900 font-semibold">Book now</Text>
+                  <Icon
+                    as={ChevronsRightIcon}
+                    className="text-gray-900 !size-5"
+                  />
+                </HStack>
+              </Pressable>
             </>
           )}
         </Card>

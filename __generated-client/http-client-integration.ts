@@ -5,31 +5,43 @@
  * OpenAPI spec version: v0.0.1
  */
 import { customAxiosInstance } from "../hooks/custom-axios";
-export type ActivityRequestDtoActivityType =
-  (typeof ActivityRequestDtoActivityType)[keyof typeof ActivityRequestDtoActivityType];
+export interface BookingChangeRequestDto {
+  newActivitySlotId: string;
+  userId?: string;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ActivityRequestDtoActivityType = {
-  APS: "APS",
-  OTHER_ACTIVITIES: "OTHER_ACTIVITIES",
-} as const;
+export interface ActivityBookingResponseDto {
+  activityBookingId?: string;
+  activitySlotId?: string;
+  bookedAt: string;
+}
 
-export type ActivityRequestDtoAttire =
-  (typeof ActivityRequestDtoAttire)[keyof typeof ActivityRequestDtoAttire];
+export interface UpdateSlotVacancyRequestDto {
+  /** @minimum 1 */
+  newVacancy: number;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ActivityRequestDtoAttire = {
-  ATTIRE_1: "ATTIRE_1",
-  ATTIRE_2: "ATTIRE_2",
-  ATTIRE_3: "ATTIRE_3",
-  ATTIRE_4: "ATTIRE_4",
-  ATTIRE_5: "ATTIRE_5",
-} as const;
+export interface ActivitySlotDetailDto {
+  activitySlotId?: string;
+  startDate?: string;
+  endDate?: string;
+  vacancy?: number;
+  remainingSlots?: number;
+  bookings?: SlotBookingDetailDto[];
+}
 
-export interface ActivityRequestDto {
+export interface SlotBookingDetailDto {
+  activityBookingId?: string;
+  userId?: string;
+  nric?: string;
+  name?: string;
+  bookedAt?: string;
+}
+
+export interface UpdatePrerequisiteRequestDto {
   /**
-   * @minLength 5
-   * @maxLength 100
+   * @minLength 0
+   * @maxLength 200
    */
   name?: string;
   /**
@@ -37,40 +49,7 @@ export interface ActivityRequestDto {
    * @maxLength 500
    */
   description?: string;
-  startDate: string;
-  endDate: string;
-  /**
-   * @minLength 0
-   * @maxLength 250
-   */
-  location?: string;
-  /**
-   * @minLength 0
-   * @maxLength 200
-   */
-  zone?: string;
-  /**
-   * @minLength 0
-   * @maxLength 200
-   */
-  field?: string;
-  activityType: ActivityRequestDtoActivityType;
-  attire?: ActivityRequestDtoAttire;
-  bookingWindowRequired?: boolean;
-  bookingWindowStartDate?: string;
-  bookingWindowEndDate?: string;
-  participants?: string[];
-  admins?: string[];
-  prerequisites?: PrerequisiteDto[];
-  slots?: ActivitySlotRequestDto[];
-}
-
-export interface ActivitySlotRequestDto {
-  activitySlotId?: string;
-  startDate: string;
-  endDate: string;
-  /** @minimum 1 */
-  vacancy: number;
+  mandatory?: boolean;
 }
 
 export interface PrerequisiteDto {
@@ -86,6 +65,40 @@ export interface PrerequisiteDto {
    */
   description?: string;
   mandatory?: boolean;
+}
+
+export interface SuccessSingleResponsePrerequisiteDto {
+  message?: string;
+  data?: PrerequisiteDto;
+}
+
+export interface SeedActivitiesRequest {
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  count?: number;
+  /** @minimum 1 */
+  participantsPerActivity?: number;
+  /** @minimum 1 */
+  adminsPerActivity?: number;
+  /**
+   * @minimum 0
+   * @maximum 100
+   */
+  publishPercent?: number;
+  /**
+   * @minimum 0
+   * @maximum 100
+   */
+  compulsoryPercent?: number;
+  slotsPerActivityMin?: number;
+  slotsPerActivityMax?: number;
+  slotDurationMinutes?: number;
+  minVacancyPerSlot?: number;
+  maxVacancyPerSlot?: number;
+  startInDaysMin?: number;
+  startInDaysMax?: number;
 }
 
 export interface ActivityAdminDto {
@@ -115,6 +128,15 @@ export type ActivityResponseDtoActivityType =
 export const ActivityResponseDtoActivityType = {
   APS: "APS",
   OTHER_ACTIVITIES: "OTHER_ACTIVITIES",
+} as const;
+
+export type ActivityResponseDtoParticipationType =
+  (typeof ActivityResponseDtoParticipationType)[keyof typeof ActivityResponseDtoParticipationType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ActivityResponseDtoParticipationType = {
+  ELECTIVE: "ELECTIVE",
+  COMPULSORY: "COMPULSORY",
 } as const;
 
 export type ActivityResponseDtoStatus =
@@ -151,6 +173,7 @@ export interface ActivityResponseDto {
   field?: string;
   attire?: ActivityResponseDtoAttire;
   activityType?: ActivityResponseDtoActivityType;
+  participationType?: ActivityResponseDtoParticipationType;
   bookingWindowRequired?: boolean;
   bookingWindowStartDate?: string;
   bookingWindowEndDate?: string;
@@ -190,12 +213,25 @@ export const DocumentDtoDocumentType = {
   OTHER_DOCUMENTS: "OTHER_DOCUMENTS",
 } as const;
 
+export type DocumentDtoSanitizationStatus =
+  (typeof DocumentDtoSanitizationStatus)[keyof typeof DocumentDtoSanitizationStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DocumentDtoSanitizationStatus = {
+  NOT_STARTED: "NOT_STARTED",
+  PENDING: "PENDING",
+  ERROR: "ERROR",
+  SUCCESS: "SUCCESS",
+  NOT_REQUIRED: "NOT_REQUIRED",
+} as const;
+
 export interface DocumentDto {
   activityDocumentId: string;
   /** @minLength 1 */
   documentName?: string;
   documentType: DocumentDtoDocumentType;
   uploadedAt: string;
+  sanitizationStatus?: DocumentDtoSanitizationStatus;
 }
 
 export interface ParticipantDto {
@@ -206,35 +242,29 @@ export interface ParticipantDto {
   addedAt: string;
 }
 
-export interface SeedActivitiesRequest {
-  count?: number;
-  participantsPerActivity?: number;
-  adminsPerActivity?: number;
-  /**
-   * @minimum 0
-   * @maximum 100
-   */
-  bookingRequiredPercent?: number;
-  /**
-   * @minimum 0
-   * @maximum 100
-   */
-  publishPercent?: number;
-  slotsPerActivityMin?: number;
-  slotsPerActivityMax?: number;
-  slotDurationMinutes?: number;
-  minVacancyPerSlot?: number;
-  maxVacancyPerSlot?: number;
-  startInDaysMin?: number;
-  startInDaysMax?: number;
-  overlapAdminsAsParticipants?: boolean;
-}
-
 export interface SeedActivitiesResponse {
   requested?: number;
   created?: number;
   published?: number;
   activities?: ActivityResponseDto[];
+}
+
+export type SuccessSingleResponseVoidData = { [key: string]: unknown };
+
+export interface SuccessSingleResponseVoid {
+  message?: string;
+  data?: SuccessSingleResponseVoidData;
+}
+
+export interface UserBookingRequestDto {
+  activityId: string;
+  activitySlotId: string;
+}
+
+export interface AdminBookingRequestDto {
+  activityId: string;
+  activitySlotId: string;
+  userId: string;
 }
 
 export interface VerifyRequestDto {
@@ -243,8 +273,9 @@ export interface VerifyRequestDto {
   code?: string;
 }
 
-export interface MobileLoginTokenDto {
-  token?: string;
+export interface AuthTokensDto {
+  accessToken?: string;
+  refreshToken?: string;
   user?: UserDto;
 }
 
@@ -257,6 +288,7 @@ export const UserDtoRoleType = {
   ADMIN: "ADMIN",
   SYSTEM_USER: "SYSTEM_USER",
   PUBLIC_USER: "PUBLIC_USER",
+  SYSTEM_AUTOMATION: "SYSTEM_AUTOMATION",
 } as const;
 
 export interface UserDto {
@@ -265,23 +297,6 @@ export interface UserDto {
   nric: string;
   email: string;
   roleType: UserDtoRoleType;
-}
-
-export interface PingTransformModel {
-  expiryDate?: string;
-  isValid?: boolean;
-}
-
-export interface SuccessSingleResponsePingTransformModel {
-  message?: string;
-  data?: PingTransformModel;
-}
-
-export type SuccessSingleResponseVoidData = { [key: string]: unknown };
-
-export interface SuccessSingleResponseVoid {
-  message?: string;
-  data?: SuccessSingleResponseVoidData;
 }
 
 export type LoginRequestDtoClientType =
@@ -313,38 +328,78 @@ export interface RemoveSlotsRequest {
   activitySlotIds?: string[];
 }
 
+export interface ActivitySlotRequestDto {
+  activitySlotId?: string;
+  startDate: string;
+  endDate: string;
+  /** @minimum 1 */
+  vacancy: number;
+}
+
 export interface AddSlotsRequest {
   /** @minItems 1 */
   slots?: ActivitySlotRequestDto[];
 }
 
+export interface CreatePrerequisiteRequestDto {
+  /**
+   * @minLength 0
+   * @maxLength 200
+   */
+  name?: string;
+  /**
+   * @minLength 0
+   * @maxLength 500
+   */
+  description?: string;
+  mandatory?: boolean;
+}
+
 export interface ParticipantsChangeRequestDto {
+  slotId?: string;
   userIds: string[];
 }
 
-export type ActivityQrDtoType =
-  (typeof ActivityQrDtoType)[keyof typeof ActivityQrDtoType];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ActivityQrDtoType = {
-  PARTICIPANT: "PARTICIPANT",
-  MANAGER: "MANAGER",
-  WALK_IN: "WALK_IN",
-} as const;
-
-export interface ActivityQrDto {
-  activityId?: string;
-  activitySlotId?: string;
-  generatedAt?: string;
-  validUntil?: string;
-  generatedById?: string;
-  type?: ActivityQrDtoType;
+export interface AdminsChangeRequestDto {
+  /** @minItems 1 */
+  userIds?: string[];
 }
 
-export interface ScanQrRequestDto {
-  activityId: string;
-  activitySlotId?: string;
-  activityQrDto: ActivityQrDto;
+export type ActivityDraftRequestDtoActivityType =
+  (typeof ActivityDraftRequestDtoActivityType)[keyof typeof ActivityDraftRequestDtoActivityType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ActivityDraftRequestDtoActivityType = {
+  APS: "APS",
+  OTHER_ACTIVITIES: "OTHER_ACTIVITIES",
+} as const;
+
+export type ActivityDraftRequestDtoParticipationType =
+  (typeof ActivityDraftRequestDtoParticipationType)[keyof typeof ActivityDraftRequestDtoParticipationType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ActivityDraftRequestDtoParticipationType = {
+  ELECTIVE: "ELECTIVE",
+  COMPULSORY: "COMPULSORY",
+} as const;
+
+export interface ActivityDraftRequestDto {
+  activityType: ActivityDraftRequestDtoActivityType;
+  participationType: ActivityDraftRequestDtoParticipationType;
+}
+
+export type ErrorResponseErrorsItem = { [key: string]: unknown };
+
+export interface ErrorResponse {
+  /** Custom message indicating the status of the API invocation. */
+  errors?: ErrorResponseErrorsItem[];
+  /** Custom message indicating the status of the API invocation. */
+  message?: string;
+}
+
+export interface ScanWalkInQrRequestDto {
+  /** @minLength 1 */
+  token?: string;
 }
 
 export interface ScanQrResponseDto {
@@ -354,8 +409,14 @@ export interface ScanQrResponseDto {
   newParticipant?: boolean;
 }
 
+export interface ScanQrRequestDto {
+  /** @minLength 1 */
+  token?: string;
+}
+
 export interface ScanAndAttendRequestDto {
-  activityQrDto: ActivityQrDto;
+  /** @minLength 1 */
+  token?: string;
 }
 
 export interface ScanAndAttendResponseDto {
@@ -371,7 +432,7 @@ export type EditAttendanceRequestDtoNewStatus =
 export const EditAttendanceRequestDtoNewStatus = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
-  FALLOUT: "FALLOUT",
+  LATE: "LATE",
   EXCUSED: "EXCUSED",
   UNMARKED: "UNMARKED",
 } as const;
@@ -383,52 +444,53 @@ export interface EditAttendanceRequestDto {
   newStatus?: EditAttendanceRequestDtoNewStatus;
 }
 
-export type ActivityDraftRequestDtoActivityType =
-  (typeof ActivityDraftRequestDtoActivityType)[keyof typeof ActivityDraftRequestDtoActivityType];
+export type NotificationDtoNotificationType =
+  (typeof NotificationDtoNotificationType)[keyof typeof NotificationDtoNotificationType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ActivityDraftRequestDtoActivityType = {
-  APS: "APS",
-  OTHER_ACTIVITIES: "OTHER_ACTIVITIES",
+export const NotificationDtoNotificationType = {
+  ACTIVITY_PUBLISHED_FOR_PARTICIPANT: "ACTIVITY_PUBLISHED_FOR_PARTICIPANT",
+  ACTIVITY_PUBLISHED_FOR_ADMIN: "ACTIVITY_PUBLISHED_FOR_ADMIN",
+  ACTIVITY_CANCELLED_FOR_PARTICIPANT: "ACTIVITY_CANCELLED_FOR_PARTICIPANT",
+  ACTIVITY_CANCELLED_FOR_ADMIN: "ACTIVITY_CANCELLED_FOR_ADMIN",
+  PARTICIPANT_ADDED: "PARTICIPANT_ADDED",
+  ADMIN_ADDED: "ADMIN_ADDED",
+  ACTIVITY_REMINDER_STARTING_SOON: "ACTIVITY_REMINDER_STARTING_SOON",
+  BOOKED_SLOT_REMINDER: "BOOKED_SLOT_REMINDER",
 } as const;
 
-export interface ActivityDraftRequestDto {
-  activityType: ActivityDraftRequestDtoActivityType;
+export type NotificationDtoMetadata = { [key: string]: string };
+
+export interface NotificationDto {
+  notificationId?: string;
+  notificationType?: NotificationDtoNotificationType;
+  title?: string;
+  body?: string;
+  link?: string;
+  createdAt?: string;
+  metadata?: NotificationDtoMetadata;
+  read?: boolean;
 }
 
-export interface ChangeActivityBookingRequestDto {
-  activityId?: string;
-  activitySlotId?: string;
-  cancelActivityBookingId?: string;
-  cancelOnly?: boolean;
+export interface SuccessSingleResponseNotificationDto {
+  message?: string;
+  data?: NotificationDto;
 }
 
-export interface ActivityBookingResponseDto {
-  activityBookingId?: string;
-  activitySlotId?: string;
-  bookedAt: string;
-}
+export type SanitizationUpdateRequestDtoNewStatus =
+  (typeof SanitizationUpdateRequestDtoNewStatus)[keyof typeof SanitizationUpdateRequestDtoNewStatus];
 
-export interface CancelledActivityBookingDto {
-  activityBookingId?: string;
-  activitySlotId?: string;
-  cancelledAt: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SanitizationUpdateRequestDtoNewStatus = {
+  NOT_STARTED: "NOT_STARTED",
+  PENDING: "PENDING",
+  ERROR: "ERROR",
+  SUCCESS: "SUCCESS",
+  NOT_REQUIRED: "NOT_REQUIRED",
+} as const;
 
-export interface ChangeActivityBookingResponseDto {
-  cancelledSlot?: CancelledActivityBookingDto;
-  bookedSlot?: ActivityBookingResponseDto;
-}
-
-export interface ActivityBookingRequestDto {
-  activityId: string;
-  activitySlotId: string;
-}
-
-export interface AddNewWalkInParticipantRequestDto {
-  newParticipantUserId?: string;
-  activityId?: string;
-  activitySlotId?: string;
+export interface SanitizationUpdateRequestDto {
+  newStatus: SanitizationUpdateRequestDtoNewStatus;
 }
 
 export type ActivityPatchDtoActivityType =
@@ -460,15 +522,11 @@ export interface ActivityPatchDto {
   location?: string;
   zone?: string;
   field?: string;
+  remarks?: string;
   activityType?: ActivityPatchDtoActivityType;
   attire?: ActivityPatchDtoAttire;
-  bookingWindowRequired?: boolean;
   bookingWindowStartDate?: string;
   bookingWindowEndDate?: string;
-  participants?: string[];
-  admins?: string[];
-  prerequisites?: PrerequisiteDto[];
-  slots?: ActivitySlotRequestDto[];
 }
 
 export interface SuccessPaginateResponseUserDto {
@@ -484,6 +542,73 @@ export interface SuccessPaginateResponseUserDto {
 export interface SuccessSingleResponseUserDto {
   message?: string;
   data?: UserDto;
+}
+
+export interface SuccessPaginateResponseNotificationDto {
+  message?: string;
+  total?: number;
+  pageSize?: number;
+  totalPage?: number;
+  pageNumber?: number;
+  currentPageTotal?: number;
+  data?: NotificationDto[];
+}
+
+export interface GroupDto {
+  groupId?: string;
+  name?: string;
+  parentGroupId?: string;
+}
+
+export interface SuccessListResponseGroupDto {
+  message?: string;
+  data?: GroupDto[];
+}
+
+export type MyBookingDetailsDtoAttendanceStatus =
+  (typeof MyBookingDetailsDtoAttendanceStatus)[keyof typeof MyBookingDetailsDtoAttendanceStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const MyBookingDetailsDtoAttendanceStatus = {
+  PRESENT: "PRESENT",
+  ABSENT: "ABSENT",
+  LATE: "LATE",
+  EXCUSED: "EXCUSED",
+  UNMARKED: "UNMARKED",
+} as const;
+
+export interface MyBookingDetailsDto {
+  activityBookingId?: string;
+  activitySlotId?: string;
+  slotStartDate?: string;
+  slotEndDate?: string;
+  bookedAt?: string;
+  attendanceStatus?: MyBookingDetailsDtoAttendanceStatus;
+}
+
+export interface SuccessSingleResponseMyBookingDetailsDto {
+  message?: string;
+  data?: MyBookingDetailsDto;
+}
+
+export interface DocumentForSanitizationDto {
+  documentId?: string;
+  fileName?: string;
+  activityId?: string;
+  activityName?: string;
+  activitySlug?: string;
+  uploadedAt?: string;
+  uploadedBy?: string;
+}
+
+export interface SuccessPaginateResponseDocumentForSanitizationDto {
+  message?: string;
+  total?: number;
+  pageSize?: number;
+  totalPage?: number;
+  pageNumber?: number;
+  currentPageTotal?: number;
+  data?: DocumentForSanitizationDto[];
 }
 
 export type ActivityListItemDtoStatus =
@@ -518,8 +643,10 @@ export interface ActivityListItemDto {
   bookingWindowRequired?: boolean;
   lastUpdatedOn?: string;
   isAdmin?: boolean;
+  isParticipant?: boolean;
   timeline?: string;
   participantsCount?: number;
+  activityDocumentsHealthStatus?: string;
 }
 
 export interface SuccessPaginateResponseActivityListItemDto {
@@ -537,21 +664,9 @@ export interface SuccessSingleResponseActivityResponseDto {
   data?: ActivityResponseDto;
 }
 
-export interface ActivitySlotDetailDto {
-  activitySlotId?: string;
-  startDate?: string;
-  endDate?: string;
-  vacancy?: number;
-  remainingSlots?: number;
-  bookings?: SlotBookingDetailDto[];
-}
-
-export interface SlotBookingDetailDto {
-  activityBookingId?: string;
-  userId?: string;
-  nric?: string;
-  name?: string;
-  bookedAt?: string;
+export interface SuccessListResponsePrerequisiteDto {
+  message?: string;
+  data?: PrerequisiteDto[];
 }
 
 export type ActivityParticipantListItemDtoAttendanceStatus =
@@ -561,7 +676,7 @@ export type ActivityParticipantListItemDtoAttendanceStatus =
 export const ActivityParticipantListItemDtoAttendanceStatus = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
-  FALLOUT: "FALLOUT",
+  LATE: "LATE",
   EXCUSED: "EXCUSED",
   UNMARKED: "UNMARKED",
 } as const;
@@ -606,6 +721,11 @@ export interface SuccessSingleResponseActivityParticipantSummaryDto {
   data?: ActivityParticipantSummaryDto;
 }
 
+export interface SuccessListResponseActivityAdminDto {
+  message?: string;
+  data?: ActivityAdminDto[];
+}
+
 export interface MarkedAttendanceUserDto {
   name?: string;
   userId?: string;
@@ -624,6 +744,10 @@ export interface SuccessPaginateResponseMarkedAttendanceUserDto {
   data?: MarkedAttendanceUserDto[];
 }
 
+export interface GenerateQrResponseDto {
+  imageStr?: string;
+}
+
 export type ActivityAttendedDtoAttendanceStatus =
   (typeof ActivityAttendedDtoAttendanceStatus)[keyof typeof ActivityAttendedDtoAttendanceStatus];
 
@@ -631,7 +755,7 @@ export type ActivityAttendedDtoAttendanceStatus =
 export const ActivityAttendedDtoAttendanceStatus = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
-  FALLOUT: "FALLOUT",
+  LATE: "LATE",
   EXCUSED: "EXCUSED",
   UNMARKED: "UNMARKED",
 } as const;
@@ -654,10 +778,6 @@ export interface SuccessPaginateResponseActivityAttendedDto {
   data?: ActivityAttendedDto[];
 }
 
-export interface GenerateQrResponseDto {
-  imageStr?: string;
-}
-
 export type UploadParams = {
   type: UploadType;
 };
@@ -678,19 +798,24 @@ export type UploadBody = {
 
 export type ListParams = {
   /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
    * @minimum 1
    */
   pageSize?: number;
   /**
-   * @minimum 1
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
    */
-  pageNumber?: number;
+  sort?: string[];
   name?: string;
   email?: string;
   nric?: string;
   roleType?: ListRoleType;
-  sortBy?: string;
-  sortDir?: string;
+  groupId?: string;
 };
 
 export type ListRoleType = (typeof ListRoleType)[keyof typeof ListRoleType];
@@ -701,17 +826,77 @@ export const ListRoleType = {
   ADMIN: "ADMIN",
   SYSTEM_USER: "SYSTEM_USER",
   PUBLIC_USER: "PUBLIC_USER",
+  SYSTEM_AUTOMATION: "SYSTEM_AUTOMATION",
 } as const;
 
-export type List1Params = {
+export type ListNotificationsParams = {
   /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
    * @minimum 1
    */
   pageSize?: number;
   /**
-   * @minimum 1
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+   */
+  sort?: string[];
+};
+
+export type GetUnreadCount200 = { [key: string]: number };
+
+export type ListUsersByGroupParams = {
+  /**
+   * One-based page index (1..N)
+   * @minimum 0
    */
   pageNumber?: number;
+  /**
+   * The size of the page to be returned
+   * @minimum 1
+   */
+  pageSize?: number;
+  /**
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+   */
+  sort?: string[];
+};
+
+export type ListFilesPendingSanitizationParams = {
+  /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
+   * @minimum 1
+   */
+  pageSize?: number;
+  /**
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+   */
+  sort?: string[];
+};
+
+export type List1Params = {
+  /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
+   * @minimum 1
+   */
+  pageSize?: number;
+  /**
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+   */
+  sort?: string[];
   name?: string;
   slug?: string;
   activityType?: List1ActivityType;
@@ -724,8 +909,7 @@ export type List1Params = {
   zone?: string;
   location?: string;
   timeline?: List1Timeline;
-  sortBy?: string;
-  sortDir?: string;
+  activityDocumentsHealthStatus?: List1ActivityDocumentsHealthStatus;
 };
 
 export type List1ActivityType =
@@ -756,18 +940,35 @@ export const List1Timeline = {
   COMPLETED: "COMPLETED",
 } as const;
 
+export type List1ActivityDocumentsHealthStatus =
+  (typeof List1ActivityDocumentsHealthStatus)[keyof typeof List1ActivityDocumentsHealthStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const List1ActivityDocumentsHealthStatus = {
+  HEALTHY: "HEALTHY",
+  PENDING_SANITIZATION: "PENDING_SANITIZATION",
+  SANITIZATION_ERROR: "SANITIZATION_ERROR",
+} as const;
+
 export type List2Params = {
   /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
    * @minimum 1
    */
   pageSize?: number;
   /**
-   * @minimum 1
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
    */
-  pageNumber?: number;
+  sort?: string[];
   name?: string;
   nric?: string;
   attendanceStatus?: List2AttendanceStatus;
+  slotId?: string;
 };
 
 export type List2AttendanceStatus =
@@ -777,20 +978,26 @@ export type List2AttendanceStatus =
 export const List2AttendanceStatus = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
-  FALLOUT: "FALLOUT",
+  LATE: "LATE",
   EXCUSED: "EXCUSED",
   UNMARKED: "UNMARKED",
 } as const;
 
 export type ListAttendanceMarkedByUserParams = {
   /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
    * @minimum 1
    */
   pageSize?: number;
   /**
-   * @minimum 1
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
    */
-  pageNumber?: number;
+  sort?: string[];
   activityId: string;
   activitySlotId?: string;
   attendanceStatus: ListAttendanceMarkedByUserAttendanceStatus;
@@ -805,20 +1012,42 @@ export type ListAttendanceMarkedByUserAttendanceStatus =
 export const ListAttendanceMarkedByUserAttendanceStatus = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
-  FALLOUT: "FALLOUT",
+  LATE: "LATE",
   EXCUSED: "EXCUSED",
   UNMARKED: "UNMARKED",
 } as const;
 
+export type GenerateQrParams = {
+  activityId: string;
+  activitySlotId: string;
+  type: GenerateQrType;
+};
+
+export type GenerateQrType =
+  (typeof GenerateQrType)[keyof typeof GenerateQrType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GenerateQrType = {
+  PARTICIPANT: "PARTICIPANT",
+  MANAGER: "MANAGER",
+  WALK_IN_REGISTRATION: "WALK_IN_REGISTRATION",
+} as const;
+
 export type ListActivitiesAttendedParams = {
   /**
+   * One-based page index (1..N)
+   * @minimum 0
+   */
+  pageNumber?: number;
+  /**
+   * The size of the page to be returned
    * @minimum 1
    */
   pageSize?: number;
   /**
-   * @minimum 1
+   * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
    */
-  pageNumber?: number;
+  sort?: string[];
   activityType: ListActivitiesAttendedActivityType;
   startDateRange?: string;
   endDateRange?: string;
@@ -833,61 +1062,77 @@ export const ListActivitiesAttendedActivityType = {
   OTHER_ACTIVITIES: "OTHER_ACTIVITIES",
 } as const;
 
-export type GenerateQrParams = {
-  activityId?: string;
-  activitySlotId?: string;
-  type: GenerateQrType;
-};
-
-export type GenerateQrType =
-  (typeof GenerateQrType)[keyof typeof GenerateQrType];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const GenerateQrType = {
-  PARTICIPANT: "PARTICIPANT",
-  MANAGER: "MANAGER",
-  WALK_IN: "WALK_IN",
-} as const;
-
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getById = (
-  id: string,
+export const changeBooking = (
+  bookingId: string,
+  bookingChangeRequestDto: BookingChangeRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
-  return customAxiosInstance<SuccessSingleResponseActivityResponseDto>(
-    { url: `/api/activities/${id}`, method: "GET" },
-    options
-  );
-};
-
-export const update = (
-  id: string,
-  activityRequestDto: ActivityRequestDto,
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<ActivityResponseDto>(
+  return customAxiosInstance<ActivityBookingResponseDto>(
     {
-      url: `/api/activities/${id}`,
+      url: `/api/bookings/${bookingId}`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: activityRequestDto,
+      data: bookingChangeRequestDto,
     },
     options
   );
 };
 
-export const patch = (
-  id: string,
-  activityPatchDto: ActivityPatchDto,
+export const cancelBooking = (
+  bookingId: string,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
-  return customAxiosInstance<ActivityResponseDto>(
+  return customAxiosInstance<SuccessSingleResponseVoid>(
+    { url: `/api/bookings/${bookingId}`, method: "DELETE" },
+    options
+  );
+};
+
+export const updateSlotVacancy = (
+  activityId: string,
+  slotId: string,
+  updateSlotVacancyRequestDto: UpdateSlotVacancyRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<ActivitySlotDetailDto>(
     {
-      url: `/api/activities/${id}`,
-      method: "PATCH",
+      url: `/api/activities/${activityId}/slots/${slotId}/vacancy`,
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: activityPatchDto,
+      data: updateSlotVacancyRequestDto,
+    },
+    options
+  );
+};
+
+export const updatePrerequisite = (
+  activityId: string,
+  prerequisiteId: string,
+  updatePrerequisiteRequestDto: UpdatePrerequisiteRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponsePrerequisiteDto>(
+    {
+      url: `/api/activities/${activityId}/prerequisites/${prerequisiteId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updatePrerequisiteRequestDto,
+    },
+    options
+  );
+};
+
+export const removePrerequisite = (
+  activityId: string,
+  prerequisiteId: string,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseVoid>(
+    {
+      url: `/api/activities/${activityId}/prerequisites/${prerequisiteId}`,
+      method: "DELETE",
     },
     options
   );
@@ -908,13 +1153,52 @@ export const seedActivities = (
   );
 };
 
-export const verifyLoginPortal = (
+export const markAllAsRead = (
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseVoid>(
+    { url: `/api/notifications/mark-all-read`, method: "POST" },
+    options
+  );
+};
+
+export const bookForSelf = (
+  userBookingRequestDto: UserBookingRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<ActivityBookingResponseDto>(
+    {
+      url: `/api/bookings/user`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: userBookingRequestDto,
+    },
+    options
+  );
+};
+
+export const bookForUser = (
+  adminBookingRequestDto: AdminBookingRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<ActivityBookingResponseDto>(
+    {
+      url: `/api/bookings/admin`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: adminBookingRequestDto,
+    },
+    options
+  );
+};
+
+export const verifyLogin = (
   verifyRequestDto: VerifyRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
-  return customAxiosInstance<MobileLoginTokenDto>(
+  return customAxiosInstance<AuthTokensDto>(
     {
-      url: `/api/auth/verify-login/portal`,
+      url: `/api/auth/verify-login`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: verifyRequestDto,
@@ -923,44 +1207,11 @@ export const verifyLoginPortal = (
   );
 };
 
-export const verifyLoginMobile = (
-  verifyRequestDto: VerifyRequestDto,
+export const refreshToken = (
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
-  return customAxiosInstance<MobileLoginTokenDto>(
-    {
-      url: `/api/auth/verify-login/mobile`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: verifyRequestDto,
-    },
-    options
-  );
-};
-
-export const refreshPortalToken = (
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<MobileLoginTokenDto>(
-    { url: `/api/auth/refresh-token/portal`, method: "POST" },
-    options
-  );
-};
-
-export const refreshMobileToken = (
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<MobileLoginTokenDto>(
-    { url: `/api/auth/refresh-token/mobile`, method: "POST" },
-    options
-  );
-};
-
-export const pingToken = (
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<SuccessSingleResponsePingTransformModel>(
-    { url: `/api/auth/ping`, method: "POST" },
+  return customAxiosInstance<AuthTokensDto>(
+    { url: `/api/auth/refresh-token`, method: "POST" },
     options
   );
 };
@@ -1062,6 +1313,32 @@ export const addSlots = (
   );
 };
 
+export const listPrerequisites = (
+  activityId: string,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessListResponsePrerequisiteDto>(
+    { url: `/api/activities/${activityId}/prerequisites`, method: "GET" },
+    options
+  );
+};
+
+export const addPrerequisite = (
+  activityId: string,
+  createPrerequisiteRequestDto: CreatePrerequisiteRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponsePrerequisiteDto>(
+    {
+      url: `/api/activities/${activityId}/prerequisites`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createPrerequisiteRequestDto,
+    },
+    options
+  );
+};
+
 export const remove = (
   activityId: string,
   participantsChangeRequestDto: ParticipantsChangeRequestDto,
@@ -1094,51 +1371,42 @@ export const add = (
   );
 };
 
-export const scanQr = (
-  scanQrRequestDto: ScanQrRequestDto,
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<ScanQrResponseDto>(
-    {
-      url: `/api/activities/scanQr`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: scanQrRequestDto,
-    },
-    options
-  );
-};
-
-export const scanAndAttend = (
-  scanAndAttendRequestDto: ScanAndAttendRequestDto,
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<ScanAndAttendResponseDto>(
-    {
-      url: `/api/activities/scanAndAttend`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: scanAndAttendRequestDto,
-    },
-    options
-  );
-};
-
-export const editAttendance = (
-  editAttendanceRequestDto: EditAttendanceRequestDto,
+export const remove1 = (
+  activityId: string,
+  adminsChangeRequestDto: AdminsChangeRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
   return customAxiosInstance<SuccessSingleResponseVoid>(
     {
-      url: `/api/activities/editAttendance`,
+      url: `/api/activities/${activityId}/admins/remove`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: editAttendanceRequestDto,
+      data: adminsChangeRequestDto,
     },
     options
   );
 };
 
+export const add1 = (
+  activityId: string,
+  adminsChangeRequestDto: AdminsChangeRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseVoid>(
+    {
+      url: `/api/activities/${activityId}/admins/add`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: adminsChangeRequestDto,
+    },
+    options
+  );
+};
+
+/**
+ * Creates a new activity in DRAFT status
+ * @summary Create draft activity
+ */
 export const createDraft = (
   activityDraftRequestDto: ActivityDraftRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
@@ -1154,46 +1422,113 @@ export const createDraft = (
   );
 };
 
-export const change = (
-  changeActivityBookingRequestDto: ChangeActivityBookingRequestDto,
+export const scanWalkInQr = (
+  scanWalkInQrRequestDto: ScanWalkInQrRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
-  return customAxiosInstance<ChangeActivityBookingResponseDto>(
+  return customAxiosInstance<ScanQrResponseDto>(
     {
-      url: `/api/activities/changeBooking`,
+      url: `/api/activities/attendance/scan-walk-in-qr`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: changeActivityBookingRequestDto,
+      data: scanWalkInQrRequestDto,
     },
     options
   );
 };
 
-export const book = (
-  activityBookingRequestDto: ActivityBookingRequestDto,
+export const scanQr = (
+  scanQrRequestDto: ScanQrRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
-  return customAxiosInstance<ActivityBookingResponseDto>(
+  return customAxiosInstance<ScanQrResponseDto>(
     {
-      url: `/api/activities/booking`,
+      url: `/api/activities/attendance/scan-qr`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: activityBookingRequestDto,
+      data: scanQrRequestDto,
     },
     options
   );
 };
 
-export const addNewWalkInParticipant = (
-  addNewWalkInParticipantRequestDto: AddNewWalkInParticipantRequestDto,
+export const scanAndAttend = (
+  scanAndAttendRequestDto: ScanAndAttendRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<ScanAndAttendResponseDto>(
+    {
+      url: `/api/activities/attendance/scan-and-attend`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: scanAndAttendRequestDto,
+    },
+    options
+  );
+};
+
+export const editAttendance = (
+  editAttendanceRequestDto: EditAttendanceRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
   return customAxiosInstance<SuccessSingleResponseVoid>(
     {
-      url: `/api/activities/addNewWalkInParticipant`,
+      url: `/api/activities/attendance/edit`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: addNewWalkInParticipantRequestDto,
+      data: editAttendanceRequestDto,
+    },
+    options
+  );
+};
+
+export const markAsRead = (
+  notificationId: string,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseNotificationDto>(
+    { url: `/api/notifications/${notificationId}/read`, method: "PATCH" },
+    options
+  );
+};
+
+export const updateSanitizationStatus = (
+  documentId: string,
+  sanitizationUpdateRequestDto: SanitizationUpdateRequestDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseVoid>(
+    {
+      url: `/api/admin/files-for-sanitization/${documentId}`,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      data: sanitizationUpdateRequestDto,
+    },
+    options
+  );
+};
+
+export const getById = (
+  id: string,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseActivityResponseDto>(
+    { url: `/api/activities/${id}`, method: "GET" },
+    options
+  );
+};
+
+export const patch = (
+  id: string,
+  activityPatchDto: ActivityPatchDto,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<ActivityResponseDto>(
+    {
+      url: `/api/activities/${id}`,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      data: activityPatchDto,
     },
     options
   );
@@ -1229,11 +1564,70 @@ export const getByNric = (
   );
 };
 
+export const listNotifications = (
+  params?: ListNotificationsParams,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessPaginateResponseNotificationDto>(
+    { url: `/api/notifications`, method: "GET", params },
+    options
+  );
+};
+
+export const getUnreadCount = (
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<GetUnreadCount200>(
+    { url: `/api/notifications/unread-count`, method: "GET" },
+    options
+  );
+};
+
+export const listAllGroups = (
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessListResponseGroupDto>(
+    { url: `/api/groups`, method: "GET" },
+    options
+  );
+};
+
+export const listUsersByGroup = (
+  groupId: string,
+  params?: ListUsersByGroupParams,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessPaginateResponseUserDto>(
+    { url: `/api/groups/${groupId}/users`, method: "GET", params },
+    options
+  );
+};
+
+export const getMyBooking = (
+  activityId: string,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessSingleResponseMyBookingDetailsDto>(
+    { url: `/api/bookings/${activityId}/my-booking`, method: "GET" },
+    options
+  );
+};
+
 export const getMe = (
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
   return customAxiosInstance<UserDto>(
     { url: `/api/auth/me`, method: "GET" },
+    options
+  );
+};
+
+export const listFilesPendingSanitization = (
+  params?: ListFilesPendingSanitizationParams,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessPaginateResponseDocumentForSanitizationDto>(
+    { url: `/api/admin/files-for-sanitization`, method: "GET", params },
     options
   );
 };
@@ -1302,26 +1696,22 @@ export const summary = (
   );
 };
 
+export const list3 = (
+  activityId: string,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessListResponseActivityAdminDto>(
+    { url: `/api/activities/${activityId}/admins`, method: "GET" },
+    options
+  );
+};
+
 export const listAttendanceMarkedByUser = (
   params: ListAttendanceMarkedByUserParams,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
   return customAxiosInstance<SuccessPaginateResponseMarkedAttendanceUserDto>(
-    {
-      url: `/api/activities/listAttendanceMarkedByUser`,
-      method: "GET",
-      params,
-    },
-    options
-  );
-};
-
-export const listActivitiesAttended = (
-  params: ListActivitiesAttendedParams,
-  options?: SecondParameter<typeof customAxiosInstance>
-) => {
-  return customAxiosInstance<SuccessPaginateResponseActivityAttendedDto>(
-    { url: `/api/activities/listActivitiesAttended`, method: "GET", params },
+    { url: `/api/activities/attendance/marked-by-user`, method: "GET", params },
     options
   );
 };
@@ -1331,7 +1721,21 @@ export const generateQr = (
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
   return customAxiosInstance<GenerateQrResponseDto>(
-    { url: `/api/activities/generateQr`, method: "GET", params },
+    { url: `/api/activities/attendance/generate-qr`, method: "GET", params },
+    options
+  );
+};
+
+export const listActivitiesAttended = (
+  params: ListActivitiesAttendedParams,
+  options?: SecondParameter<typeof customAxiosInstance>
+) => {
+  return customAxiosInstance<SuccessPaginateResponseActivityAttendedDto>(
+    {
+      url: `/api/activities/attendance/activities-attended`,
+      method: "GET",
+      params,
+    },
     options
   );
 };
@@ -1351,26 +1755,38 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
-export type GetByIdResult = NonNullable<Awaited<ReturnType<typeof getById>>>;
-export type UpdateResult = NonNullable<Awaited<ReturnType<typeof update>>>;
-export type PatchResult = NonNullable<Awaited<ReturnType<typeof patch>>>;
+export type ChangeBookingResult = NonNullable<
+  Awaited<ReturnType<typeof changeBooking>>
+>;
+export type CancelBookingResult = NonNullable<
+  Awaited<ReturnType<typeof cancelBooking>>
+>;
+export type UpdateSlotVacancyResult = NonNullable<
+  Awaited<ReturnType<typeof updateSlotVacancy>>
+>;
+export type UpdatePrerequisiteResult = NonNullable<
+  Awaited<ReturnType<typeof updatePrerequisite>>
+>;
+export type RemovePrerequisiteResult = NonNullable<
+  Awaited<ReturnType<typeof removePrerequisite>>
+>;
 export type SeedActivitiesResult = NonNullable<
   Awaited<ReturnType<typeof seedActivities>>
 >;
-export type VerifyLoginPortalResult = NonNullable<
-  Awaited<ReturnType<typeof verifyLoginPortal>>
+export type MarkAllAsReadResult = NonNullable<
+  Awaited<ReturnType<typeof markAllAsRead>>
 >;
-export type VerifyLoginMobileResult = NonNullable<
-  Awaited<ReturnType<typeof verifyLoginMobile>>
+export type BookForSelfResult = NonNullable<
+  Awaited<ReturnType<typeof bookForSelf>>
 >;
-export type RefreshPortalTokenResult = NonNullable<
-  Awaited<ReturnType<typeof refreshPortalToken>>
+export type BookForUserResult = NonNullable<
+  Awaited<ReturnType<typeof bookForUser>>
 >;
-export type RefreshMobileTokenResult = NonNullable<
-  Awaited<ReturnType<typeof refreshMobileToken>>
+export type VerifyLoginResult = NonNullable<
+  Awaited<ReturnType<typeof verifyLogin>>
 >;
-export type PingTokenResult = NonNullable<
-  Awaited<ReturnType<typeof pingToken>>
+export type RefreshTokenResult = NonNullable<
+  Awaited<ReturnType<typeof refreshToken>>
 >;
 export type LogoutResult = NonNullable<Awaited<ReturnType<typeof logout>>>;
 export type LoginResult = NonNullable<Awaited<ReturnType<typeof login>>>;
@@ -1381,8 +1797,22 @@ export type RemoveSlotsResult = NonNullable<
   Awaited<ReturnType<typeof removeSlots>>
 >;
 export type AddSlotsResult = NonNullable<Awaited<ReturnType<typeof addSlots>>>;
+export type ListPrerequisitesResult = NonNullable<
+  Awaited<ReturnType<typeof listPrerequisites>>
+>;
+export type AddPrerequisiteResult = NonNullable<
+  Awaited<ReturnType<typeof addPrerequisite>>
+>;
 export type RemoveResult = NonNullable<Awaited<ReturnType<typeof remove>>>;
 export type AddResult = NonNullable<Awaited<ReturnType<typeof add>>>;
+export type Remove1Result = NonNullable<Awaited<ReturnType<typeof remove1>>>;
+export type Add1Result = NonNullable<Awaited<ReturnType<typeof add1>>>;
+export type CreateDraftResult = NonNullable<
+  Awaited<ReturnType<typeof createDraft>>
+>;
+export type ScanWalkInQrResult = NonNullable<
+  Awaited<ReturnType<typeof scanWalkInQr>>
+>;
 export type ScanQrResult = NonNullable<Awaited<ReturnType<typeof scanQr>>>;
 export type ScanAndAttendResult = NonNullable<
   Awaited<ReturnType<typeof scanAndAttend>>
@@ -1390,20 +1820,38 @@ export type ScanAndAttendResult = NonNullable<
 export type EditAttendanceResult = NonNullable<
   Awaited<ReturnType<typeof editAttendance>>
 >;
-export type CreateDraftResult = NonNullable<
-  Awaited<ReturnType<typeof createDraft>>
+export type MarkAsReadResult = NonNullable<
+  Awaited<ReturnType<typeof markAsRead>>
 >;
-export type ChangeResult = NonNullable<Awaited<ReturnType<typeof change>>>;
-export type BookResult = NonNullable<Awaited<ReturnType<typeof book>>>;
-export type AddNewWalkInParticipantResult = NonNullable<
-  Awaited<ReturnType<typeof addNewWalkInParticipant>>
+export type UpdateSanitizationStatusResult = NonNullable<
+  Awaited<ReturnType<typeof updateSanitizationStatus>>
 >;
+export type GetByIdResult = NonNullable<Awaited<ReturnType<typeof getById>>>;
+export type PatchResult = NonNullable<Awaited<ReturnType<typeof patch>>>;
 export type ListResult = NonNullable<Awaited<ReturnType<typeof list>>>;
 export type GetById1Result = NonNullable<Awaited<ReturnType<typeof getById1>>>;
 export type GetByNricResult = NonNullable<
   Awaited<ReturnType<typeof getByNric>>
 >;
+export type ListNotificationsResult = NonNullable<
+  Awaited<ReturnType<typeof listNotifications>>
+>;
+export type GetUnreadCountResult = NonNullable<
+  Awaited<ReturnType<typeof getUnreadCount>>
+>;
+export type ListAllGroupsResult = NonNullable<
+  Awaited<ReturnType<typeof listAllGroups>>
+>;
+export type ListUsersByGroupResult = NonNullable<
+  Awaited<ReturnType<typeof listUsersByGroup>>
+>;
+export type GetMyBookingResult = NonNullable<
+  Awaited<ReturnType<typeof getMyBooking>>
+>;
 export type GetMeResult = NonNullable<Awaited<ReturnType<typeof getMe>>>;
+export type ListFilesPendingSanitizationResult = NonNullable<
+  Awaited<ReturnType<typeof listFilesPendingSanitization>>
+>;
 export type List1Result = NonNullable<Awaited<ReturnType<typeof list1>>>;
 export type DownloadDocumentResult = NonNullable<
   Awaited<ReturnType<typeof downloadDocument>>
@@ -1411,14 +1859,15 @@ export type DownloadDocumentResult = NonNullable<
 export type GetSlotResult = NonNullable<Awaited<ReturnType<typeof getSlot>>>;
 export type List2Result = NonNullable<Awaited<ReturnType<typeof list2>>>;
 export type SummaryResult = NonNullable<Awaited<ReturnType<typeof summary>>>;
+export type List3Result = NonNullable<Awaited<ReturnType<typeof list3>>>;
 export type ListAttendanceMarkedByUserResult = NonNullable<
   Awaited<ReturnType<typeof listAttendanceMarkedByUser>>
 >;
-export type ListActivitiesAttendedResult = NonNullable<
-  Awaited<ReturnType<typeof listActivitiesAttended>>
->;
 export type GenerateQrResult = NonNullable<
   Awaited<ReturnType<typeof generateQr>>
+>;
+export type ListActivitiesAttendedResult = NonNullable<
+  Awaited<ReturnType<typeof listActivitiesAttended>>
 >;
 export type DeleteDocumentResult = NonNullable<
   Awaited<ReturnType<typeof deleteDocument>>

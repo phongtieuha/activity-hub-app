@@ -1,10 +1,17 @@
 import { GlobalLoadingBridge } from "@/components/GlobalLoading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { type AxiosRequestConfig } from "axios";
+import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { serializeToQueryString } from "./forms";
+import {
+  setGlobalNotificationFunction,
+  showGlobalNotification,
+  useNotification,
+} from "./useNotification";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: "http://192.168.1.150:9100",
+  baseURL: "http://192.168.1.4:9100",
 }); // use your own URL here or environment variable
 AXIOS_INSTANCE.defaults.xsrfCookieName = undefined;
 AXIOS_INSTANCE.defaults.xsrfHeaderName = undefined;
@@ -17,7 +24,6 @@ export const customAxiosInstance = async <T>(
   const htmlEncodedData = config.data;
   // Extract AUTH_TOKEN from localStorage and set Authorization header
   const authToken = await AsyncStorage.getItem("AUTH_TOKEN");
-  console.log("BODY DATA:", htmlEncodedData);
 
   const headers = {
     ...(config.headers || {}),
@@ -43,6 +49,24 @@ export const customAxiosInstance = async <T>(
   };
 
   return promise;
+};
+
+// Store router reference for use in interceptors
+let globalRouter: any = null;
+
+// Custom hook for axios with router and notification integration
+export const useAxiosWithRouter = () => {
+  const router = useRouter();
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    // Store router reference for use in interceptors
+    globalRouter = router;
+    // Set the global notification function from context
+    setGlobalNotificationFunction(showNotification);
+  }, [router, showNotification]);
+
+  return { router, showNotification };
 };
 
 // ---- Global loading integration ----
@@ -104,14 +128,45 @@ AXIOS_INSTANCE.interceptors.response.use(
         if (pendingRequests === 0) GlobalLoadingBridge.api?.hide();
       }
     } catch {}
+
     if (error.status === 401) {
-      // goToPage('/Account/Login')
+      // Handle unauthorized - redirect to login
+      showGlobalNotification("Session expired. Please login again.", "error");
+
+      if (globalRouter) {
+        AsyncStorage.removeItem("AUTH_TOKEN");
+        globalRouter.replace("/logout");
+      } else {
+        // Fallback: just remove the token for now
+        AsyncStorage.removeItem("AUTH_TOKEN");
+      }
     }
+
     if (error.status === 400) {
+      // Show error notification for 400 errors
+      const errorMessage =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        "Bad request error";
+
+      showGlobalNotification(errorMessage, "error");
+
       return Promise.reject(
-        new Error(error.response.data.message || "API Error")
+        new Error(
+          error.response?.data?.detail ||
+            error.response?.data?.message ||
+            "API Error"
+        )
       );
     }
+
+    // Handle other errors with notifications
+    if (error.status >= 500) {
+      showGlobalNotification("Server error. Please try again later.", "error");
+    } else if (error.status && error.status !== 401 && error.status !== 400) {
+      showGlobalNotification("An unexpected error occurred.", "error");
+    }
+
     return Promise.reject(new Error(error));
   }
 );

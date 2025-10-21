@@ -1,6 +1,6 @@
 import {
   login,
-  verifyLoginMobile,
+  verifyLogin,
 } from "@/__generated-client/http-client-integration";
 import AnimatedCard from "@/components/ui/AnimatedCard";
 import { Box } from "@/components/ui/box";
@@ -185,11 +185,11 @@ export default function Index() {
     Keyboard.dismiss();
     // setLoggedInAs("participant");
     if (isOTPShown) {
-      const result = await verifyLoginMobile({
+      const result = await verifyLogin({
         loginAttemptId: loginAttemptId,
         code: selectedOTP,
       });
-      await AsyncStorage.setItem("AUTH_TOKEN", result?.token ?? "");
+      await AsyncStorage.setItem("AUTH_TOKEN", result?.accessToken ?? "");
       await AsyncStorage.setItem("LOGGED_IN_AS", "participant");
       router.replace("./(participant)/(tabs)");
     } else {
@@ -206,11 +206,11 @@ export default function Index() {
     Keyboard.dismiss();
     // setLoggedInAs("manager");
     if (isOTPShown) {
-      const result = await verifyLoginMobile({
+      const result = await verifyLogin({
         loginAttemptId: loginAttemptId,
         code: selectedOTP,
       });
-      await AsyncStorage.setItem("AUTH_TOKEN", result?.token ?? "");
+      await AsyncStorage.setItem("AUTH_TOKEN", result?.accessToken ?? "");
       await AsyncStorage.setItem("LOGGED_IN_AS", "manager");
       router.replace("./(manager)/(tabs)");
     } else {

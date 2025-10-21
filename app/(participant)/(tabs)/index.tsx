@@ -22,6 +22,9 @@ import {
   formatDay,
   formatDayInWord,
   formatMonth,
+  getCurrentSGTDate,
+  getSGTDate,
+  getTimeUntilEvent,
   groupActivitiesByDateRangeOrdered,
 } from "@/hooks/date-formatter";
 import { useScroll } from "@/hooks/useScroll";
@@ -143,10 +146,6 @@ export default function HomeScreen() {
         pageSize: 100,
       });
       setScheduledActivities((data) => [
-        ...data,
-        ...(scheduledActivitiesResp?.data ?? []),
-      ]);
-      setActionRequiredActivities((data) => [
         ...data,
         ...(scheduledActivitiesResp?.data ?? []),
       ]);
@@ -321,7 +320,7 @@ export default function HomeScreen() {
         </VStack>
       ) : (
         <>
-          {actionRequiredActivities.length > 0 && (
+          {actionRequiredActivities.length > 0 ? (
             <VStack
               space="md"
               className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
@@ -355,7 +354,10 @@ export default function HomeScreen() {
                   <HStack className="items-start" space="md">
                     <Center className="rounded-3xl w-[60px]  bg-gray-50 mt-3">
                       <Text className="text-base font-bold text-red-600">
-                        IN 3 H
+                        {getTimeUntilEvent(
+                          getSGTDate(activity.startDate!),
+                          getCurrentSGTDate()
+                        )}
                       </Text>
                     </Center>
 
@@ -386,78 +388,99 @@ export default function HomeScreen() {
                 </AnimatedCard>
               ))}
             </VStack>
+          ) : (
+            <Badge
+              action="muted"
+              size="lg"
+              className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
+            >
+              <BadgeText>No activities that require your attention!</BadgeText>
+            </Badge>
           )}
 
           <Divider className={`bg-transparent h-4`} />
 
-          <AnimatedCard delay={cardFadeDelay * 3}>
-            <VStack
-              space="xl"
+          {!!scheduledActivities.length ? (
+            <AnimatedCard delay={cardFadeDelay * 3}>
+              <VStack
+                space="xl"
+                className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
+              >
+                <HStack space="md" className="items-center">
+                  <Heading size="lg">Scheduled</Heading>
+                  <Badge action="error" size="lg" className="rounded-full">
+                    <BadgeText>{scheduledActivities.length}</BadgeText>
+                  </Badge>
+                  <Button
+                    action="negative"
+                    variant="link"
+                    className="ml-auto"
+                    size="sm"
+                    onPress={() => setShowAllScheduled(!showAllScheduled)}
+                  >
+                    <ButtonText>
+                      {showAllScheduled ? "Show Less" : "See All"}
+                    </ButtonText>
+                    <ButtonIcon as={ChevronRightIcon} />
+                  </Button>
+                </HStack>
+
+                {Object.entries(displayedScheduledActivitiesGrouped).map(
+                  ([date, activities], i) => (
+                    <VStack space="xl" key={date}>
+                      <HStack className="items-start">
+                        <VStack space="xs">
+                          <Box className="py-3">
+                            <VStack className="items-start justify-start">
+                              <Text className="text-base font-bold text-gray-900">
+                                {formatDay(date)} {formatMonth(date)}
+                              </Text>
+                              <Text className="text-center text-gray-600">
+                                {formatDayInWord(date)}
+                              </Text>
+                            </VStack>
+                          </Box>
+                        </VStack>
+
+                        <DotIcon style={{ marginTop: 18 }} color="#4b5563" />
+
+                        <VStack space="xl" className="flex-1">
+                          {activities.map((activity, index) => (
+                            <ScheduledCard
+                              key={
+                                "scheduledcard" + activity.activityId + index
+                              }
+                              activity={activity}
+                              onPress={() =>
+                                router.push(
+                                  `../view-activity/${activity.activityId}`
+                                )
+                              }
+                            ></ScheduledCard>
+                          ))}
+                        </VStack>
+                      </HStack>
+
+                      {i ===
+                      Object.entries(displayedScheduledActivitiesGrouped)
+                        .length -
+                        1 ? null : (
+                        <Divider className="" style={{ height: 1 }} />
+                      )}
+                    </VStack>
+                  )
+                )}
+              </VStack>
+            </AnimatedCard>
+          ) : (
+            <Badge
+              action="muted"
+              size="lg"
               className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
             >
-              <HStack space="md" className="items-center">
-                <Heading size="lg">Scheduled</Heading>
-                <Badge action="error" size="lg" className="rounded-full">
-                  <BadgeText>{scheduledActivities.length}</BadgeText>
-                </Badge>
-                <Button
-                  action="negative"
-                  variant="link"
-                  className="ml-auto"
-                  size="sm"
-                  onPress={() => setShowAllScheduled(!showAllScheduled)}
-                >
-                  <ButtonText>
-                    {showAllScheduled ? "Show Less" : "See All"}
-                  </ButtonText>
-                  <ButtonIcon as={ChevronRightIcon} />
-                </Button>
-              </HStack>
-
-              {Object.entries(displayedScheduledActivitiesGrouped).map(
-                ([date, activities], i) => (
-                  <VStack space="xl" key={date}>
-                    <HStack className="items-start">
-                      <VStack space="xs">
-                        <Box className="py-3">
-                          <VStack className="items-start justify-start">
-                            <Text className="text-base font-bold text-gray-900">
-                              {formatDay(date)} {formatMonth(date)}
-                            </Text>
-                            <Text className="text-center text-gray-600">
-                              {formatDayInWord(date)}
-                            </Text>
-                          </VStack>
-                        </Box>
-                      </VStack>
-
-                      <DotIcon style={{ marginTop: 18 }} color="#4b5563" />
-
-                      <VStack space="xl" className="flex-1">
-                        {activities.map((activity, index) => (
-                          <ScheduledCard
-                            key={"scheduledcard" + activity.activityId + index}
-                            activity={activity}
-                            onPress={() =>
-                              router.push(
-                                `../view-activity/${activity.activityId}`
-                              )
-                            }
-                          ></ScheduledCard>
-                        ))}
-                      </VStack>
-                    </HStack>
-
-                    {i ===
-                    Object.entries(displayedScheduledActivitiesGrouped).length -
-                      1 ? null : (
-                      <Divider className="" style={{ height: 1 }} />
-                    )}
-                  </VStack>
-                )
-              )}
-            </VStack>
-          </AnimatedCard>
+              <BadgeText>No scheduled activities!</BadgeText>
+            </Badge>
+          )}
         </>
       )}
 

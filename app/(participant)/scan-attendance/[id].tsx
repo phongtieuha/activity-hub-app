@@ -25,7 +25,6 @@ import { useNotification } from "@/hooks/useNotification";
 import { QrPayload } from "@/models/qr";
 import { useRouter } from "expo-router";
 import { CheckCircleIcon } from "lucide-react-native";
-import { DateTime } from "luxon";
 import React from "react";
 import { Dimensions, KeyboardAvoidingView, Platform, View } from "react-native";
 
@@ -52,15 +51,7 @@ const ScanAttendance = () => {
     const parsedData: QrPayload = JSON.parse(data);
 
     const payload: ScanAndAttendRequestDto = {
-      activityQrDto: {
-        ...parsedData,
-        generatedAt: DateTime.fromSeconds(parsedData.generatedAt)
-          .toUTC()
-          .toISO()!,
-        validUntil: DateTime.fromSeconds(parsedData.validUntil)
-          .toUTC()
-          .toISO()!,
-      },
+      token: data,
     };
     try {
       const result = await scanAndAttend(payload);

@@ -7,7 +7,9 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import "@/global.css";
+import { useAxiosWithRouter } from "@/hooks/custom-axios";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { NotificationProvider } from "@/hooks/useNotification";
 import { TabBarProvider } from "@/hooks/useTabBar";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
@@ -15,6 +17,12 @@ import { Image, Platform, StatusBar, StyleSheet } from "react-native";
 import "react-native-reanimated";
 
 export const ColorModeContext = React.createContext({});
+
+// Component to initialize axios with notification context
+const AxiosInitializer = () => {
+  useAxiosWithRouter();
+  return null;
+};
 
 const CustomBackButton = () => {
   const router = useRouter();
@@ -67,48 +75,51 @@ export default function RootLayout() {
             <GluestackUIProvider
               mode={colorScheme === "light" ? "light" : "dark"}
             >
-              <Stack screenOptions={{ animation: "slide_from_right" }}>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="+not-found" />
+              <NotificationProvider>
+                <AxiosInitializer />
+                <Stack screenOptions={{ animation: "slide_from_right" }}>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="+not-found" />
 
-                <Stack.Screen
-                  name="(manager)/(tabs)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(manager)/view-activity/[id]"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(manager)/scan-attendance/[id]"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(manager)/update-attendance/[id]"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(manager)/documents/[id]"
-                  options={getHeaderOptions("Documents")}
-                />
-                <Stack.Screen
-                  name="(manager)/manage-activity/[id]"
-                  options={getHeaderOptions("Manage Activity")}
-                />
+                  <Stack.Screen
+                    name="(manager)/(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(manager)/view-activity/[id]"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(manager)/scan-attendance/[id]"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(manager)/update-attendance/[id]"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(manager)/documents/[id]"
+                    options={getHeaderOptions("Documents")}
+                  />
+                  <Stack.Screen
+                    name="(manager)/manage-activity/[id]"
+                    options={getHeaderOptions("Manage Activity")}
+                  />
 
-                <Stack.Screen
-                  name="(participant)/(tabs)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(participant)/view-activity/[id]"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(participant)/scan-attendance/[id]"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
+                  <Stack.Screen
+                    name="(participant)/(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(participant)/view-activity/[id]"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(participant)/scan-attendance/[id]"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </NotificationProvider>
             </GluestackUIProvider>
           </GlobalLoadingProvider>
         </ColorModeContext.Provider>

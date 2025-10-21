@@ -70,7 +70,9 @@ export default function TabFourScreen() {
   // --- Handlers ---
   const handleShowMyQR = async () => {
     const qrResp = await generateQr({
-      type: "WALK_IN",
+      activityId: "",
+      activitySlotId: "",
+      type: "WALK_IN_REGISTRATION",
     });
     setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
     setShowQRActionsheet(true);
@@ -85,10 +87,10 @@ export default function TabFourScreen() {
 
   // --- Data ---
   const DATA: Section[] = [
-    {
-      title: "General",
-      data: [{ title: "My QR Code", onPress: handleShowMyQR }],
-    },
+    // {
+    //   title: "General",
+    //   data: [{ title: "My QR Code", onPress: handleShowMyQR }],
+    // },
     {
       title: "Settings",
       data: [{ title: "Log out", onPress: () => router.replace("/logout") }],
