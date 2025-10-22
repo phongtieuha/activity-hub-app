@@ -1,7 +1,5 @@
 import {
-  BookCheckIcon,
   CalendarPlus,
-  ChevronsRightIcon,
   MapPinIcon,
   NotebookTextIcon,
   ShirtIcon,
@@ -42,7 +40,6 @@ interface IProps {
   activityDetails: ActivityResponseDto;
   onBookNowPress?: () => void;
   onCancelBookingPress?: (slot: ActivitySlotDto) => void;
-  showBookNowButton?: boolean;
   showBookedSlots?: boolean;
   showCancelButton?: boolean;
 }
@@ -231,31 +228,30 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
           <HStack className="justify-between">
             <Heading className="font-semibold">Booking Required</Heading>
 
-            {props.activityDetails.bookingWindowRequired && (
+            {props.activityDetails.participationType === "COMPULSORY" && (
               <Badge action="error">
-                <BadgeText>Yes</BadgeText>
+                <BadgeText>No</BadgeText>
               </Badge>
             )}
-            {!props.activityDetails.bookingWindowRequired && (
+            {props.activityDetails.participationType === "ELECTIVE" && (
               <Badge action="success">
-                <BadgeText>No</BadgeText>
+                <BadgeText>Yes</BadgeText>
               </Badge>
             )}
           </HStack>
 
-          {props.activityDetails.bookingWindowRequired && (
+          {props.activityDetails.participationType === "ELECTIVE" && (
             <>
               <Divider className="border border-gray-200 border-dashed bg-transparent" />
-              {props.activityDetails.bookingWindowRequired &&
-                (isBookingStartDateSameAsEndDate
-                  ? bookingSameDatesBlock(
-                      props.activityDetails.bookingWindowStartDate!,
-                      props.activityDetails.bookingWindowEndDate!
-                    )
-                  : bookingDateRangeBlock(
-                      props.activityDetails.bookingWindowStartDate!,
-                      props.activityDetails.bookingWindowEndDate!
-                    ))}
+              {isBookingStartDateSameAsEndDate
+                ? bookingSameDatesBlock(
+                    props.activityDetails.bookingWindowStartDate!,
+                    props.activityDetails.bookingWindowEndDate!
+                  )
+                : bookingDateRangeBlock(
+                    props.activityDetails.bookingWindowStartDate!,
+                    props.activityDetails.bookingWindowEndDate!
+                  )}
             </>
           )}
 
@@ -293,22 +289,6 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
                   </Text>
                 )}
               </VStack>
-            </>
-          )}
-
-          {props.showBookNowButton && (
-            <>
-              <Divider className="border border-gray-200 border-dashed bg-transparent" />
-              <Pressable onPress={props.onBookNowPress}>
-                <HStack className="bg-red-200 py-2 px-4 items-center justify-between rounded-3xl gap-2">
-                  <Icon as={BookCheckIcon} className="text-gray-900 !size-4" />
-                  <Text className="text-gray-900 font-semibold">Book now</Text>
-                  <Icon
-                    as={ChevronsRightIcon}
-                    className="text-gray-900 !size-5"
-                  />
-                </HStack>
-              </Pressable>
             </>
           )}
         </Card>

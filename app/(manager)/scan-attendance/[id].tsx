@@ -26,9 +26,8 @@ import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { formatTime } from "@/hooks/date-formatter";
+import { formatDateTime } from "@/hooks/date-formatter";
 import { useNotification } from "@/hooks/useNotification";
-import { QrPayload } from "@/models/qr";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef } from "react";
 import {
@@ -108,7 +107,7 @@ const ScanAttendance = () => {
           {name}
         </ActionsheetItemText>
         <ActionsheetItemText className="text-gray-700 text-lg">
-          {attendAt}
+          {formatDateTime(attendAt)}
         </ActionsheetItemText>
       </ActionsheetItem>
     ),
@@ -121,35 +120,35 @@ const ScanAttendance = () => {
     if (isScanningInProgress) {
       return;
     }
-    setIsScanningInProgress(true);
-    const parsedData: QrPayload = JSON.parse(data);
+    console.log("data", data);
 
     const payload: ScanQrRequestDto = {
       token: data,
     };
-    try {
-      const result = await scanQr(payload);
 
-      if (result.newParticipant) {
-        setScanQrResponseDto(result);
-        setShowActionsheet(true);
-      } else {
-        const participantsResp = await list2(id as string, {
-          pageNumber: 1,
-          pageSize: 1000,
-          attendanceStatus: "PRESENT",
-        });
-        setAttendanceRecords(
-          participantsResp.data?.map((p) => ({
-            id: p.userId!,
-            name: p.name!,
-            attendAt: p.addedAt!,
-          })) ?? []
-        );
-        setShowAttendanceSheet(true);
-      }
+    setIsScanningInProgress(true);
+    let result: ScanQrResponseDto | null = null;
+    try {
+      result = await scanQr(payload);
+
+      const participantsResp = await list2(id as string, {
+        pageNumber: 1,
+        pageSize: 1000,
+        attendanceStatus: "PRESENT",
+      });
+      setAttendanceRecords(
+        participantsResp.data?.map((p) => ({
+          id: p.userId!,
+          name: p.name!,
+          attendAt: p.addedAt!,
+        })) ?? []
+      );
+      setShowAttendanceSheet(true);
     } catch (error: any) {
-      showNotification(error.message || "Error scanning QR", "error");
+      if (error.message.includes("Invalid QR code type")) {
+        setScanQrResponseDto(result!);
+        setShowActionsheet(true);
+      }
     }
     setIsScanningInProgress(false);
   };
@@ -169,9 +168,10 @@ const ScanAttendance = () => {
         participantsResp.data?.map((p) => ({
           id: p.userId!,
           name: p.name!,
-          attendAt: formatTime(p.addedAt!),
+          attendAt: p.addedAt!,
         })) ?? []
       );
+      setShowActionsheet(false);
       setShowAttendanceSheet(true);
     } catch (error: any) {
       showNotification(
@@ -209,8 +209,8 @@ const ScanAttendance = () => {
                 New participant
               </Heading>
               <Text size="lg" className="">
-                {scanQrResponseDto?.userName} is not in the participant list, do
-                you want to add him/her?
+                {/* {scanQrResponseDto?.userName}  */}
+                This participant is not in the list, do you want to add him/her?
               </Text>
 
               <Divider className="my-4 bg-transparent" />

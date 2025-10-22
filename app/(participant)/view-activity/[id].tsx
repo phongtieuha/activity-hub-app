@@ -98,9 +98,10 @@ const ViewActivity = () => {
   const [selectedBookingDate, setSelectedBookingDate] =
     React.useState<string>();
   const [bookingStep, setBookingStep] = React.useState<"select" | "success">();
+  const [bookingMode, setBookingMode] = React.useState<"slot" | "qr">("slot");
 
   const bookingSlotsGroupedByDateOrderedByDateKey = React.useMemo(() => {
-    if (activityDetails?.bookingWindowRequired) {
+    if (activityDetails?.participationType === "ELECTIVE") {
       return groupActivitiesByDateRangeOrdered<ActivitySlotDto>(
         activityDetails.slots || []
       );
@@ -113,21 +114,21 @@ const ViewActivity = () => {
   }, [bookingSlotsGroupedByDateOrderedByDateKey]);
 
   const [hasAttendanceTaken, setHasAttendanceTaken] = React.useState(false);
-  const registrationRequired = React.useMemo(
-    () => activityDetails?.bookingWindowRequired ?? false,
-    [activityDetails]
-  );
+
   const alreadyRegistered = React.useMemo(
     () => activityDetails?.slots?.find((slot) => slot.bookedByMe) ?? false,
     [activityDetails]
   );
-  const showAttendanceButtons = React.useMemo(
-    () => (registrationRequired && alreadyRegistered) || !registrationRequired,
-    [registrationRequired, alreadyRegistered]
-  );
 
   const handlepOpenBookingSheet = () => {
     setBookingStep("select");
+    setBookingMode("slot");
+    setShowBookingSheet(true);
+  };
+
+  const handlepGenerateQROpenBookingSheet = () => {
+    setBookingStep("select");
+    setBookingMode("qr");
     setShowBookingSheet(true);
   };
 
@@ -136,6 +137,28 @@ const ViewActivity = () => {
     setSelectedBookingDate(undefined);
     setShowBookingSheet(false);
     setBookingStep(undefined);
+  };
+
+  const handleGenerateQRBookingSheet = async () => {
+    setIsQrRefreshing(true);
+    try {
+      const qrResp = await generateQr({
+        type: "WALK_IN_REGISTRATION",
+        activityId: id as string,
+        activitySlotId: selectedSlots?.activitySlotId!,
+      });
+      setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
+      setShowBookingSheet(false);
+      setShowQRActionsheet(true);
+      const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);
+
+      if (qrData) {
+        const parsedData: QrPayload = JSON.parse(qrData);
+        setQrData(parsedData);
+      }
+    } finally {
+      setIsQrRefreshing(false);
+    }
   };
 
   const handleBookBookingSheet = async () => {
@@ -171,10 +194,6 @@ const ViewActivity = () => {
     }
   };
 
-  // const handleSelectBookingSheet = () => {
-  //   setBookingStep("confirm");
-  // };
-
   const onBookingDateSelected = (date: string) => {
     setSelectedBookingDate(date);
   };
@@ -206,9 +225,8 @@ const ViewActivity = () => {
       const qrResp = await generateQr({
         type: "PARTICIPANT",
         activityId: id as string,
-        activitySlotId:
-          activityDetails?.slots?.find((x) => x.bookedByMe)?.activitySlotId ||
-          "",
+        activitySlotId: activityDetails?.slots?.find((x) => x.bookedByMe)
+          ?.activitySlotId!,
       });
       setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
       setShowQRActionsheet(true);
@@ -235,7 +253,18 @@ const ViewActivity = () => {
       const hasAttendanceTaken = attendanceRecordsResp.data?.some(
         (x) => x.activityId === id && x.attendanceStatus === "PRESENT"
       );
-      setHasAttendanceTaken(hasAttendanceTaken ?? false);
+
+      if (!hasAttendanceTaken) {
+        const attendanceRecordsResp = await listActivitiesAttended({
+          activityType: "OTHER_ACTIVITIES",
+        });
+        const hasAttendanceTaken = attendanceRecordsResp.data?.some(
+          (x) => x.activityId === id && x.attendanceStatus === "PRESENT"
+        );
+        setHasAttendanceTaken(hasAttendanceTaken ?? false);
+      } else {
+        setHasAttendanceTaken(hasAttendanceTaken ?? false);
+      }
 
       const userResp = await getMe();
       setUserDetails(userResp);
@@ -322,48 +351,68 @@ const ViewActivity = () => {
           >
             <DetailsCard
               activityDetails={activityDetails}
-              showBookNowButton={true}
               showBookedSlots
               showCancelButton={
-                activityDetails.participationType === "ELECTIVE"
+                activityDetails.participationType === "ELECTIVE" &&
+                !hasAttendanceTaken
               }
-              onBookNowPress={handlepOpenBookingSheet}
               onCancelBookingPress={handleCancelBookingSheet}
             />
 
-            {showAttendanceButtons && (
-              <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
-                {!hasAttendanceTaken ? (
+            {!alreadyRegistered && (
+              <>
+                <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
                   <VStack space="xl">
-                    <Pressable
-                      onPress={() => router.push(`../scan-attendance/${id}`)}
-                    >
+                    <Pressable onPress={handlepGenerateQROpenBookingSheet}>
                       <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        {/* <Icon
-                          as={ScanQrCodeIcon}
-                          className="text-red-600 !size-5"
-                        /> */}
                         <Text className="text-red-600 font-semibold">
-                          Scan QR
-                        </Text>
-                      </HStack>
-                    </Pressable>
-                    <Pressable onPress={handleRegisterAttendance}>
-                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        <Text className="text-white font-semibold">
                           Generate QR
                         </Text>
                       </HStack>
                     </Pressable>
+                    <Pressable onPress={handlepOpenBookingSheet}>
+                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                        <Text className="text-white font-semibold">
+                          Book a slot
+                        </Text>
+                      </HStack>
+                    </Pressable>
                   </VStack>
-                ) : (
-                  <Badge action="success" className="py-3 px-4 gap-2 shadow-sm">
-                    <BadgeIcon as={CheckCircleIcon} className="!size-6" />
-                    <BadgeText className="text-lg">
-                      Attendance has been taken.
-                    </BadgeText>
-                  </Badge>
-                )}
+                </AnimatedCard>
+              </>
+            )}
+
+            {hasAttendanceTaken && (
+              <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
+                <Badge action="success" className="py-3 px-4 gap-2 shadow-sm">
+                  <BadgeIcon as={CheckCircleIcon} className="!size-6" />
+                  <BadgeText className="text-lg">
+                    Attendance has been taken.
+                  </BadgeText>
+                </Badge>
+              </AnimatedCard>
+            )}
+
+            {alreadyRegistered && !hasAttendanceTaken && (
+              <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
+                <VStack space="xl">
+                  <Pressable
+                    onPress={() => router.push(`../scan-attendance/${id}`)}
+                  >
+                    <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                      <Text className="text-red-600 font-semibold">
+                        Scan QR
+                      </Text>
+                    </HStack>
+                  </Pressable>
+                  <Pressable onPress={handleRegisterAttendance}>
+                    <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                      <Text className="text-white font-semibold">
+                        Generate QR
+                      </Text>
+                    </HStack>
+                  </Pressable>
+                </VStack>
               </AnimatedCard>
             )}
           </AnimatedCard>
@@ -594,15 +643,28 @@ const ViewActivity = () => {
                 </ScrollView>
 
                 <VStack space="md" className="mt-auto">
-                  <Button
-                    size="lg"
-                    variant="solid"
-                    action={!selectedSlots ? "secondary" : "negative"}
-                    onPress={handleBookBookingSheet}
-                    disabled={!selectedSlots?.activitySlotId}
-                  >
-                    <ButtonText className="">Book</ButtonText>
-                  </Button>
+                  {bookingMode === "slot" && (
+                    <Button
+                      size="lg"
+                      variant="solid"
+                      action={!selectedSlots ? "secondary" : "negative"}
+                      onPress={handleBookBookingSheet}
+                      disabled={!selectedSlots?.activitySlotId}
+                    >
+                      <ButtonText className="">Book</ButtonText>
+                    </Button>
+                  )}
+                  {bookingMode === "qr" && (
+                    <Button
+                      size="lg"
+                      variant="solid"
+                      action={!selectedSlots ? "secondary" : "negative"}
+                      onPress={handleGenerateQRBookingSheet}
+                      disabled={!selectedSlots?.activitySlotId}
+                    >
+                      <ButtonText className="">Generate QR</ButtonText>
+                    </Button>
+                  )}
                   <Button
                     size="lg"
                     action="default"

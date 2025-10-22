@@ -89,12 +89,9 @@ const ViewActivity = () => {
     React.useState<string>();
 
   const bookingSlotsGroupedByDateOrderedByDateKey = React.useMemo(() => {
-    if (activityDetails?.bookingWindowRequired) {
-      return groupActivitiesByDateRangeOrdered<ActivitySlotDto>(
-        activityDetails.slots || []
-      );
-    }
-    return {};
+    return groupActivitiesByDateRangeOrdered<ActivitySlotDto>(
+      activityDetails?.slots || []
+    );
   }, [activityDetails]);
 
   const enabledDates = React.useMemo(() => {
@@ -149,6 +146,7 @@ const ViewActivity = () => {
       });
 
       setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
+      setShowBookingSheet(false);
       setShowQRActionsheet(true);
 
       const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);

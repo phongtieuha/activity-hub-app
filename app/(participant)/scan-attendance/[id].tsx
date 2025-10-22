@@ -22,7 +22,6 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { formatDate, formatTime } from "@/hooks/date-formatter";
 import { useNotification } from "@/hooks/useNotification";
-import { QrPayload } from "@/models/qr";
 import { useRouter } from "expo-router";
 import { CheckCircleIcon } from "lucide-react-native";
 import React from "react";
@@ -47,12 +46,12 @@ const ScanAttendance = () => {
     if (isScanningInProgress) {
       return;
     }
-    setIsScanningInProgress(true);
-    const parsedData: QrPayload = JSON.parse(data);
 
     const payload: ScanAndAttendRequestDto = {
       token: data,
     };
+
+    setIsScanningInProgress(true);
     try {
       const result = await scanAndAttend(payload);
 
