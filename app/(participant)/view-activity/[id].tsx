@@ -47,7 +47,6 @@ import { Text } from "@/components/ui/text";
 
 import { VStack } from "@/components/ui/vstack";
 import {
-  differenceInHours,
   formatDate,
   formatDayInWord,
   formatSlotTime,
@@ -204,17 +203,17 @@ const ViewActivity = () => {
 
   // --- Derived State ---
   const qrExpiry = useMemo(() => {
-    if (qrData) {
-      const generated = DateTime.fromSeconds(qrData.generatedAt).setZone(
-        "Asia/Singapore"
-      );
-      const validUntil = DateTime.fromSeconds(qrData.validUntil).setZone(
-        "Asia/Singapore"
-      );
-      return differenceInHours(generated, validUntil);
-    }
-    return null;
-  }, [qrData]);
+    // if (qrData) {
+    //   const generated = DateTime.fromSeconds(qrData.generatedAt).setZone(
+    //     "Asia/Singapore"
+    //   );
+    //   const validUntil = DateTime.fromSeconds(qrData.validUntil).setZone(
+    //     "Asia/Singapore"
+    //   );
+    //   return differenceInHours(generated, validUntil);
+    // }
+    return "1M";
+  }, []);
 
   // --- Handlers ---
   const handleCloseQRActionsheet = () => setShowQRActionsheet(false);

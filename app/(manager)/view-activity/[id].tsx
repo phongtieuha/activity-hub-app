@@ -34,7 +34,6 @@ import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
-  differenceInHours,
   formatDate,
   formatDayInWord,
   formatSlotTime,
@@ -122,17 +121,17 @@ const ViewActivity = () => {
 
   // 6) Derived state
   const qrExpiry = useMemo(() => {
-    if (qrData) {
-      const generated = DateTime.fromSeconds(qrData.generatedAt).setZone(
-        "Asia/Singapore"
-      );
-      const validUntil = DateTime.fromSeconds(qrData.validUntil).setZone(
-        "Asia/Singapore"
-      );
-      return differenceInHours(generated, validUntil);
-    }
-    return null;
-  }, [qrData]);
+    // if (qrData) {
+    //   const generated = DateTime.fromSeconds(qrData.generatedAt).setZone(
+    //     "Asia/Singapore"
+    //   );
+    //   const validUntil = DateTime.fromSeconds(qrData.validUntil).setZone(
+    //     "Asia/Singapore"
+    //   );
+    //   return differenceInHours(generated, validUntil);
+    // }
+    return "1M";
+  }, []);
 
   // 7) Callbacks/handlers
   const handleCloseQRActionsheet = () => setShowQRActionsheet(false);
