@@ -110,9 +110,7 @@ export function formatTime(date: string): string {
 }
 
 export function formatSlotTime(date: string): string {
-  return DateTime.fromJSDate(
-    new Date(date.endsWith("Z") ? date.slice(0, -1) : date)
-  ).toFormat("hh:mm a");
+  return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("hh:mm a");
 }
 
 export function differenceInHours(d1: DateTime, d2: DateTime): string {

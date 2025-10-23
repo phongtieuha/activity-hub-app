@@ -488,8 +488,8 @@ const ViewActivity = () => {
                         events={bookingSlotsGroupedByDateOrderedByDateKey[
                           selectedBookingDate!
                         ].map((slot) => ({
-                          start: slot.startDate.slice(0, -1),
-                          end: slot.endDate.slice(0, -1),
+                          start: slot.startDate,
+                          end: slot.endDate,
                           ...slot,
                         }))}
                         renderEvent={(slot, index) => (

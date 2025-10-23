@@ -222,76 +222,92 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
           </Text>
         </HStack>
 
-        <Divider className="h-2 bg-transparent" />
+        {bookedSlots.length === 0 && (
+          <>
+            <Divider className="h-2 bg-transparent" />
+            <Card className="p-4 rounded-3xl border border-gray-200 gap-3">
+              <HStack className="justify-between">
+                <Text className="font-semibold">Booking Required</Text>
 
-        <Card className="p-4 rounded-3xl border border-gray-200 gap-3">
-          <HStack className="justify-between">
-            <Heading className="font-semibold">Booking Required</Heading>
+                {props.activityDetails.participationType === "ELECTIVE" && (
+                  <Badge action="error">
+                    <BadgeText>Yes</BadgeText>
+                  </Badge>
+                )}
+                {props.activityDetails.participationType === "COMPULSORY" && (
+                  <Badge action="success">
+                    <BadgeText>No</BadgeText>
+                  </Badge>
+                )}
+              </HStack>
 
-            {props.activityDetails.participationType === "COMPULSORY" && (
-              <Badge action="error">
-                <BadgeText>No</BadgeText>
-              </Badge>
-            )}
-            {props.activityDetails.participationType === "ELECTIVE" && (
-              <Badge action="success">
-                <BadgeText>Yes</BadgeText>
-              </Badge>
-            )}
-          </HStack>
+              {props.activityDetails.participationType === "ELECTIVE" && (
+                <>
+                  <Divider className="border border-gray-200 border-dashed bg-transparent" />
+                  {isBookingStartDateSameAsEndDate
+                    ? bookingSameDatesBlock(
+                        props.activityDetails.bookingWindowStartDate!,
+                        props.activityDetails.bookingWindowEndDate!
+                      )
+                    : bookingDateRangeBlock(
+                        props.activityDetails.bookingWindowStartDate!,
+                        props.activityDetails.bookingWindowEndDate!
+                      )}
+                </>
+              )}
+            </Card>
+          </>
+        )}
 
-          {props.activityDetails.participationType === "ELECTIVE" && (
-            <>
-              <Divider className="border border-gray-200 border-dashed bg-transparent" />
-              {isBookingStartDateSameAsEndDate
-                ? bookingSameDatesBlock(
-                    props.activityDetails.bookingWindowStartDate!,
-                    props.activityDetails.bookingWindowEndDate!
-                  )
-                : bookingDateRangeBlock(
-                    props.activityDetails.bookingWindowStartDate!,
-                    props.activityDetails.bookingWindowEndDate!
-                  )}
-            </>
-          )}
+        {props.showBookedSlots && bookedSlots.length > 0 && (
+          <>
+            <Divider className="h-2 bg-transparent" />
+            <Card className="p-4 rounded-3xl border border-red-600 gap-3">
+              <Heading className="font-semibold">Booked slot</Heading>
 
-          {props.showBookedSlots && (
-            <>
-              <Divider className="border border-gray-200 border-dashed bg-transparent" />
-              <VStack className="text-typography-300 items-start justify-center">
-                <Text className="">Booked slot</Text>
+              <VStack
+                space="md"
+                className="text-typography-300 items-start justify-center"
+              >
                 {bookedSlots.map((slot) => (
-                  <HStack
-                    key={slot.activitySlotId}
-                    className="justify-between items-center self-stretch"
-                  >
-                    <Text className="text-typography-900 font-semibold text-base">
-                      {formatDayInWord(slot.startDate)},{" "}
-                      {formatShortDate(slot.startDate)},{" "}
-                      {formatSlotTime(slot.startDate)} -{" "}
-                      {formatSlotTime(slot.endDate)}
-                    </Text>
+                  <>
+                    <HStack
+                      className="justify-between"
+                      space="xl"
+                      key={slot.activitySlotId}
+                    >
+                      <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-4 py-3 flex-1">
+                        <Text className="">Date</Text>
+                        <Text className="text-typography-900 font-semibold text-base">
+                          {formatDayInWord(slot.startDate)},{" "}
+                          {formatShortDate(slot.startDate)}
+                        </Text>
+                      </VStack>
+
+                      <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-4 py-3 flex-1">
+                        <Text className="">Time</Text>
+                        <Text className="text-typography-900 font-semibold">
+                          {formatSlotTime(slot.startDate)} -{" "}
+                          {formatSlotTime(slot.endDate)}
+                        </Text>
+                      </VStack>
+                    </HStack>
                     {props.showCancelButton && (
                       <Button
-                        size="xs"
                         variant="outline"
                         action="negative"
+                        className="w-full"
                         onPress={() => handleCancelBooking(slot)}
                       >
                         <ButtonText>Cancel Booking</ButtonText>
                       </Button>
                     )}
-                  </HStack>
+                  </>
                 ))}
-                {bookedSlots.length === 0 && (
-                  <Text className="text-typography-900 font-semibold text-base">
-                    -
-                  </Text>
-                )}
               </VStack>
-            </>
-          )}
-        </Card>
+            </Card>
+          </>
+        )}
 
         {props.children}
       </VStack>

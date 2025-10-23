@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -50,8 +51,13 @@ const MinimalTimeline = <T extends object>({
     let latestHour = -Infinity;
 
     events.forEach((event) => {
-      const startDate = new Date(event.start);
-      const endDate = new Date(event.end);
+      const startDate = DateTime.fromISO(event.start)
+        .setZone("Asia/Singapore")
+        .toJSDate();
+      const endDate = DateTime.fromISO(event.end)
+        .setZone("Asia/Singapore")
+        .toJSDate();
+      console.log("startDate", startDate);
 
       const startHour = startDate.getHours();
       let endHour = endDate.getHours();
@@ -88,8 +94,12 @@ const MinimalTimeline = <T extends object>({
 
   // Calculate event positioning with offset for dynamic start
   const getEventLayout = (event: TimelineEvent): EventLayout => {
-    const startDate = new Date(event.start);
-    const endDate = new Date(event.end);
+    const startDate = DateTime.fromISO(event.start)
+      .setZone("Asia/Singapore")
+      .toJSDate();
+    const endDate = DateTime.fromISO(event.end)
+      .setZone("Asia/Singapore")
+      .toJSDate();
 
     const startHour = startDate.getHours();
     const startMinutes = startDate.getMinutes();

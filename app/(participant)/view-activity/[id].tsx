@@ -1,4 +1,5 @@
 import {
+  ActivityAttendedDtoAttendanceStatus,
   ActivityResponseDto,
   ActivitySlotDto,
   bookForSelf,
@@ -186,7 +187,7 @@ const ViewActivity = () => {
 
   const handleCancelBookingSheet = async (slot: ActivitySlotDto) => {
     try {
-      await cancelBooking(slot?.activitySlotId!);
+      await cancelBooking(slot?.myBookingId!);
       await fetchData();
     } catch (error: any) {
       showNotification(error.message, "error");
@@ -250,7 +251,10 @@ const ViewActivity = () => {
       });
 
       const hasAttendanceTaken = attendanceRecordsResp.data?.some(
-        (x) => x.activityId === id && x.attendanceStatus === "PRESENT"
+        (x) =>
+          x.activityId === id &&
+          (x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.PRESENT ||
+            x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.LATE)
       );
 
       if (!hasAttendanceTaken) {
@@ -258,7 +262,11 @@ const ViewActivity = () => {
           activityType: "OTHER_ACTIVITIES",
         });
         const hasAttendanceTaken = attendanceRecordsResp.data?.some(
-          (x) => x.activityId === id && x.attendanceStatus === "PRESENT"
+          (x) =>
+            x.activityId === id &&
+            (x.attendanceStatus ===
+              ActivityAttendedDtoAttendanceStatus.PRESENT ||
+              x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.LATE)
         );
         setHasAttendanceTaken(hasAttendanceTaken ?? false);
       } else {
@@ -566,8 +574,8 @@ const ViewActivity = () => {
                           events={bookingSlotsGroupedByDateOrderedByDateKey[
                             selectedBookingDate!
                           ].map((slot) => ({
-                            start: slot.startDate.slice(0, -1),
-                            end: slot.endDate.slice(0, -1),
+                            start: slot.startDate,
+                            end: slot.endDate,
                             ...slot,
                           }))}
                           renderEvent={(slot, index) => (
