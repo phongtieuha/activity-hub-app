@@ -34,13 +34,14 @@ import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
+  differenceInMinutes,
   formatDate,
   formatDayInWord,
   formatSlotTime,
+  getCurrentSGTDate,
+  getSGTDate,
   groupActivitiesByDateRangeOrdered,
 } from "@/hooks/date-formatter";
-import { decodeQrFromBase64 } from "@/hooks/useQrDecode";
-import { QrPayload } from "@/models/qr";
 import * as Brightness from "expo-brightness";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -52,7 +53,7 @@ import {
   ScrollTextIcon,
 } from "lucide-react-native";
 import { DateTime } from "luxon";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import {
   Dimensions,
   KeyboardAvoidingView,
@@ -79,7 +80,7 @@ const ViewActivity = () => {
 
   // 5) QR-related state
   const [qrBase64String, setQrBase64String] = React.useState("");
-  const [qrData, setQrData] = React.useState<QrPayload>();
+  const [qrExpiry, setQrExpiry] = React.useState<string | null>(null);
   const [isQrRefreshing, setIsQrRefreshing] = React.useState(false);
 
   const [showBookingSheet, setShowBookingSheet] = React.useState(false);
@@ -119,20 +120,6 @@ const ViewActivity = () => {
     setSelectedSlots(slot);
   };
 
-  // 6) Derived state
-  const qrExpiry = useMemo(() => {
-    // if (qrData) {
-    //   const generated = DateTime.fromSeconds(qrData.generatedAt).setZone(
-    //     "Asia/Singapore"
-    //   );
-    //   const validUntil = DateTime.fromSeconds(qrData.validUntil).setZone(
-    //     "Asia/Singapore"
-    //   );
-    //   return differenceInHours(generated, validUntil);
-    // }
-    return "1M";
-  }, []);
-
   // 7) Callbacks/handlers
   const handleCloseQRActionsheet = () => setShowQRActionsheet(false);
   const handleRegisterAttendance = async () => {
@@ -145,14 +132,14 @@ const ViewActivity = () => {
       });
 
       setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
+      setQrExpiry(
+        differenceInMinutes(
+          getCurrentSGTDate(),
+          getSGTDate(qrResp.expiryDateTime!)
+        ) + "M"
+      );
       setShowBookingSheet(false);
       setShowQRActionsheet(true);
-
-      const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);
-      if (qrData) {
-        const parsedData: QrPayload = JSON.parse(qrData);
-        setQrData(parsedData);
-      }
     } finally {
       setIsQrRefreshing(false);
     }

@@ -48,15 +48,16 @@ import { Text } from "@/components/ui/text";
 
 import { VStack } from "@/components/ui/vstack";
 import {
+  differenceInMinutes,
   formatDate,
   formatDayInWord,
   formatSlotTime,
   formatTime,
+  getCurrentSGTDate,
+  getSGTDate,
   groupActivitiesByDateRangeOrdered,
 } from "@/hooks/date-formatter";
 import { useNotification } from "@/hooks/useNotification";
-import { decodeQrFromBase64 } from "@/hooks/useQrDecode";
-import { QrPayload } from "@/models/qr";
 import * as Brightness from "expo-brightness";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -67,7 +68,7 @@ import {
   LoaderIcon,
 } from "lucide-react-native";
 import { DateTime } from "luxon";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Dimensions,
   KeyboardAvoidingView,
@@ -90,7 +91,7 @@ const ViewActivity = () => {
   const [userDetails, setUserDetails] = React.useState<UserDto>();
   const [refreshing, setRefreshing] = React.useState(false);
   const [isFetchingData, setIsFetchingData] = React.useState(false);
-  const [qrData, setQrData] = React.useState<QrPayload>();
+  const [qrExpiry, setQrExpiry] = React.useState<string | null>(null);
   const [isQrRefreshing, setIsQrRefreshing] = React.useState(false);
   const originalBrightnessRef = React.useRef<number | null>(null);
   const [showBookingSheet, setShowBookingSheet] = React.useState(false);
@@ -148,14 +149,20 @@ const ViewActivity = () => {
         activitySlotId: selectedSlots?.activitySlotId!,
       });
       setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
+      setQrExpiry(
+        differenceInMinutes(
+          getCurrentSGTDate(),
+          getSGTDate(qrResp.expiryDateTime!)
+        ) + "M"
+      );
       setShowBookingSheet(false);
       setShowQRActionsheet(true);
-      const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);
+      // const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);
 
-      if (qrData) {
-        const parsedData: QrPayload = JSON.parse(qrData);
-        setQrData(parsedData);
-      }
+      // if (qrData) {
+      //   const parsedData: QrPayload = JSON.parse(qrData);
+      //   setQrData(parsedData);
+      // }
     } finally {
       setIsQrRefreshing(false);
     }
@@ -202,20 +209,6 @@ const ViewActivity = () => {
     setSelectedSlots(slot);
   };
 
-  // --- Derived State ---
-  const qrExpiry = useMemo(() => {
-    // if (qrData) {
-    //   const generated = DateTime.fromSeconds(qrData.generatedAt).setZone(
-    //     "Asia/Singapore"
-    //   );
-    //   const validUntil = DateTime.fromSeconds(qrData.validUntil).setZone(
-    //     "Asia/Singapore"
-    //   );
-    //   return differenceInHours(generated, validUntil);
-    // }
-    return "1M";
-  }, []);
-
   // --- Handlers ---
   const handleCloseQRActionsheet = () => setShowQRActionsheet(false);
 
@@ -229,12 +222,13 @@ const ViewActivity = () => {
           ?.activitySlotId!,
       });
       setQrBase64String(`data:image/png;base64,${qrResp.imageStr}`);
+      setQrExpiry(
+        differenceInMinutes(
+          getCurrentSGTDate(),
+          getSGTDate(qrResp.expiryDateTime!)
+        ) + "M"
+      );
       setShowQRActionsheet(true);
-      const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);
-      if (qrData) {
-        const parsedData: QrPayload = JSON.parse(qrData);
-        setQrData(parsedData);
-      }
     } finally {
       setIsQrRefreshing(false);
     }
@@ -246,9 +240,7 @@ const ViewActivity = () => {
       const detailResp = await getById(id as string);
       setActivityDetails(detailResp?.data);
 
-      const attendanceRecordsResp = await listActivitiesAttended({
-        activityType: "APS",
-      });
+      const attendanceRecordsResp = await listActivitiesAttended();
 
       const hasAttendanceTaken = attendanceRecordsResp.data?.some(
         (x) =>
@@ -256,22 +248,7 @@ const ViewActivity = () => {
           (x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.PRESENT ||
             x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.LATE)
       );
-
-      if (!hasAttendanceTaken) {
-        const attendanceRecordsResp = await listActivitiesAttended({
-          activityType: "OTHER_ACTIVITIES",
-        });
-        const hasAttendanceTaken = attendanceRecordsResp.data?.some(
-          (x) =>
-            x.activityId === id &&
-            (x.attendanceStatus ===
-              ActivityAttendedDtoAttendanceStatus.PRESENT ||
-              x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.LATE)
-        );
-        setHasAttendanceTaken(hasAttendanceTaken ?? false);
-      } else {
-        setHasAttendanceTaken(hasAttendanceTaken ?? false);
-      }
+      setHasAttendanceTaken(hasAttendanceTaken ?? false);
 
       const userResp = await getMe();
       setUserDetails(userResp);

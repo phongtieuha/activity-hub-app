@@ -114,11 +114,6 @@ export function formatSlotTime(date: string): string {
 }
 
 export function differenceInHours(d1: DateTime, d2: DateTime): string {
-  console.log(
-    d1.setZone("Asia/Singapore").toFormat(DATE_TIME_FORMAT),
-    d2.setZone("Asia/Singapore").toFormat(DATE_TIME_FORMAT)
-  );
-
   const diff = d2.diff(d1, ["hours", "minutes", "seconds"]).toObject();
   const pad = (n: number) => n.toString().padStart(2, "0");
   const intMinutes = diff.minutes !== undefined ? Math.floor(diff.minutes) : 0;
@@ -128,6 +123,14 @@ export function differenceInHours(d1: DateTime, d2: DateTime): string {
   )}`;
 
   return diffStr;
+}
+
+export function differenceInMinutes(d1: DateTime, d2: DateTime): string {
+  // difference in minutes only
+  const diff = d2.diff(d1, ["minutes"]).toObject();
+  const roundedMinutes = Math.round(diff.minutes ?? 0);
+
+  return roundedMinutes.toString();
 }
 
 /**

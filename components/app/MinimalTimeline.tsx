@@ -57,7 +57,6 @@ const MinimalTimeline = <T extends object>({
       const endDate = DateTime.fromISO(event.end)
         .setZone("Asia/Singapore")
         .toJSDate();
-      console.log("startDate", startDate);
 
       const startHour = startDate.getHours();
       let endHour = endDate.getHours();

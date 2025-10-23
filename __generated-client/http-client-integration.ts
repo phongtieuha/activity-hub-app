@@ -388,15 +388,6 @@ export interface ActivityDraftRequestDto {
   participationType: ActivityDraftRequestDtoParticipationType;
 }
 
-export type ErrorResponseErrorsItem = { [key: string]: unknown };
-
-export interface ErrorResponse {
-  /** Custom message indicating the status of the API invocation. */
-  errors?: ErrorResponseErrorsItem[];
-  /** Custom message indicating the status of the API invocation. */
-  message?: string;
-}
-
 export interface ScanWalkInQrRequestDto {
   /** @minLength 1 */
   token?: string;
@@ -746,6 +737,7 @@ export interface SuccessPaginateResponseMarkedAttendanceUserDto {
 
 export interface GenerateQrResponseDto {
   imageStr?: string;
+  expiryDateTime?: string;
 }
 
 export type ActivityAttendedDtoAttendanceStatus =
@@ -1048,7 +1040,7 @@ export type ListActivitiesAttendedParams = {
    * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
    */
   sort?: string[];
-  activityType: ListActivitiesAttendedActivityType;
+  activityType?: ListActivitiesAttendedActivityType;
   startDateRange?: string;
   endDateRange?: string;
 };
@@ -1403,10 +1395,6 @@ export const add1 = (
   );
 };
 
-/**
- * Creates a new activity in DRAFT status
- * @summary Create draft activity
- */
 export const createDraft = (
   activityDraftRequestDto: ActivityDraftRequestDto,
   options?: SecondParameter<typeof customAxiosInstance>
@@ -1727,7 +1715,7 @@ export const generateQr = (
 };
 
 export const listActivitiesAttended = (
-  params: ListActivitiesAttendedParams,
+  params?: ListActivitiesAttendedParams,
   options?: SecondParameter<typeof customAxiosInstance>
 ) => {
   return customAxiosInstance<SuccessPaginateResponseActivityAttendedDto>(

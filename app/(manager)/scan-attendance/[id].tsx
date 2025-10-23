@@ -120,7 +120,6 @@ const ScanAttendance = () => {
     if (isScanningInProgress) {
       return;
     }
-    console.log("data", data);
 
     const payload: ScanQrRequestDto = {
       token: data,
