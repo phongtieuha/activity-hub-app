@@ -133,7 +133,7 @@ const ScanAttendance = () => {
       const participantsResp = await list2(id as string, {
         pageNumber: 1,
         pageSize: 1000,
-        attendanceStatus: "PRESENT",
+        attendanceStatuses: ["PRESENT", "LATE"],
       });
       setAttendanceRecords(
         participantsResp.data?.map((p) => ({
@@ -161,7 +161,7 @@ const ScanAttendance = () => {
       const participantsResp = await list2(id as string, {
         pageNumber: 1,
         pageSize: 1000,
-        attendanceStatus: "PRESENT",
+        attendanceStatuses: ["PRESENT", "LATE"],
       });
       setAttendanceRecords(
         participantsResp.data?.map((p) => ({

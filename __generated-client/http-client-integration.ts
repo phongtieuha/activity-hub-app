@@ -959,15 +959,15 @@ export type List2Params = {
   sort?: string[];
   name?: string;
   nric?: string;
-  attendanceStatus?: List2AttendanceStatus;
+  attendanceStatuses?: List2AttendanceStatusesItem[];
   slotId?: string;
 };
 
-export type List2AttendanceStatus =
-  (typeof List2AttendanceStatus)[keyof typeof List2AttendanceStatus];
+export type List2AttendanceStatusesItem =
+  (typeof List2AttendanceStatusesItem)[keyof typeof List2AttendanceStatusesItem];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const List2AttendanceStatus = {
+export const List2AttendanceStatusesItem = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
   LATE: "LATE",

@@ -357,7 +357,7 @@ const ViewActivity = () => {
                     <Pressable onPress={handlepOpenBookingSheet}>
                       <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
                         <Text className="text-white font-semibold">
-                          Book a slot
+                          Book a Slot
                         </Text>
                       </HStack>
                     </Pressable>
@@ -499,7 +499,7 @@ const ViewActivity = () => {
                 style={{ height: screenHeight * 0.85 }}
               >
                 <Heading size="xl" className="font-bold">
-                  Select a slot
+                  Select a Slot
                 </Heading>
                 <ScrollView
                   className="flex-1"
@@ -677,6 +677,7 @@ const ViewActivity = () => {
                   <Text size="lg" className="text-center text-white">
                     Booking has been taken on
                   </Text>
+                  <Divider className="my-4 bg-transparent" />
                 </AnimatedCard>
 
                 <Heading
@@ -688,7 +689,6 @@ const ViewActivity = () => {
                 </Heading>
 
                 <AnimatedCard delay={cardFadeDelay * 2}>
-                  <Divider className="my-4 bg-transparent" />
                   {!!selectedSlots && (
                     <Heading
                       key={"bookedSlot" + selectedSlots.activitySlotId}
