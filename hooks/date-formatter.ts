@@ -37,7 +37,7 @@ export function groupActivitiesByDateRangeOrdered<
 }
 
 export const DATE_FORMAT = "dd LLL yyyy";
-export const DATE_TIME_FORMAT = "dd LLL yyyy hh':'mm a";
+export const DATE_TIME_FORMAT = "dd LLL yyyy HH':'mm a";
 export const DATE_FULL_FORMAT = "dd LLLL yyyy";
 export const DATEPICKER_FORMAT = "yyyy-LL-dd";
 
@@ -106,11 +106,11 @@ export function formatMonth(date: string): string {
 }
 
 export function formatTime(date: string): string {
-  return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("hh:mm a");
+  return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("HH:mm a");
 }
 
 export function formatSlotTime(date: string): string {
-  return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("hh:mm a");
+  return DateTime.fromISO(date).setZone("Asia/Singapore").toFormat("HH:mm a");
 }
 
 export function differenceInHours(d1: DateTime, d2: DateTime): string {
@@ -142,14 +142,14 @@ export function differenceInMinutes(d1: DateTime, d2: DateTime): string {
 export function getTimeUntilEvent(
   eventDate: DateTime,
   currentDate: DateTime
-): string {
+): string[] {
   // Ensure both dates are in Singapore timezone
   const eventSGT = eventDate.setZone("Asia/Singapore");
   const currentSGT = currentDate.setZone("Asia/Singapore");
 
   // Check if event has passed (regardless of date)
   if (eventSGT <= currentSGT) {
-    return "NOW";
+    return ["NOW"];
   }
 
   // Check if they're on the same date
@@ -158,10 +158,10 @@ export function getTimeUntilEvent(
   if (sameDate) {
     // Event is later today - return hours
     const hoursDiff = Math.ceil(eventSGT.diff(currentSGT, "hours").hours);
-    return `IN ${hoursDiff}H`;
+    return ["In", hoursDiff.toString(), hoursDiff === 1 ? "Hour" : "Hours"];
   } else {
     // Different dates - return days
     const daysDiff = Math.ceil(eventSGT.diff(currentSGT, "days").days);
-    return `IN ${daysDiff}D`;
+    return ["In", daysDiff.toString(), daysDiff === 1 ? "Day" : "Days"];
   }
 }

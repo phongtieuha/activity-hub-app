@@ -11,7 +11,7 @@ import {
 } from "./useNotification";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: "http://192.168.1.4:9100",
+  baseURL: "http://192.168.1.77:9100",
 }); // use your own URL here or environment variable
 AXIOS_INSTANCE.defaults.xsrfCookieName = undefined;
 AXIOS_INSTANCE.defaults.xsrfHeaderName = undefined;

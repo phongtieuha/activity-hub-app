@@ -1,9 +1,8 @@
 import { ActivityListItemDto } from "@/__generated-client/http-client-integration";
-import { formatDate, formatTime } from "@/hooks/date-formatter";
+import { formatDate } from "@/hooks/date-formatter";
 import {
   CalendarDaysIcon,
   ChevronRightIcon,
-  ClockIcon,
   MapPinIcon,
 } from "lucide-react-native";
 import React from "react";
@@ -36,21 +35,21 @@ const ActionRequiredCard: React.FC<IProps> = ({
         className="rounded-3xl border border-red-600"
       >
         <VStack className="gap-[2px]">
-          <HStack space="sm" className="text-typography-500 items-center">
+          {/* <HStack space="sm" className="text-typography-500 items-center">
             <Icon as={ClockIcon} className="text-typography-500 !size-4 " />
             <Text size="sm" className="font-semibold">
               {formatTime(activity.startDate!)} -{" "}
               {formatTime(activity.endDate!)}
             </Text>
-          </HStack>
+          </HStack> */}
 
           <Box>
-            <HStack space="sm" className="text-typography-300 items-center">
+            {/* <HStack space="sm" className="text-typography-300 items-center">
               <Box className="size-2 rounded-full bg-blue-600 mx-1" />
               <Text size="sm" className="font-bold text-blue-600 tracking-wide">
                 {activity.timeline}
               </Text>
-            </HStack>
+            </HStack> */}
 
             <Text size="md" className="font-extrabold text-typography-900">
               {activity.name}

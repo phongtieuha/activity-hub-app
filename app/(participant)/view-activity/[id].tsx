@@ -12,8 +12,10 @@ import {
   UserDto,
 } from "@/__generated-client/http-client-integration";
 import CalendarScreen from "@/components/app/Calendar";
-import DetailsCard from "@/components/app/DetailsCard";
-import MinimalTimeline from "@/components/app/MinimalTimeline";
+import DetailsCard from "@/components/app/DetailsCardForParticipant";
+import MinimalTimeline, {
+  TimelineEvent,
+} from "@/components/app/MinimalTimeline";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {
   Actionsheet,
@@ -121,6 +123,16 @@ const ViewActivity = () => {
     [activityDetails]
   );
 
+  const isBookingDateToday = React.useMemo(() => {
+    const bookedSlot = activityDetails?.slots?.find((slot) => slot.bookedByMe);
+    if (!bookedSlot) return false;
+
+    return (
+      bookedSlot.startDate.slice(0, 10) ===
+      getCurrentSGTDate().toISODate()?.slice(0, 10)
+    );
+  }, [activityDetails]);
+
   const handlepOpenBookingSheet = () => {
     setBookingStep("select");
     setBookingMode("slot");
@@ -174,7 +186,7 @@ const ViewActivity = () => {
         (slot) => slot.bookedByMe
       );
       if (!!existingBooking) {
-        await changeBooking(existingBooking?.activitySlotId!, {
+        await changeBooking(existingBooking?.myBookingId!, {
           newActivitySlotId: selectedSlots?.activitySlotId!,
           userId: userDetails?.userId!,
         });
@@ -297,6 +309,58 @@ const ViewActivity = () => {
     fetchData();
   }, [fetchData]);
 
+  const renderBookingSlot = (
+    slot: ActivitySlotDto & TimelineEvent,
+    index: number,
+    isFullHeight: boolean = false
+  ) => (
+    <Pressable
+      key={selectedBookingDate! + slot.activitySlotId + index}
+      onPress={() => (!slot.bookedByMe ? handleSelectSlot(slot) : undefined)}
+      className={`${isFullHeight ? "h-full" : ""} `}
+    >
+      <HStack
+        className={`${
+          isFullHeight ? "h-full" : ""
+        } justify-between items-center border p-4 rounded-3xl ${
+          selectedSlots?.activitySlotId === slot.activitySlotId
+            ? "bg-red-50 border-red-600"
+            : `border-transparent ${
+                slot.bookedByMe ? "bg-gray-50 opacity-60" : "bg-gray-50"
+              }`
+        }`}
+      >
+        <VStack className="items-start">
+          <Text className="font-semibold text-typography-900">
+            {formatSlotTime(slot.startDate)} - {formatSlotTime(slot.endDate)}
+          </Text>
+          <HStack space="sm">
+            <Text className=" text-green-600">
+              {slot.remainingSlots} Remaining
+            </Text>
+            <Text className="text-typography-900">/</Text>
+            <Text className="text-typography-900">{slot.vacancy} Vacancy</Text>
+          </HStack>
+        </VStack>
+        {!slot.bookedByMe ? (
+          <Radio
+            size="md"
+            value={slot.activitySlotId!}
+            className="pointer-events-none"
+          >
+            <RadioIndicator className="">
+              <RadioIcon as={CircleIcon} />
+            </RadioIndicator>
+          </Radio>
+        ) : (
+          <HStack space="sm">
+            <Text className="text-red-600">Booked</Text>
+          </HStack>
+        )}
+      </HStack>
+    </Pressable>
+  );
+
   return (
     <>
       <ParallaxScrollView
@@ -347,13 +411,15 @@ const ViewActivity = () => {
               <>
                 <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
                   <VStack space="xl">
-                    <Pressable onPress={handlepGenerateQROpenBookingSheet}>
-                      <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        <Text className="text-red-600 font-semibold">
-                          Generate QR
-                        </Text>
-                      </HStack>
-                    </Pressable>
+                    {isBookingDateToday && (
+                      <Pressable onPress={handlepGenerateQROpenBookingSheet}>
+                        <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                          <Text className="text-red-600 font-semibold">
+                            Generate QR
+                          </Text>
+                        </HStack>
+                      </Pressable>
+                    )}
                     <Pressable onPress={handlepOpenBookingSheet}>
                       <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
                         <Text className="text-white font-semibold">
@@ -379,24 +445,36 @@ const ViewActivity = () => {
 
             {alreadyRegistered && !hasAttendanceTaken && (
               <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
-                <VStack space="xl">
-                  <Pressable
-                    onPress={() => router.push(`../scan-attendance/${id}`)}
-                  >
-                    <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                      <Text className="text-red-600 font-semibold">
-                        Scan QR
-                      </Text>
-                    </HStack>
-                  </Pressable>
-                  <Pressable onPress={handleRegisterAttendance}>
-                    <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                      <Text className="text-white font-semibold">
-                        Generate QR
-                      </Text>
-                    </HStack>
-                  </Pressable>
-                </VStack>
+                {isBookingDateToday ? (
+                  <VStack space="xl">
+                    <Pressable
+                      onPress={() => router.push(`../scan-attendance/${id}`)}
+                    >
+                      <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                        <Text className="text-red-600 font-semibold">
+                          Scan QR
+                        </Text>
+                      </HStack>
+                    </Pressable>
+                    <Pressable onPress={handleRegisterAttendance}>
+                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                        <Text className="text-white font-semibold">
+                          Generate QR
+                        </Text>
+                      </HStack>
+                    </Pressable>
+                  </VStack>
+                ) : (
+                  <VStack space="xl">
+                    <Pressable onPress={handlepOpenBookingSheet}>
+                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                        <Text className="text-white font-semibold">
+                          Select another Slot
+                        </Text>
+                      </HStack>
+                    </Pressable>
+                  </VStack>
+                )}
               </AnimatedCard>
             )}
           </AnimatedCard>
@@ -545,83 +623,42 @@ const ViewActivity = () => {
                       </Text>
 
                       <Divider className="h-4 bg-transparent" />
-
-                      <RadioGroup value={selectedSlots?.activitySlotId}>
-                        <MinimalTimeline<ActivitySlotDto>
-                          events={bookingSlotsGroupedByDateOrderedByDateKey[
+                      {bookingSlotsGroupedByDateOrderedByDateKey[
+                        selectedBookingDate!
+                      ].length === 1 && (
+                        <RadioGroup value={selectedSlots?.activitySlotId}>
+                          {bookingSlotsGroupedByDateOrderedByDateKey[
                             selectedBookingDate!
-                          ].map((slot) => ({
-                            start: slot.startDate,
-                            end: slot.endDate,
-                            ...slot,
-                          }))}
-                          renderEvent={(slot, index) => (
-                            <>
-                              <Pressable
-                                key={
-                                  selectedBookingDate! +
-                                  slot.activitySlotId +
-                                  index
-                                }
-                                onPress={() =>
-                                  !slot.bookedByMe
-                                    ? handleSelectSlot(slot)
-                                    : undefined
-                                }
-                                className={`h-full  `}
-                              >
-                                <HStack
-                                  className={`h-full justify-between items-center border p-4 rounded-3xl ${
-                                    selectedSlots?.activitySlotId ===
-                                    slot.activitySlotId
-                                      ? "bg-red-50 border-red-600"
-                                      : `border-transparent ${
-                                          slot.bookedByMe
-                                            ? "bg-gray-50 opacity-60"
-                                            : "bg-gray-50"
-                                        }`
-                                  }`}
-                                >
-                                  <VStack className="items-start">
-                                    <Text className="font-semibold text-typography-900">
-                                      {formatSlotTime(slot.startDate)} -{" "}
-                                      {formatSlotTime(slot.endDate)}
-                                    </Text>
-                                    <HStack space="sm">
-                                      <Text className=" text-green-600">
-                                        {slot.remainingSlots} Remaining
-                                      </Text>
-                                      <Text className="text-typography-900">
-                                        /
-                                      </Text>
-                                      <Text className="text-typography-900">
-                                        {slot.vacancy} Vacancy
-                                      </Text>
-                                    </HStack>
-                                  </VStack>
-                                  {!slot.bookedByMe ? (
-                                    <Radio
-                                      size="md"
-                                      value={slot.activitySlotId!}
-                                      className="pointer-events-none"
-                                    >
-                                      <RadioIndicator className="">
-                                        <RadioIcon as={CircleIcon} />
-                                      </RadioIndicator>
-                                    </Radio>
-                                  ) : (
-                                    <HStack space="sm">
-                                      <Text className="text-red-600">
-                                        Booked
-                                      </Text>
-                                    </HStack>
-                                  )}
-                                </HStack>
-                              </Pressable>
-                            </>
-                          )}
-                        />
-                      </RadioGroup>
+                          ]
+                            .map((slot) => ({
+                              start: slot.startDate,
+                              end: slot.endDate,
+                              ...slot,
+                            }))
+                            .map((slot, index) =>
+                              renderBookingSlot(slot, index)
+                            )}
+                        </RadioGroup>
+                      )}
+
+                      {bookingSlotsGroupedByDateOrderedByDateKey[
+                        selectedBookingDate!
+                      ].length > 1 && (
+                        <RadioGroup value={selectedSlots?.activitySlotId}>
+                          <MinimalTimeline<ActivitySlotDto>
+                            events={bookingSlotsGroupedByDateOrderedByDateKey[
+                              selectedBookingDate!
+                            ].map((slot) => ({
+                              start: slot.startDate,
+                              end: slot.endDate,
+                              ...slot,
+                            }))}
+                            renderEvent={(slot, index) =>
+                              renderBookingSlot(slot, index, true)
+                            }
+                          />
+                        </RadioGroup>
+                      )}
                     </>
                   )}
                 </ScrollView>
@@ -675,7 +712,7 @@ const ViewActivity = () => {
                 <Divider className="my-4 bg-transparent" />
                 <AnimatedCard delay={cardFadeDelay}>
                   <Text size="lg" className="text-center text-white">
-                    Booking has been taken on
+                    Your booking below has been confirmed.
                   </Text>
                   <Divider className="my-4 bg-transparent" />
                 </AnimatedCard>

@@ -48,6 +48,10 @@ import {
   StyleSheet,
 } from "react-native";
 
+type ActivityListItemDtoExtended = ActivityListItemDto & {
+  timeUntilEventDisplay?: string[];
+};
+
 export default function HomeScreen() {
   // 1) Navigation & utilities
   const router = useRouter();
@@ -70,9 +74,9 @@ export default function HomeScreen() {
   const [isFetchingData, setIsFetchingData] = React.useState(false);
   const [loggedInDetails, setLoggedInDetails] = React.useState<UserDto>();
   const [actionRequiredActivities, setActionRequiredActivities] =
-    React.useState<ActivityListItemDto[]>([]);
+    React.useState<ActivityListItemDtoExtended[]>([]);
   const [scheduledActivities, setScheduledActivities] = React.useState<
-    ActivityListItemDto[]
+    ActivityListItemDtoExtended[]
   >([]);
   const [showAllActionRequired, setShowAllActionRequired] =
     React.useState(false);
@@ -120,13 +124,19 @@ export default function HomeScreen() {
       setActionRequiredActivities([]);
       setScheduledActivities([]);
 
+      let scheduledActivities: ActivityListItemDtoExtended[] = [];
+      let actionsRequiredActivities: ActivityListItemDtoExtended[] = [];
+
       const startSoonActivitiesResp = await list1({
         status: "PUBLISHED",
         timeline: "STARTING_SOON",
         pageNumber: 1,
         pageSize: 100,
       });
-      setActionRequiredActivities(startSoonActivitiesResp?.data ?? []);
+      actionsRequiredActivities = [
+        ...actionsRequiredActivities,
+        ...(startSoonActivitiesResp?.data ?? []),
+      ];
 
       const ongoingActivitiesResp = await list1({
         status: "PUBLISHED",
@@ -134,10 +144,10 @@ export default function HomeScreen() {
         pageNumber: 1,
         pageSize: 100,
       });
-      setActionRequiredActivities((data) => [
-        ...data,
+      scheduledActivities = [
+        ...scheduledActivities,
         ...(ongoingActivitiesResp?.data ?? []),
-      ]);
+      ];
 
       const scheduledActivitiesResp = await list1({
         status: "PUBLISHED",
@@ -145,9 +155,38 @@ export default function HomeScreen() {
         pageNumber: 1,
         pageSize: 100,
       });
+      scheduledActivities = [
+        ...scheduledActivities,
+        ...(scheduledActivitiesResp?.data ?? []),
+      ];
+
+      for (const activity of [
+        ...actionsRequiredActivities,
+        ...scheduledActivities,
+      ]) {
+        const timeUntilEventDisplay = getTimeUntilEvent(
+          getSGTDate(activity.startDate!),
+          getCurrentSGTDate()
+        );
+        activity.timeUntilEventDisplay = timeUntilEventDisplay;
+      }
+
+      const todayActivities = scheduledActivities.filter((x) =>
+        x.timeUntilEventDisplay?.includes("NOW")
+      );
+
+      actionsRequiredActivities = [
+        ...actionsRequiredActivities,
+        ...todayActivities,
+      ];
+
+      setActionRequiredActivities(actionsRequiredActivities);
+
       setScheduledActivities((data) => [
         ...data,
-        ...(scheduledActivitiesResp?.data ?? []),
+        ...scheduledActivities.filter(
+          (x) => !actionsRequiredActivities.includes(x)
+        ),
       ]);
     } finally {
       setIsFetchingData(false);
@@ -357,13 +396,25 @@ export default function HomeScreen() {
                   delay={cardFadeDelay}
                 >
                   <HStack className="items-start" space="md">
-                    <Center className="rounded-3xl w-[60px]  bg-gray-50 mt-3">
-                      <Text className="text-base font-bold text-red-600">
-                        {getTimeUntilEvent(
-                          getSGTDate(activity.startDate!),
-                          getCurrentSGTDate()
-                        )}
-                      </Text>
+                    <Center className="rounded-3xl w-[60px] bg-gray-50 py-2">
+                      {activity.timeUntilEventDisplay &&
+                      activity.timeUntilEventDisplay.length < 3 ? (
+                        <Text className="text-base font-bold text-red-600">
+                          {activity.timeUntilEventDisplay.join(" ")}
+                        </Text>
+                      ) : activity.timeUntilEventDisplay ? (
+                        <>
+                          <Text className="text-sm font-bold text-gray-900">
+                            {activity.timeUntilEventDisplay[0]}
+                          </Text>
+                          <Text className="text-3xl font-extrabold text-red-600">
+                            {activity.timeUntilEventDisplay[1]}
+                          </Text>
+                          <Text className="text-sm font-bold text-gray-900">
+                            {activity.timeUntilEventDisplay[2]}
+                          </Text>
+                        </>
+                      ) : null}
                     </Center>
 
                     {/* <DotIcon style={{ marginTop: 10 }} color="#4b5563" /> */}
@@ -489,10 +540,7 @@ export default function HomeScreen() {
         </>
       )}
 
-      <Divider
-        className={`bg-transparent`}
-        style={{ height: Math.abs(tabBarBottom) }}
-      />
+      <Divider className={`bg-transparent`} style={{ height: 100 }} />
     </ScrollView>
   );
 }

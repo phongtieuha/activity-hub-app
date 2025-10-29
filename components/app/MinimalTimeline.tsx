@@ -51,18 +51,14 @@ const MinimalTimeline = <T extends object>({
     let latestHour = -Infinity;
 
     events.forEach((event) => {
-      const startDate = DateTime.fromISO(event.start)
-        .setZone("Asia/Singapore")
-        .toJSDate();
-      const endDate = DateTime.fromISO(event.end)
-        .setZone("Asia/Singapore")
-        .toJSDate();
+      const startDate = DateTime.fromISO(event.start).setZone("Asia/Singapore");
+      const endDate = DateTime.fromISO(event.end).setZone("Asia/Singapore");
 
-      const startHour = startDate.getHours();
-      let endHour = endDate.getHours();
+      const startHour = startDate.hour;
+      let endHour = endDate.hour;
 
       // Handle cross-midnight events
-      if (endDate.getDate() > startDate.getDate() && endHour === 0) {
+      if (endDate.day > startDate.day && endHour === 0) {
         endHour = 24;
       }
 
@@ -93,20 +89,16 @@ const MinimalTimeline = <T extends object>({
 
   // Calculate event positioning with offset for dynamic start
   const getEventLayout = (event: TimelineEvent): EventLayout => {
-    const startDate = DateTime.fromISO(event.start)
-      .setZone("Asia/Singapore")
-      .toJSDate();
-    const endDate = DateTime.fromISO(event.end)
-      .setZone("Asia/Singapore")
-      .toJSDate();
+    const startDate = DateTime.fromISO(event.start).setZone("Asia/Singapore");
+    const endDate = DateTime.fromISO(event.end).setZone("Asia/Singapore");
 
-    const startHour = startDate.getHours();
-    const startMinutes = startDate.getMinutes();
-    let endHour = endDate.getHours();
-    const endMinutes = endDate.getMinutes();
+    const startHour = startDate.hour;
+    const startMinutes = startDate.minute;
+    let endHour = endDate.hour;
+    const endMinutes = endDate.minute;
 
     // Handle cross-midnight events (end time is next day)
-    if (endDate.getDate() > startDate.getDate()) {
+    if (endDate.day > startDate.day) {
       // If end is next day and hour is 0 (midnight), treat as hour 24 for calculation
       if (endHour === 0) {
         endHour = 24;
