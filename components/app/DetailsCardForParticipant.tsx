@@ -50,54 +50,12 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
   const [selectedSlotToCancel, setSelectedSlotToCancel] =
     useState<ActivitySlotDto | null>(null);
 
-  const isStartDateSameAsEndDate =
-    props.activityDetails.startDate?.split("T")[0] ===
-    props.activityDetails.endDate?.split("T")[0];
-
   const isBookingStartDateSameAsEndDate =
     props.activityDetails.bookingWindowStartDate?.split("T")[0] ===
     props.activityDetails.bookingWindowEndDate?.split("T")[0];
 
   const bookedSlots = (props.activityDetails.slots ?? []).filter(
     (x) => x.bookedByMe
-  );
-
-  const sameDatesBlock = (startDate: string, endDate: string) => (
-    <HStack className="justify-between" space="xl">
-      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-6 py-3 text-typography-300">
-        <Text className="">Start Date</Text>
-        <Text className="text-base font-semibold text-typography-900">
-          {formatDayInWord(startDate)}, {formatShortDate(startDate)}
-        </Text>
-      </VStack>
-
-      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-6 py-3 text-typography-300">
-        <Text className="">Time</Text>
-        <Text className="font-semibold text-typography-900">
-          {formatTime(startDate)} - {formatTime(endDate)}
-        </Text>
-      </VStack>
-    </HStack>
-  );
-
-  const dateRangeBlock = (startDate: string, endDate: string) => (
-    <HStack className="justify-between" space="xl">
-      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
-        <Text className="">Start Date</Text>
-        <Text className="text-base font-semibold text-typography-900">
-          {formatDayInWord(startDate)}, {formatShortDate(startDate)},{" "}
-          {formatTime(startDate)}
-        </Text>
-      </VStack>
-
-      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
-        <Text className="">End Date</Text>
-        <Text className="font-semibold text-typography-900">
-          {formatDayInWord(endDate)}, {formatShortDate(endDate)},{" "}
-          {formatTime(endDate)}
-        </Text>
-      </VStack>
-    </HStack>
   );
 
   const bookingSameDatesBlock = (startDate: string, endDate: string) => (
