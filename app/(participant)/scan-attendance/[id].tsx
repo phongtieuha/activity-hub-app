@@ -68,7 +68,7 @@ const ScanAttendance = () => {
       <View className="relative" style={{ minHeight: screenHeight }}>
         <QrScanPreview onQrScanned={onQrScanned} />
         <Pressable
-          className="absolute top-16 left-4"
+          className="absolute left-4 top-16"
           onPress={() => router.back()}
         >
           <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
@@ -79,14 +79,14 @@ const ScanAttendance = () => {
       >
         <Actionsheet isOpen={showActionsheet} onClose={handleCloseActionSheet}>
           <ActionsheetBackdrop />
-          <ActionsheetContent className="bg-green-600 border-0">
+          <ActionsheetContent className="border-0 bg-green-600">
             <ActionsheetDragIndicatorWrapper>
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
             <Box className="w-full py-5" style={{ height: screenHeight * 0.7 }}>
               <Divider className="my-4 bg-transparent" />
               <Center>
-                <Icon as={CheckCircleIcon} className="text-white !size-20" />
+                <Icon as={CheckCircleIcon} className="!size-20 text-white" />
               </Center>
               <Divider className="my-4 bg-transparent" />
               <AnimatedCard delay={cardFadeDelay}>
@@ -105,7 +105,7 @@ const ScanAttendance = () => {
                 <Divider className="my-4 bg-transparent" />
                 <Heading
                   size="xl"
-                  className="font-semibold text-center text-white"
+                  className="text-center font-semibold text-white"
                 >
                   {formatDate(scanQrResponseDto?.attendanceTakenAt!)},{" "}
                   {formatTime(scanQrResponseDto?.attendanceTakenAt!)}

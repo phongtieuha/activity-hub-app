@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
  * then orders the groups by date key ascending.
  */
 export function groupActivitiesByDateRangeOrdered<
-  T extends { startDate?: string; endDate?: string }
+  T extends { startDate?: string; endDate?: string },
 >(scheduledActivities: T[]): Record<string, T[]> {
   const grouped: Record<string, T[]> = {};
   scheduledActivities.forEach((activity) => {
@@ -29,10 +29,13 @@ export function groupActivitiesByDateRangeOrdered<
       ([dateA], [dateB]) =>
         new Date(dateA).getTime() - new Date(dateB).getTime()
     )
-    .reduce((acc, [date, activities]) => {
-      acc[date] = activities;
-      return acc;
-    }, {} as Record<string, T[]>);
+    .reduce(
+      (acc, [date, activities]) => {
+        acc[date] = activities;
+        return acc;
+      },
+      {} as Record<string, T[]>
+    );
   return ordered;
 }
 

@@ -34,7 +34,7 @@ const Documents = () => {
     <ScrollView>
       {DocumentRecords.map((item) => (
         <Pressable key={item.id}>
-          <HStack className="gap-5 items-center px-4 pt-4">
+          <HStack className="items-center gap-5 px-4 pt-4">
             <Icon as={DownloadIcon} />
             <Text className="font-bold text-typography-900">{item.title}</Text>
           </HStack>

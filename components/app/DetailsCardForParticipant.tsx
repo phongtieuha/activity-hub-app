@@ -64,16 +64,16 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
 
   const sameDatesBlock = (startDate: string, endDate: string) => (
     <HStack className="justify-between" space="xl">
-      <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-6 py-3 flex-1">
+      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-6 py-3 text-typography-300">
         <Text className="">Start Date</Text>
-        <Text className="text-typography-900 font-semibold text-base">
+        <Text className="text-base font-semibold text-typography-900">
           {formatDayInWord(startDate)}, {formatShortDate(startDate)}
         </Text>
       </VStack>
 
-      <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-6 py-3 flex-1">
+      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-6 py-3 text-typography-300">
         <Text className="">Time</Text>
-        <Text className="text-typography-900 font-semibold">
+        <Text className="font-semibold text-typography-900">
           {formatTime(startDate)} - {formatTime(endDate)}
         </Text>
       </VStack>
@@ -82,17 +82,17 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
 
   const dateRangeBlock = (startDate: string, endDate: string) => (
     <HStack className="justify-between" space="xl">
-      <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-4 py-3 flex-1">
+      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
         <Text className="">Start Date</Text>
-        <Text className="text-typography-900 font-semibold text-base">
+        <Text className="text-base font-semibold text-typography-900">
           {formatDayInWord(startDate)}, {formatShortDate(startDate)},{" "}
           {formatTime(startDate)}
         </Text>
       </VStack>
 
-      <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-4 py-3 flex-1">
+      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
         <Text className="">End Date</Text>
-        <Text className="text-typography-900 font-semibold">
+        <Text className="font-semibold text-typography-900">
           {formatDayInWord(endDate)}, {formatShortDate(endDate)},{" "}
           {formatTime(endDate)}
         </Text>
@@ -102,16 +102,16 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
 
   const bookingSameDatesBlock = (startDate: string, endDate: string) => (
     <HStack className="justify-between" space="xl">
-      <VStack className="text-typography-300 items-start justify-center flex-1">
+      <VStack className="flex-1 items-start justify-center text-typography-300">
         <Text className="">Available at</Text>
-        <Text className="text-typography-900 font-semibold text-base">
+        <Text className="text-base font-semibold text-typography-900">
           {formatDayInWord(startDate)}, {formatShortDate(startDate)}
         </Text>
       </VStack>
 
-      <VStack className="text-typography-300 items-start justify-center flex-1">
+      <VStack className="flex-1 items-start justify-center text-typography-300">
         <Text className="">Close at</Text>
-        <Text className="text-typography-900 font-semibold">
+        <Text className="font-semibold text-typography-900">
           {formatTime(startDate)} - {formatTime(endDate)}
         </Text>
       </VStack>
@@ -120,17 +120,17 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
 
   const bookingDateRangeBlock = (startDate: string, endDate: string) => (
     <HStack className="justify-between" space="xl">
-      <VStack className="text-typography-300 items-start justify-center flex-1">
+      <VStack className="flex-1 items-start justify-center text-typography-300">
         <Text>Available at</Text>
-        <Text className="text-typography-900 font-semibold text-base">
+        <Text className="text-base font-semibold text-typography-900">
           {formatDayInWord(startDate)}, {formatShortDate(startDate)},{" "}
           {formatTime(startDate)}
         </Text>
       </VStack>
 
-      <VStack className="text-typography-300 items-start justify-center flex-1">
+      <VStack className="flex-1 items-start justify-center text-typography-300">
         <Text>Close at</Text>
-        <Text className="text-typography-900 font-semibold">
+        <Text className="font-semibold text-typography-900">
           {formatDayInWord(endDate)}, {formatShortDate(endDate)},{" "}
           {formatTime(endDate)}
         </Text>
@@ -165,14 +165,14 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
       <Divider className="h-1 bg-transparent" />
 
       <HStack className="items-center justify-between">
-        <HStack space="sm" className="text-typography-300 items-center">
-          <Box className="size-2 rounded-full bg-blue-600 mx-1" />
-          <Text size="md" className="font-bold text-blue-600 tracking-wide">
+        <HStack space="sm" className="items-center text-typography-300">
+          <Box className="mx-1 size-2 rounded-full bg-blue-600" />
+          <Text size="md" className="font-bold tracking-wide text-blue-600">
             {props.activityDetails.timeline}
           </Text>
         </HStack>
 
-        <Pressable className="border border-gray-300 rounded-full p-2.5">
+        <Pressable className="rounded-full border border-gray-300 p-2.5">
           <Icon as={CalendarPlus} className="text-gray-600"></Icon>
         </Pressable>
       </HStack>
@@ -181,8 +181,8 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
         {props.activityDetails.name}
       </Heading>
       <Divider className="h-1 bg-transparent" />
-      <HStack className="justify-between items-start">
-        <HStack space="sm" className="text-typography-300 items-center">
+      <HStack className="items-start justify-between">
+        <HStack space="sm" className="items-center text-typography-300">
           <Icon as={MapPinIcon} className="text-typography-400" />
           <Text>{props.activityDetails.location || "-"}</Text>
           <Badge variant="solid" action="success">
@@ -195,7 +195,7 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
       {bookedSlots.length === 0 && (
         <VStack space="lg">
           {props.activityDetails.participationType === "ELECTIVE" && (
-            <Badge action="warning" className="py-3 gap-2">
+            <Badge action="warning" className="gap-2 py-3">
               <BadgeIcon as={BadgeAlertIcon} className="!size-6" />
               <BadgeText className="text-base">
                 You are required to book your slot during the booking window.
@@ -203,7 +203,7 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
             </Badge>
           )}
 
-          <Card className="p-4 rounded-3xl border border-gray-200 gap-3">
+          <Card className="gap-3 rounded-3xl border border-gray-200 p-4">
             {props.activityDetails.participationType === "COMPULSORY" && (
               <>
                 <HStack className="justify-between">
@@ -214,7 +214,7 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
                     </Badge>
                   )}
                 </HStack>
-                <Divider className="border border-gray-200 border-dashed bg-transparent" />
+                <Divider className="border border-dashed border-gray-200 bg-transparent" />
               </>
             )}
 
@@ -236,12 +236,12 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
       )}
 
       {props.showBookedSlots && bookedSlots.length > 0 && (
-        <Card className="p-4 rounded-3xl border border-red-600 gap-3">
+        <Card className="gap-3 rounded-3xl border border-red-600 p-4">
           <Heading className="font-semibold">Booked slot</Heading>
 
           <VStack
             space="md"
-            className="text-typography-300 items-start justify-center"
+            className="items-start justify-center text-typography-300"
           >
             {bookedSlots.map((slot) => (
               <>
@@ -250,17 +250,17 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
                   space="xl"
                   key={slot.activitySlotId}
                 >
-                  <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-4 py-3 flex-1">
+                  <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
                     <Text className="">Date</Text>
-                    <Text className="text-typography-900 font-semibold text-base">
+                    <Text className="text-base font-semibold text-typography-900">
                       {formatDayInWord(slot.startDate)},{" "}
                       {formatShortDate(slot.startDate)}
                     </Text>
                   </VStack>
 
-                  <VStack className="text-typography-300 items-start rounded-3xl bg-gray-100 justify-center px-4 py-3 flex-1">
+                  <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
                     <Text className="">Time</Text>
-                    <Text className="text-typography-900 font-semibold">
+                    <Text className="font-semibold text-typography-900">
                       {formatSlotTime(slot.startDate)} -{" "}
                       {formatSlotTime(slot.endDate)}
                     </Text>
@@ -286,20 +286,20 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
 
       <VStack space="md">
         <HStack className="justify-between">
-          <HStack space="sm" className="text-typography-300 items-center">
+          <HStack space="sm" className="items-center text-typography-300">
             <Icon as={ShirtIcon} className="text-typography-400" />
             <Text>Attire</Text>
           </HStack>
-          <Text className="text-typography-900 font-semibold">
+          <Text className="font-semibold text-typography-900">
             {ServerAttireToDisplayMapping[props.activityDetails.attire!] || "-"}
           </Text>
         </HStack>
         <HStack className="justify-between">
-          <HStack space="sm" className="text-typography-300 items-center">
+          <HStack space="sm" className="items-center text-typography-300">
             <Icon as={NotebookTextIcon} className="text-typography-400" />
             <Text>Remarks</Text>
           </HStack>
-          <Text className="text-typography-900 font-semibold">
+          <Text className="font-semibold text-typography-900">
             {props.activityDetails.remarks || "-"}
           </Text>
         </HStack>

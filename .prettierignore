@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+__generated-client/
+
+# Build outputs
+.expo/
+dist/
+build/
+android/build/
+ios/build/
+
+# Generated files
+*.generated.*
+.expo-shared/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package manager lockfiles (optional - you might want to format these)
+# package-lock.json
+# yarn.lock
+
+# Metro
+.metro-health-check*
+
+# Expo
+.expo/
+web-build/
+
+# CocoaPods
+Pods/
+ios/Pods/
+
+# Temporary files
+.tmp/
+*.tmp

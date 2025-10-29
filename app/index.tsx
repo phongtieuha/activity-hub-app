@@ -266,7 +266,7 @@ export default function Index() {
     >
       <Animated.View
         style={{ height: heroImageHeight, width: "100%" }}
-        className="rounded-tr-3xl rounded-tl-3xl overflow-hidden"
+        className="overflow-hidden rounded-tl-3xl rounded-tr-3xl"
       >
         <Center style={{ flex: 1 }}>
           <ImageBackground
@@ -295,7 +295,7 @@ export default function Index() {
 
       <AnimatedCard
         key={"chooseLogin"}
-        className="rounded-3xl p-4 gap-4 -mt-7 bg-white flex-1"
+        className="-mt-7 flex-1 gap-4 rounded-3xl bg-white p-4"
       >
         <Divider className="h-1 bg-transparent" />
         {!loggedInAs && (
@@ -309,7 +309,7 @@ export default function Index() {
             <HStack space="xl" className="mt-auto">
               <Pressable
                 onPress={() => setLoggedInAs("participant")}
-                className="flex-1 border border-gray-300 rounded-3xl flex flex-col p-4 items-center justify-center gap-3"
+                className="flex flex-1 flex-col items-center justify-center gap-3 rounded-3xl border border-gray-300 p-4"
               >
                 <Center className="rounded-full bg-red-600 p-2">
                   <User2Icon color="white" />
@@ -318,7 +318,7 @@ export default function Index() {
               </Pressable>
               <Pressable
                 onPress={() => setLoggedInAs("manager")}
-                className="flex-1 border border-gray-300 rounded-3xl flex flex-col p-4 items-center justify-center gap-3"
+                className="flex flex-1 flex-col items-center justify-center gap-3 rounded-3xl border border-gray-300 p-4"
               >
                 <Center className="rounded-full bg-red-600 p-2">
                   <SquareUserRoundIcon color="white" />

@@ -102,11 +102,11 @@ const ScanAttendance = () => {
   // 8) Item renderer
   const Item = React.useCallback(
     ({ name, attendAt }: AttendanceRecord) => (
-      <ActionsheetItem className="border-t border-gray-300 justify-between">
-        <ActionsheetItemText className="font-bold text-lg">
+      <ActionsheetItem className="justify-between border-t border-gray-300">
+        <ActionsheetItemText className="text-lg font-bold">
           {name}
         </ActionsheetItemText>
-        <ActionsheetItemText className="text-gray-700 text-lg">
+        <ActionsheetItemText className="text-lg text-gray-700">
           {formatDateTime(attendAt)}
         </ActionsheetItemText>
       </ActionsheetItem>
@@ -185,7 +185,7 @@ const ScanAttendance = () => {
       <View className="relative" style={{ minHeight: screenHeight }}>
         <QrScanPreview onQrScanned={onQrScanned} />
         <Pressable
-          className="absolute top-16 left-4"
+          className="absolute left-4 top-16"
           onPress={() => router.back()}
         >
           <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
@@ -201,7 +201,7 @@ const ScanAttendance = () => {
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
             <VStack
-              className="w-full py-5 justify-between"
+              className="w-full justify-between py-5"
               style={{ height: screenHeight * 0.3 }}
             >
               <Heading size="xl" className="font-bold">

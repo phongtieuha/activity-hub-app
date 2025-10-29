@@ -165,7 +165,7 @@ export default function TabFourScreen() {
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
             <VStack className="w-full py-5">
-              <Heading size="xl" className="font-bold text-center">
+              <Heading size="xl" className="text-center font-bold">
                 Attendance QR Code
               </Heading>
               <Text size="md" className="text-center">
@@ -180,7 +180,7 @@ export default function TabFourScreen() {
                   style={styles.qrImage}
                 />
               </Box>
-              <Text size="md" className="text-center mt-4">
+              <Text size="md" className="mt-4 text-center">
                 QR code will expire in {qrExpiry}
               </Text>
               <Divider className="my-4 bg-transparent" />

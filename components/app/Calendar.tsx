@@ -191,13 +191,13 @@ const CalendarScreen = ({
       />
 
       {/* Availability Legend */}
-      <HStack className="pt-4 px-4 gap-6">
+      <HStack className="gap-6 px-4 pt-4">
         <HStack className="items-center gap-2">
-          <Box className="w-3 h-3 rounded-full bg-green-500" />
+          <Box className="h-3 w-3 rounded-full bg-green-500" />
           <Text className="text-sm text-green-500">High availability</Text>
         </HStack>
         <HStack className="items-center gap-2">
-          <Box className="w-3 h-3 rounded-full bg-red-600" />
+          <Box className="h-3 w-3 rounded-full bg-red-600" />
           <Text className="text-sm text-red-500">Low availability</Text>
         </HStack>
       </HStack>

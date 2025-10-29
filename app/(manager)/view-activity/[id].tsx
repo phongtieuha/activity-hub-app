@@ -214,7 +214,7 @@ const ViewActivity = () => {
         onRefresh={onRefresh}
       >
         <Pressable
-          className="absolute top-16 left-4"
+          className="absolute left-4 top-16"
           onPress={() => router.back()}
         >
           <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
@@ -234,7 +234,7 @@ const ViewActivity = () => {
         {activityDetails && (
           <AnimatedCard
             style={styles.contentCard}
-            className="rounded-3xl bg-white flex-1 pb-8 p-4"
+            className="flex-1 rounded-3xl bg-white p-4 pb-8"
           >
             <DetailsCard activityDetails={activityDetails} />
 
@@ -247,18 +247,18 @@ const ViewActivity = () => {
                     onPress={() => router.push(`../update-attendance/${id}`)}
                     className="min-w-[31.5%]"
                   >
-                    <VStack className="py-4 px-6 border border-gray-200 items-center justify-center rounded-3xl gap-2">
-                      <Center className="bg-red-100 p-2 rounded-full">
+                    <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
+                      <Center className="rounded-full bg-red-100 p-2">
                         <Icon
                           as={PencilLineIcon}
-                          className="text-red-600 !size-5"
+                          className="!size-5 text-red-600"
                         />
                       </Center>
                       <Center>
-                        <Text className="text-gray-900 font-semibold">
+                        <Text className="font-semibold text-gray-900">
                           Update
                         </Text>
-                        <Text className="text-gray-900 font-semibold">
+                        <Text className="font-semibold text-gray-900">
                           Attendance
                         </Text>
                       </Center>
@@ -269,15 +269,15 @@ const ViewActivity = () => {
                     onPress={() => router.push(`../documents/${id}`)}
                     className="min-w-[31.5%]"
                   >
-                    <VStack className="py-4 px-6 border border-gray-200 items-center justify-center rounded-3xl gap-2">
-                      <Center className="bg-red-100 p-2 rounded-full">
-                        <Icon as={FileIcon} className="text-red-600 !size-5" />
+                    <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
+                      <Center className="rounded-full bg-red-100 p-2">
+                        <Icon as={FileIcon} className="!size-5 text-red-600" />
                       </Center>
                       <Center>
-                        <Text className="text-gray-900 font-semibold">
+                        <Text className="font-semibold text-gray-900">
                           View
                         </Text>
-                        <Text className="text-gray-900 font-semibold">
+                        <Text className="font-semibold text-gray-900">
                           Documents
                         </Text>
                       </Center>
@@ -288,18 +288,18 @@ const ViewActivity = () => {
                     onPress={() => router.push(`../manage-activity/${id}`)}
                     className="min-w-[31.5%]"
                   >
-                    <VStack className="py-4 px-6 border border-gray-200 items-center justify-center rounded-3xl gap-2">
-                      <Center className="bg-red-100 p-2 rounded-full">
+                    <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
+                      <Center className="rounded-full bg-red-100 p-2">
                         <Icon
                           as={ScrollTextIcon}
-                          className="text-red-600 !size-5"
+                          className="!size-5 text-red-600"
                         />
                       </Center>
                       <Center>
-                        <Text className="text-gray-900 font-semibold">
+                        <Text className="font-semibold text-gray-900">
                           Manage
                         </Text>
-                        <Text className="text-gray-900 font-semibold">
+                        <Text className="font-semibold text-gray-900">
                           Activity
                         </Text>
                       </Center>
@@ -309,23 +309,23 @@ const ViewActivity = () => {
               </AnimatedCard>
             </ScrollView>
 
-            <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
+            <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
               <VStack space="xl">
                 <Pressable
                   onPress={() => router.push(`../scan-attendance/${id}`)}
                 >
-                  <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                  <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
                     {/* <Icon
                       as={ScanQrCodeIcon}
                       className="text-red-600 !size-5"
                     /> */}
-                    <Text className="text-red-600 font-semibold">Scan QR</Text>
+                    <Text className="font-semibold text-red-600">Scan QR</Text>
                   </HStack>
                 </Pressable>
                 <Pressable onPress={handlepOpenBookingSheet}>
-                  <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
+                  <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
                     {/* <Icon as={UserPenIcon} className="text-white !size-5" /> */}
-                    <Text className="text-white font-semibold">
+                    <Text className="font-semibold text-white">
                       Generate QR
                     </Text>
                   </HStack>
@@ -338,7 +338,7 @@ const ViewActivity = () => {
         {isFetchingData && (
           <AnimatedCard
             style={styles.contentCard}
-            className="rounded-3xl bg-white flex-1 pb-8 gap-5 p-4"
+            className="flex-1 gap-5 rounded-3xl bg-white p-4 pb-8"
           >
             <Skeleton className="h-[100px] rounded-3xl" />
             <SkeletonText _lines={10} className="h-5 rounded-3xl" />
@@ -356,7 +356,7 @@ const ViewActivity = () => {
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
           <VStack className="w-full py-5">
-            <Heading size="xl" className="font-bold text-center">
+            <Heading size="xl" className="text-center font-bold">
               Attendance QR Code
             </Heading>
             <Text size="md" className="text-center">
@@ -367,7 +367,7 @@ const ViewActivity = () => {
               <Image source={{ uri: qrBase64String }} style={styles.qrImage} />
               {qrExpiry?.includes("-") && (
                 <>
-                  <Box className="bg-white/90 absolute inset-0"></Box>
+                  <Box className="absolute inset-0 bg-white/90"></Box>
                   <Center className=" absolute inset-0">
                     <Button
                       onPress={handleRegisterAttendance}
@@ -389,7 +389,7 @@ const ViewActivity = () => {
                 </>
               )}
             </Box>
-            <Text size="md" className="text-center mt-4">
+            <Text size="md" className="mt-4 text-center">
               QR code will expire in {qrExpiry}
             </Text>
             <Divider className="my-4 bg-transparent" />
@@ -418,7 +418,7 @@ const ViewActivity = () => {
             </ActionsheetDragIndicatorWrapper>
 
             <VStack
-              className="w-full py-4 px-6"
+              className="w-full px-6 py-4"
               space="xl"
               style={{ height: screenHeight * 0.85 }}
             >
@@ -463,7 +463,7 @@ const ViewActivity = () => {
                 {selectedBookingDate && (
                   <>
                     <Divider className="h-4 bg-transparent" />
-                    <Text size="md" className="font-bold bg-white py-2 ">
+                    <Text size="md" className="bg-white py-2 font-bold ">
                       {formatDayInWord(selectedBookingDate!)},{" "}
                       {formatDate(selectedBookingDate!)}
                     </Text>
@@ -491,10 +491,10 @@ const ViewActivity = () => {
                               className={`h-full  `}
                             >
                               <HStack
-                                className={`h-full justify-between items-center border p-4 rounded-3xl ${
+                                className={`h-full items-center justify-between rounded-3xl border p-4 ${
                                   selectedSlots?.activitySlotId ===
                                   slot.activitySlotId
-                                    ? "bg-red-50 border-red-600"
+                                    ? "border-red-600 bg-red-50"
                                     : `border-transparent ${
                                         slot.bookedByMe
                                           ? "bg-gray-50 opacity-60"

@@ -296,13 +296,13 @@ const UpdateAttendance = () => {
             <Badge
               size="lg"
               action={value === selectedAttendanceStatusTab ? "error" : "muted"}
-              className="gap-2 py-3 rounded-3xl flex flex-col items-center justify-center w-24"
+              className="flex w-24 flex-col items-center justify-center gap-2 rounded-3xl py-3"
             >
               <BadgeIcon
                 as={AttendanceStatusToIconMapping[value]}
                 className="!size-5"
               ></BadgeIcon>
-              <BadgeText className="capitalize text-center">{value}</BadgeText>
+              <BadgeText className="text-center capitalize">{value}</BadgeText>
             </Badge>
           </Pressable>
         ))}
@@ -351,7 +351,7 @@ const UpdateAttendance = () => {
     return (
       <Animated.View
         style={[animatedStyle]}
-        className="absolute top-0 left-0 right-0 z-[1000] "
+        className="absolute left-0 right-0 top-0 z-[1000] "
       >
         <LinearGradient
           colors={["rgba(0,0,0,0.3)", "transparent"]}
@@ -415,26 +415,26 @@ const UpdateAttendance = () => {
               </VStack>
 
               <HStack space="lg">
-                <VStack className="items-center bg-gray-900/90 rounded-3xl p-3 flex-1">
+                <VStack className="flex-1 items-center rounded-3xl bg-gray-900/90 p-3">
                   <Text size="2xl" className="font-semibold text-green-600">
                     {attendanceSummary?.attendanceCounts?.["PRESENT"] ?? 0}
                   </Text>
                   <Text className="text-white">PRESENT</Text>
                 </VStack>
-                <VStack className="items-center bg-gray-900/90 rounded-3xl p-3 flex-1">
+                <VStack className="flex-1 items-center rounded-3xl bg-gray-900/90 p-3">
                   <Text size="2xl" className="font-semibold text-white">
                     {attendanceSummary?.attendanceCounts?.["ABSENT"] ?? 0}
                   </Text>
                   <Text className="text-white">ABSENT</Text>
                 </VStack>
 
-                <VStack className="items-center bg-gray-900/90 rounded-3xl p-3 flex-1">
+                <VStack className="flex-1 items-center rounded-3xl bg-gray-900/90 p-3">
                   <Text size="2xl" className="font-semibold text-white">
                     {attendanceSummary?.attendanceCounts?.["FALLOUT"] ?? 0}
                   </Text>
                   <Text className="text-white">FALL OUT</Text>
                 </VStack>
-                <VStack className="items-center bg-gray-900/90 rounded-3xl p-3 flex-1">
+                <VStack className="flex-1 items-center rounded-3xl bg-gray-900/90 p-3">
                   <Text size="2xl" className="font-semibold text-white">
                     {attendanceSummary?.attendanceCounts?.["EXCUSED"] ?? 0}
                   </Text>
@@ -451,7 +451,7 @@ const UpdateAttendance = () => {
               // add height or padding as needed
             }
           }
-          className="bg-white flex-1 rounded-3xl overflow-hidden"
+          className="flex-1 overflow-hidden rounded-3xl bg-white"
         >
           <VStack space="md" className="">
             <Divider className="mb-1" />
@@ -475,7 +475,7 @@ const UpdateAttendance = () => {
           <Divider className="my-3 bg-transparent" />
           <AnimatedCard delay={cardFadeDelay * 3}>
             <Pressable onPress={handleSelectAll}>
-              <HStack className="justify-between items-center px-4">
+              <HStack className="items-center justify-between px-4">
                 <Text className="font-bold">
                   PARTICIPANTS ({filteredAttendanceRecords.length})
                 </Text>
@@ -506,7 +506,7 @@ const UpdateAttendance = () => {
                     className={`${item.isChecked ? "bg-red-100" : ""}`}
                     onPress={() => handleSelectAttendance(item)}
                   >
-                    <HStack className="justify-between items-center px-4 pt-4">
+                    <HStack className="items-center justify-between px-4 pt-4">
                       <VStack>
                         <Text className="font-bold text-typography-900">
                           {item.name}
@@ -550,12 +550,12 @@ const UpdateAttendance = () => {
               attendantRecords.some((item) => item.isChecked)
                 ? "bg-red-600"
                 : "bg-gray-900"
-            } py-3 rounded-3xl mb-6 mx-4`}
+            } mx-4 mb-6 rounded-3xl py-3`}
             onPress={handleShowUpdateAttendance}
             disabled={!attendantRecords.some((item) => item.isChecked)}
           >
             <Center>
-              <Text className="text-white text-xl">
+              <Text className="text-xl text-white">
                 Update Attendance{" "}
                 {filteredAttendanceRecords.filter((item) => item.isChecked)
                   .length ? (
@@ -585,7 +585,7 @@ const UpdateAttendance = () => {
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
             <VStack
-              className="w-full py-5 justify-between"
+              className="w-full justify-between py-5"
               style={{ height: screenHeight * 0.6 }}
             >
               <Heading size="xl" className="font-bold">
@@ -604,9 +604,9 @@ const UpdateAttendance = () => {
                       onPress={() => handleSelectStatus(value)}
                     >
                       <HStack
-                        className={`justify-between items-center border p-4 rounded-3xl ${
+                        className={`items-center justify-between rounded-3xl border p-4 ${
                           value === selectedAttendanceStatusRadio
-                            ? "bg-red-50 border-red-600"
+                            ? "border-red-600 bg-red-50"
                             : "border-gray-300"
                         }`}
                       >

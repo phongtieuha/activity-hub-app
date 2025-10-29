@@ -56,10 +56,10 @@ const ActionRequiredCard: React.FC<IProps> = ({
             </Text>
           </Box>
 
-          <HStack space="sm" className="text-typography-500 items-center">
+          <HStack space="sm" className="items-center text-typography-500">
             <Icon
               as={CalendarDaysIcon}
-              className="text-typography-500 !size-4"
+              className="!size-4 text-typography-500"
             />
             <Text size="sm">
               {formatDate(activity.startDate!)}
@@ -69,8 +69,8 @@ const ActionRequiredCard: React.FC<IProps> = ({
             </Text>
           </HStack>
 
-          <HStack space="sm" className="text-typography-500 items-center">
-            <Icon className="text-typography-500 !size-4" as={MapPinIcon} />
+          <HStack space="sm" className="items-center text-typography-500">
+            <Icon className="!size-4 text-typography-500" as={MapPinIcon} />
             <Text size="sm">{activity.location}</Text>
           </HStack>
 
@@ -79,7 +79,7 @@ const ActionRequiredCard: React.FC<IProps> = ({
           <Button
             variant="outline"
             action="negative"
-            className="w-full justify-between rounded-3xl pointer-events-none"
+            className="pointer-events-none w-full justify-between rounded-3xl"
           >
             <ButtonText>{actionText}</ButtonText>
             <ButtonIcon as={ChevronRightIcon} className="size-4" />

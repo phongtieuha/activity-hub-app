@@ -54,10 +54,10 @@ const ScheduledCard: React.FC<IProps> = ({ onPress, activity }) => {
             </Text>
           </Box>
 
-          <HStack space="sm" className="text-typography-500 items-center">
+          <HStack space="sm" className="items-center text-typography-500">
             <Icon
               as={CalendarDaysIcon}
-              className="text-typography-500 !size-4"
+              className="!size-4 text-typography-500"
             />
             <Text size="sm">
               {formatDate(activity.startDate!)}
@@ -67,8 +67,8 @@ const ScheduledCard: React.FC<IProps> = ({ onPress, activity }) => {
             </Text>
           </HStack>
 
-          <HStack space="sm" className="text-typography-500 items-center">
-            <Icon className="text-typography-500 !size-4" as={MapPinIcon} />
+          <HStack space="sm" className="items-center text-typography-500">
+            <Icon className="!size-4 text-typography-500" as={MapPinIcon} />
             <Text size="sm">{activity.location}</Text>
           </HStack>
         </VStack>

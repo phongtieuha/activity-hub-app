@@ -322,9 +322,9 @@ const ViewActivity = () => {
       <HStack
         className={`${
           isFullHeight ? "h-full" : ""
-        } justify-between items-center border p-4 rounded-3xl ${
+        } items-center justify-between rounded-3xl border p-4 ${
           selectedSlots?.activitySlotId === slot.activitySlotId
-            ? "bg-red-50 border-red-600"
+            ? "border-red-600 bg-red-50"
             : `border-transparent ${
                 slot.bookedByMe ? "bg-gray-50 opacity-60" : "bg-gray-50"
               }`
@@ -375,7 +375,7 @@ const ViewActivity = () => {
         onRefresh={onRefresh}
       >
         <Pressable
-          className="absolute top-16 left-4"
+          className="absolute left-4 top-16"
           onPress={() => router.back()}
         >
           <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
@@ -395,7 +395,7 @@ const ViewActivity = () => {
         {activityDetails && (
           <AnimatedCard
             style={styles.contentCard}
-            className="rounded-3xl bg-white flex-1 pb-8 p-4"
+            className="flex-1 rounded-3xl bg-white p-4 pb-8"
           >
             <DetailsCard
               activityDetails={activityDetails}
@@ -409,20 +409,20 @@ const ViewActivity = () => {
 
             {!alreadyRegistered && (
               <>
-                <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
+                <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
                   <VStack space="xl">
                     {isBookingDateToday && (
                       <Pressable onPress={handlepGenerateQROpenBookingSheet}>
-                        <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                          <Text className="text-red-600 font-semibold">
+                        <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
+                          <Text className="font-semibold text-red-600">
                             Generate QR
                           </Text>
                         </HStack>
                       </Pressable>
                     )}
                     <Pressable onPress={handlepOpenBookingSheet}>
-                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        <Text className="text-white font-semibold">
+                      <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
+                        <Text className="font-semibold text-white">
                           Book a Slot
                         </Text>
                       </HStack>
@@ -433,8 +433,8 @@ const ViewActivity = () => {
             )}
 
             {hasAttendanceTaken && (
-              <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
-                <Badge action="success" className="py-3 px-4 gap-2 shadow-sm">
+              <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
+                <Badge action="success" className="gap-2 px-4 py-3 shadow-sm">
                   <BadgeIcon as={CheckCircleIcon} className="!size-6" />
                   <BadgeText className="text-lg">
                     Attendance has been taken.
@@ -444,21 +444,21 @@ const ViewActivity = () => {
             )}
 
             {alreadyRegistered && !hasAttendanceTaken && (
-              <AnimatedCard delay={cardFadeDelay} className="w-full mt-auto">
+              <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
                 {isBookingDateToday ? (
                   <VStack space="xl">
                     <Pressable
                       onPress={() => router.push(`../scan-attendance/${id}`)}
                     >
-                      <HStack className="border border-red-600 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        <Text className="text-red-600 font-semibold">
+                      <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
+                        <Text className="font-semibold text-red-600">
                           Scan QR
                         </Text>
                       </HStack>
                     </Pressable>
                     <Pressable onPress={handleRegisterAttendance}>
-                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        <Text className="text-white font-semibold">
+                      <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
+                        <Text className="font-semibold text-white">
                           Generate QR
                         </Text>
                       </HStack>
@@ -467,8 +467,8 @@ const ViewActivity = () => {
                 ) : (
                   <VStack space="xl">
                     <Pressable onPress={handlepOpenBookingSheet}>
-                      <HStack className="bg-red-700/95 py-4 px-6 items-center justify-center rounded-3xl gap-2">
-                        <Text className="text-white font-semibold">
+                      <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
+                        <Text className="font-semibold text-white">
                           Select another Slot
                         </Text>
                       </HStack>
@@ -483,7 +483,7 @@ const ViewActivity = () => {
         {isFetchingData && (
           <AnimatedCard
             style={styles.contentCard}
-            className="rounded-3xl bg-white flex-1 pb-8 gap-5 p-4"
+            className="flex-1 gap-5 rounded-3xl bg-white p-4 pb-8"
           >
             <Skeleton className="h-[100px] rounded-3xl" />
             <SkeletonText _lines={10} className="h-5 rounded-3xl" />
@@ -504,7 +504,7 @@ const ViewActivity = () => {
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
             <VStack className="w-full py-5">
-              <Heading size="xl" className="font-bold text-center">
+              <Heading size="xl" className="text-center font-bold">
                 Attendance QR Code
               </Heading>
               <Text size="md" className="text-center">
@@ -520,7 +520,7 @@ const ViewActivity = () => {
                 />
                 {qrExpiry?.includes("-") && (
                   <>
-                    <Box className="bg-white/90 absolute inset-0"></Box>
+                    <Box className="absolute inset-0 bg-white/90"></Box>
                     <Center className=" absolute inset-0">
                       <Button
                         onPress={handleRegisterAttendance}
@@ -541,7 +541,7 @@ const ViewActivity = () => {
                   </>
                 )}
               </Box>
-              <Text size="md" className="text-center mt-4">
+              <Text size="md" className="mt-4 text-center">
                 QR code will expire in {qrExpiry}
               </Text>
               <Divider className="my-4 bg-transparent" />
@@ -572,7 +572,7 @@ const ViewActivity = () => {
               </ActionsheetDragIndicatorWrapper>
 
               <VStack
-                className="w-full py-4 px-6"
+                className="w-full px-6 py-4"
                 space="xl"
                 style={{ height: screenHeight * 0.85 }}
               >
@@ -617,7 +617,7 @@ const ViewActivity = () => {
                   {selectedBookingDate && (
                     <>
                       <Divider className="h-4 bg-transparent" />
-                      <Text size="md" className="font-bold bg-white py-2 ">
+                      <Text size="md" className="bg-white py-2 font-bold ">
                         {formatDayInWord(selectedBookingDate!)},{" "}
                         {formatDate(selectedBookingDate!)}
                       </Text>
@@ -697,17 +697,17 @@ const ViewActivity = () => {
               </VStack>
             </ActionsheetContent>
           ) : (
-            <ActionsheetContent className="bg-green-600 border-0">
+            <ActionsheetContent className="border-0 bg-green-600">
               <ActionsheetDragIndicatorWrapper>
                 <ActionsheetDragIndicator />
               </ActionsheetDragIndicatorWrapper>
               <Box
-                className="w-full py-4 px-6"
+                className="w-full px-6 py-4"
                 style={{ height: screenHeight * 0.8 }}
               >
                 <Divider className="my-4 bg-transparent" />
                 <Center>
-                  <Icon as={CheckCircleIcon} className="text-white !size-20" />
+                  <Icon as={CheckCircleIcon} className="!size-20 text-white" />
                 </Center>
                 <Divider className="my-4 bg-transparent" />
                 <AnimatedCard delay={cardFadeDelay}>
@@ -719,7 +719,7 @@ const ViewActivity = () => {
 
                 <Heading
                   size="xl"
-                  className="font-semibold text-center text-white"
+                  className="text-center font-semibold text-white"
                 >
                   {formatDayInWord(selectedBookingDate!)},{" "}
                   {formatDate(selectedBookingDate!)}
@@ -730,7 +730,7 @@ const ViewActivity = () => {
                     <Heading
                       key={"bookedSlot" + selectedSlots.activitySlotId}
                       size="xl"
-                      className="font-semibold text-center text-white"
+                      className="text-center font-semibold text-white"
                     >
                       {formatTime(selectedSlots.startDate)} -{" "}
                       {formatTime(selectedSlots.endDate)}

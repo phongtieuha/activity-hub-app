@@ -32,7 +32,7 @@ const CustomBackButton = () => {
       onPress={() => {
         router.back();
       }}
-      className="web:ml-2 ios:ml-2 android:mr-4"
+      className="ios:ml-2 android:mr-4 web:ml-2"
     >
       <Icon as={ChevronLeftIcon} size="xl" className="text-white" />
     </Pressable>

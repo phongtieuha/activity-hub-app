@@ -230,9 +230,9 @@ export default function HomeScreen() {
     >
       <StatusBar barStyle={"default"} backgroundColor="#fff" />
 
-      <Divider className={`bg-transparent h-16`} />
+      <Divider className={`h-16 bg-transparent`} />
 
-      <HStack space="lg" className="px-4 items-center">
+      <HStack space="lg" className="items-center px-4">
         <Image
           source={require("@/assets/images/splash-icon.png")}
           style={{
@@ -245,7 +245,7 @@ export default function HomeScreen() {
         <Button
           variant="link"
           action="secondary"
-          className="bg-white/90 rounded-full px-2 ml-auto"
+          className="ml-auto rounded-full bg-white/90 px-2"
         >
           <ButtonIcon
             size="xl"
@@ -257,26 +257,26 @@ export default function HomeScreen() {
         <Button
           variant="link"
           action="secondary"
-          className="bg-white/90 rounded-full px-2"
+          className="rounded-full bg-white/90 px-2"
         >
           <Box className="relative">
             <ButtonIcon as={BellIcon} className="!size-6"></ButtonIcon>
-            <Box className="rounded-full bg-red-600 w-1/5 h-1/5 absolute right-1 top-0"></Box>
+            <Box className="absolute right-1 top-0 h-1/5 w-1/5 rounded-full bg-red-600"></Box>
           </Box>
         </Button>
       </HStack>
 
-      <Divider className={`bg-transparent h-4`} />
+      <Divider className={`h-4 bg-transparent`} />
 
-      <Box className="relative mx-4 rounded-3xl overflow-hidden">
+      <Box className="relative mx-4 overflow-hidden rounded-3xl">
         <Image
           source={require("@/assets/images/solider-background.png")}
           style={styles.reactLogo}
           contentFit="cover"
           contentPosition={{ top: -100, left: 0 }}
         />
-        <Box className="bg-black/30 absolute inset-0 size-full"></Box>
-        <Box className="absolute top-4 left-8">
+        <Box className="absolute inset-0 size-full bg-black/30"></Box>
+        <Box className="absolute left-8 top-4">
           <Heading size="lg" className="text-red-600">
             HELLO!
           </Heading>
@@ -288,12 +288,12 @@ export default function HomeScreen() {
           </Heading>
         </Box>
 
-        <HStack className=" justify-around absolute bottom-4 left-0 w-full">
+        <HStack className=" absolute bottom-4 left-0 w-full justify-around">
           <Button
             size="sm"
             variant="link"
             action="secondary"
-            className="flex flex-col h-full "
+            className="flex h-full flex-col "
           >
             <Image
               source={require("@/assets/images/icon-helmet.png")}
@@ -308,7 +308,7 @@ export default function HomeScreen() {
             size="sm"
             variant="link"
             action="secondary"
-            className="flex flex-col h-full"
+            className="flex h-full flex-col"
           >
             <Image
               source={require("@/assets/images/icon-running.png")}
@@ -323,7 +323,7 @@ export default function HomeScreen() {
             size="sm"
             variant="link"
             action="secondary"
-            className="flex flex-col h-full"
+            className="flex h-full flex-col"
           >
             <Image
               source={require("@/assets/images/icon-gun.png")}
@@ -338,7 +338,7 @@ export default function HomeScreen() {
             size="sm"
             variant="link"
             action="secondary"
-            className="flex flex-col h-full"
+            className="flex h-full flex-col"
           >
             <Image
               source={require("@/assets/images/icon-sockets.png")}
@@ -352,15 +352,15 @@ export default function HomeScreen() {
         </HStack>
       </Box>
 
-      <Divider className={`bg-transparent h-4`} />
+      <Divider className={`h-4 bg-transparent`} />
 
       {isFetchingData ? (
         <VStack space="lg">
-          <Card className="bg-white mx-4 p-4 rounded-3xl overflow-hidden">
+          <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
             <SkeletonText _lines={7} className="h-5 rounded-3xl" />
           </Card>
 
-          <Card className="bg-white mx-4 p-4 rounded-3xl overflow-hidden">
+          <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
             <SkeletonText _lines={7} className="h-5 rounded-3xl" />
           </Card>
         </VStack>
@@ -369,7 +369,7 @@ export default function HomeScreen() {
           {actionRequiredActivities.length > 0 ? (
             <VStack
               space="md"
-              className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
+              className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
             >
               <HStack space="md" className="items-center">
                 <Heading size="lg">Actions required</Heading>
@@ -396,7 +396,7 @@ export default function HomeScreen() {
                   delay={cardFadeDelay}
                 >
                   <HStack className="items-start" space="md">
-                    <Center className="rounded-3xl w-[60px] bg-gray-50 py-2">
+                    <Center className="w-[60px] rounded-3xl bg-gray-50 py-2">
                       {activity.timeUntilEventDisplay &&
                       activity.timeUntilEventDisplay.length < 3 ? (
                         <Text className="text-base font-bold text-red-600">
@@ -448,19 +448,19 @@ export default function HomeScreen() {
             <Badge
               action="muted"
               size="lg"
-              className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
+              className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
             >
               <BadgeText>No activities that require your attention!</BadgeText>
             </Badge>
           )}
 
-          <Divider className={`bg-transparent h-4`} />
+          <Divider className={`h-4 bg-transparent`} />
 
           {!!scheduledActivities.length ? (
             <AnimatedCard delay={cardFadeDelay * 3}>
               <VStack
                 space="xl"
-                className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
+                className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
               >
                 <HStack space="md" className="items-center">
                   <Heading size="lg">Scheduled</Heading>
@@ -532,7 +532,7 @@ export default function HomeScreen() {
             <Badge
               action="muted"
               size="lg"
-              className="bg-white mx-4 p-4 rounded-3xl overflow-hidden"
+              className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
             >
               <BadgeText>No scheduled activities!</BadgeText>
             </Badge>
