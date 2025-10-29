@@ -11,7 +11,6 @@ import {
   ListIcon,
   UserCogIcon,
 } from "lucide-react-native";
-import React from "react";
 import { Platform } from "react-native";
 
 export default function TabLayout() {

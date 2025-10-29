@@ -60,18 +60,18 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   View,
 } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
-  runOnJS,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { scheduleOnRN } from "react-native-worklets";
 
 function isAttendanceRecordMarkable(status: TUpdateAttendanceRecord) {
   return status.attendanceStatus !== AttendanceStatus.PRESENT;
@@ -280,7 +280,7 @@ const UpdateAttendance = () => {
 
       // Update state less frequently to avoid performance issues
       if ((shouldStick && !isSticky) || (!shouldStick && isSticky)) {
-        runOnJS(setIsSticky)(shouldStick);
+        scheduleOnRN(setIsSticky, shouldStick);
       }
     },
   });

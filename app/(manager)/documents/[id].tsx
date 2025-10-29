@@ -2,7 +2,6 @@ import { Divider } from "@/components/ui/divider";
 import { HStack } from "@/components/ui/hstack";
 import { DownloadIcon, Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import React from "react";
 import { Pressable, ScrollView } from "react-native";
 
 type TDocument = {
