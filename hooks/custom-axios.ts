@@ -11,7 +11,7 @@ import {
 } from "./useNotification";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: "http://192.168.1.77:9100",
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
 }); // use your own URL here or environment variable
 AXIOS_INSTANCE.defaults.xsrfCookieName = undefined;
 AXIOS_INSTANCE.defaults.xsrfHeaderName = undefined;
