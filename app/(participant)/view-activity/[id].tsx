@@ -50,6 +50,7 @@ import { Text } from "@/components/ui/text";
 
 import { VStack } from "@/components/ui/vstack";
 import {
+  DATEPICKER_FORMAT,
   differenceInMinutes,
   formatDate,
   formatDayInWord,
@@ -127,10 +128,12 @@ const ViewActivity = () => {
     const bookedSlot = activityDetails?.slots?.find((slot) => slot.bookedByMe);
     if (!bookedSlot) return false;
 
-    return (
-      bookedSlot.startDate.slice(0, 10) ===
-      getCurrentSGTDate().toISODate()?.slice(0, 10)
+    const eventDate = getSGTDate(bookedSlot.startDate).toFormat(
+      DATEPICKER_FORMAT
     );
+    const currentDate = getCurrentSGTDate().toFormat(DATEPICKER_FORMAT);
+
+    return eventDate === currentDate;
   }, [activityDetails]);
 
   const handlepOpenBookingSheet = () => {

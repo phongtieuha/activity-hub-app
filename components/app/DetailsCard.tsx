@@ -4,29 +4,17 @@ import {
   NotebookTextIcon,
   ShirtIcon,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React from "react";
 
-import {
-  ActivityResponseDto,
-  ActivitySlotDto,
-} from "@/__generated-client/http-client-integration";
+import { ActivityResponseDto } from "@/__generated-client/http-client-integration";
 import {
   formatDayInWord,
   formatShortDate,
-  formatSlotTime,
   formatTime,
 } from "@/hooks/date-formatter";
 import { ServerAttireToDisplayMapping } from "@/models/activity";
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-} from "../ui/actionsheet";
 import { Badge, BadgeText } from "../ui/badge";
 import { Box } from "../ui/box";
-import { Button, ButtonText } from "../ui/button";
 import { Card } from "../ui/card";
 import { Divider } from "../ui/divider";
 import { Heading } from "../ui/heading";
@@ -38,17 +26,9 @@ import { VStack } from "../ui/vstack";
 
 interface IProps {
   activityDetails: ActivityResponseDto;
-  onBookNowPress?: () => void;
-  onCancelBookingPress?: (slot: ActivitySlotDto) => void;
-  showBookedSlots?: boolean;
-  showCancelButton?: boolean;
 }
 
 const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedSlotToCancel, setSelectedSlotToCancel] =
-    useState<ActivitySlotDto | null>(null);
-
   const isStartDateSameAsEndDate =
     props.activityDetails.startDate?.split("T")[0] ===
     props.activityDetails.endDate?.split("T")[0];
@@ -137,23 +117,6 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
     </HStack>
   );
 
-  function handleCancelBooking(slot: ActivitySlotDto): void {
-    setSelectedSlotToCancel(slot);
-    setShowConfirmModal(true);
-  }
-
-  function handleConfirmCancel(): void {
-    if (selectedSlotToCancel) {
-      props.onCancelBookingPress?.(selectedSlotToCancel);
-      setShowConfirmModal(false);
-      setSelectedSlotToCancel(null);
-    }
-  }
-
-  function handleCancelModal(): void {
-    setShowConfirmModal(false);
-    setSelectedSlotToCancel(null);
-  }
   return (
     <>
       <Badge action="error" size="lg" className="justify-center">
@@ -259,91 +222,8 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
           </>
         )}
 
-        {props.showBookedSlots && bookedSlots.length > 0 && (
-          <>
-            <Divider className="h-2 bg-transparent" />
-            <Card className="gap-3 rounded-3xl border border-red-600 p-4">
-              <Heading className="font-semibold">Booked slot</Heading>
-
-              <VStack
-                space="md"
-                className="items-start justify-center text-typography-300"
-              >
-                {bookedSlots.map((slot) => (
-                  <>
-                    <HStack
-                      className="justify-between"
-                      space="xl"
-                      key={slot.activitySlotId}
-                    >
-                      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
-                        <Text className="">Date</Text>
-                        <Text className="text-base font-semibold text-typography-900">
-                          {formatDayInWord(slot.startDate)},{" "}
-                          {formatShortDate(slot.startDate)}
-                        </Text>
-                      </VStack>
-
-                      <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
-                        <Text className="">Time</Text>
-                        <Text className="font-semibold text-typography-900">
-                          {formatSlotTime(slot.startDate)} -{" "}
-                          {formatSlotTime(slot.endDate)}
-                        </Text>
-                      </VStack>
-                    </HStack>
-                    {props.showCancelButton && (
-                      <Button
-                        variant="outline"
-                        action="negative"
-                        className="w-full"
-                        onPress={() => handleCancelBooking(slot)}
-                      >
-                        <ButtonText>Cancel Booking</ButtonText>
-                      </Button>
-                    )}
-                  </>
-                ))}
-              </VStack>
-            </Card>
-          </>
-        )}
-
         {props.children}
       </VStack>
-
-      {/* Confirmation Modal */}
-      <Actionsheet isOpen={showConfirmModal} onClose={handleCancelModal}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-          <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-          </ActionsheetDragIndicatorWrapper>
-          <VStack space="lg" className="w-full p-4">
-            <Heading className="text-center">
-              Are you sure you want to cancel your booking ?
-            </Heading>
-
-            <Badge size="lg" className="justify-center">
-              <BadgeText>This action cannot be undone!</BadgeText>
-            </Badge>
-
-            <HStack space="xl">
-              <Button
-                size="lg"
-                action="negative"
-                className="flex-1"
-                onPress={handleCancelModal}
-              >
-                <ButtonText className="">Keep Booking</ButtonText>
-              </Button>
-              <Button size="lg" action="default" onPress={handleConfirmCancel}>
-                <ButtonText>Yes, Cancel Booking</ButtonText>
-              </Button>
-            </HStack>
-          </VStack>
-        </ActionsheetContent>
-      </Actionsheet>
     </>
   );
 };

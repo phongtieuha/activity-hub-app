@@ -1,6 +1,8 @@
 import {
   BadgeAlertIcon,
+  Calendar1Icon,
   CalendarPlus,
+  ClockIcon,
   MapPinIcon,
   NotebookTextIcon,
   ShirtIcon,
@@ -194,50 +196,45 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
       )}
 
       {props.showBookedSlots && bookedSlots.length > 0 && (
-        <Card className="gap-3 rounded-3xl border border-red-600 p-4">
-          <Heading className="font-semibold">Booked slot</Heading>
-
-          <VStack
-            space="md"
-            className="items-start justify-center text-typography-300"
-          >
-            {bookedSlots.map((slot) => (
-              <>
-                <HStack
-                  className="justify-between"
-                  space="xl"
-                  key={slot.activitySlotId}
-                >
-                  <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
-                    <Text className="">Date</Text>
-                    <Text className="text-base font-semibold text-typography-900">
+        <VStack space="lg">
+          <Badge action="success" className="items-start gap-2 px-6 py-3">
+            <VStack space="sm" className="w-full">
+              <BadgeText className="mt-0.5 text-lg">
+                Your booking below has been confirmed.
+              </BadgeText>
+              {bookedSlots.map((slot) => (
+                <VStack space="xs" key={slot.activitySlotId}>
+                  <HStack space="md" className="items-center">
+                    <BadgeIcon as={Calendar1Icon} className="!size-5" />
+                    <BadgeText className="text-xl font-bold">
                       {formatDayInWord(slot.startDate)},{" "}
                       {formatShortDate(slot.startDate)}
-                    </Text>
-                  </VStack>
+                    </BadgeText>
+                  </HStack>
 
-                  <VStack className="flex-1 items-start justify-center rounded-3xl bg-gray-100 px-4 py-3 text-typography-300">
-                    <Text className="">Time</Text>
-                    <Text className="font-semibold text-typography-900">
+                  <HStack space="md" className="items-center">
+                    <BadgeIcon as={ClockIcon} className="!size-5" />
+                    <BadgeText className="text-xl font-bold">
                       {formatSlotTime(slot.startDate)} -{" "}
                       {formatSlotTime(slot.endDate)}
-                    </Text>
-                  </VStack>
-                </HStack>
-                {props.showCancelButton && (
-                  <Button
-                    variant="outline"
-                    action="negative"
-                    className="w-full"
-                    onPress={() => handleCancelBooking(slot)}
-                  >
-                    <ButtonText>Cancel Booking</ButtonText>
-                  </Button>
-                )}
-              </>
-            ))}
-          </VStack>
-        </Card>
+                    </BadgeText>
+                  </HStack>
+
+                  {props.showCancelButton && (
+                    <Button
+                      variant="outline"
+                      action="negative"
+                      className="mt-3 w-full"
+                      onPress={() => handleCancelBooking(slot)}
+                    >
+                      <ButtonText>Cancel Booking</ButtonText>
+                    </Button>
+                  )}
+                </VStack>
+              ))}
+            </VStack>
+          </Badge>
+        </VStack>
       )}
 
       <Divider className="h-6 bg-transparent" />

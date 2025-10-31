@@ -6,6 +6,7 @@ import {
 } from "@/__generated-client/http-client-integration";
 import CalendarScreen from "@/components/app/Calendar";
 import DetailsCard from "@/components/app/DetailsCard";
+import DetailsNowCardForManager from "@/components/app/DetailsNowCardForManager";
 import MinimalTimeline from "@/components/app/MinimalTimeline";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {
@@ -34,6 +35,7 @@ import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
+  DATEPICKER_FORMAT,
   differenceInMinutes,
   formatDate,
   formatDayInWord,
@@ -50,6 +52,8 @@ import {
   FileIcon,
   LoaderIcon,
   PencilLineIcon,
+  QrCodeIcon,
+  ScanQrCodeIcon,
   ScrollTextIcon,
 } from "lucide-react-native";
 import { DateTime } from "luxon";
@@ -98,8 +102,26 @@ const ViewActivity = () => {
     return Object.keys(bookingSlotsGroupedByDateOrderedByDateKey);
   }, [bookingSlotsGroupedByDateOrderedByDateKey]);
 
+  const bookedSlot = activityDetails?.slots?.[0];
+
+  const isBookingDateToday = React.useMemo(() => {
+    if (!bookedSlot) return false;
+
+    const eventDate = getSGTDate(bookedSlot.startDate).toFormat(
+      DATEPICKER_FORMAT
+    );
+    const currentDate = getCurrentSGTDate().toFormat(DATEPICKER_FORMAT);
+
+    return eventDate === currentDate;
+  }, [bookedSlot]);
+
   const handlepOpenBookingSheet = () => {
-    setShowBookingSheet(true);
+    if (bookedSlot) {
+      setSelectedSlots(() => bookedSlot);
+      handleRegisterAttendance();
+    } else {
+      setShowBookingSheet(true);
+    }
   };
 
   const handlepCloseBookingSheet = () => {
@@ -151,6 +173,7 @@ const ViewActivity = () => {
     try {
       const detailResp = await getById(id as string);
       setActivityDetails(detailResp?.data);
+      setSelectedSlots(detailResp?.data?.slots?.[0]);
     } finally {
       setIsFetchingData(false);
     }
@@ -236,102 +259,126 @@ const ViewActivity = () => {
             style={styles.contentCard}
             className="flex-1 rounded-3xl bg-white p-4 pb-8"
           >
-            <DetailsCard activityDetails={activityDetails} />
+            {bookedSlot ? (
+              <DetailsNowCardForManager
+                activityDetails={activityDetails}
+                slot={bookedSlot}
+              />
+            ) : (
+              <DetailsCard activityDetails={activityDetails} />
+            )}
 
             <Divider className="h-8 bg-transparent" />
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <AnimatedCard delay={cardFadeDelay}>
-                <HStack space="xl" className=" justify-start">
-                  <Pressable
-                    onPress={() => router.push(`../update-attendance/${id}`)}
-                    className="min-w-[31.5%]"
-                  >
-                    <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
-                      <Center className="rounded-full bg-red-100 p-2">
-                        <Icon
-                          as={PencilLineIcon}
-                          className="!size-5 text-red-600"
-                        />
-                      </Center>
-                      <Center>
-                        <Text className="font-semibold text-gray-900">
-                          Update
-                        </Text>
-                        <Text className="font-semibold text-gray-900">
-                          Attendance
-                        </Text>
-                      </Center>
-                    </VStack>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => router.push(`../documents/${id}`)}
-                    className="min-w-[31.5%]"
-                  >
-                    <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
-                      <Center className="rounded-full bg-red-100 p-2">
-                        <Icon as={FileIcon} className="!size-5 text-red-600" />
-                      </Center>
-                      <Center>
-                        <Text className="font-semibold text-gray-900">
-                          View
-                        </Text>
-                        <Text className="font-semibold text-gray-900">
-                          Documents
-                        </Text>
-                      </Center>
-                    </VStack>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => router.push(`../manage-activity/${id}`)}
-                    className="min-w-[31.5%]"
-                  >
-                    <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
-                      <Center className="rounded-full bg-red-100 p-2">
-                        <Icon
-                          as={ScrollTextIcon}
-                          className="!size-5 text-red-600"
-                        />
-                      </Center>
-                      <Center>
-                        <Text className="font-semibold text-gray-900">
-                          Manage
-                        </Text>
-                        <Text className="font-semibold text-gray-900">
-                          Activity
-                        </Text>
-                      </Center>
-                    </VStack>
-                  </Pressable>
-                </HStack>
-              </AnimatedCard>
-            </ScrollView>
-
-            <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
-              <VStack space="xl">
+            <AnimatedCard delay={cardFadeDelay}>
+              <HStack space="xl" className="justify-start">
                 <Pressable
-                  onPress={() => router.push(`../scan-attendance/${id}`)}
+                  onPress={() => router.push(`../update-attendance/${id}`)}
+                  className="flex-shink-0 flex-1"
                 >
-                  <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
-                    {/* <Icon
-                      as={ScanQrCodeIcon}
-                      className="text-red-600 !size-5"
-                    /> */}
-                    <Text className="font-semibold text-red-600">Scan QR</Text>
-                  </HStack>
+                  <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
+                    <Center className="rounded-full bg-red-100 p-2">
+                      <Icon
+                        as={PencilLineIcon}
+                        className="!size-5 text-red-600"
+                      />
+                    </Center>
+                    <Center>
+                      <Text className="font-semibold text-gray-900">
+                        Update
+                      </Text>
+                      <Text className="font-semibold text-gray-900">
+                        Attendance
+                      </Text>
+                    </Center>
+                  </VStack>
                 </Pressable>
-                <Pressable onPress={handlepOpenBookingSheet}>
-                  <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
-                    {/* <Icon as={UserPenIcon} className="text-white !size-5" /> */}
-                    <Text className="font-semibold text-white">
-                      Generate QR
-                    </Text>
-                  </HStack>
+
+                <Pressable
+                  onPress={() => router.push(`../documents/${id}`)}
+                  className="flex-shink-0 flex-1"
+                >
+                  <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
+                    <Center className="rounded-full bg-red-100 p-2">
+                      <Icon as={FileIcon} className="!size-5 text-red-600" />
+                    </Center>
+                    <Center>
+                      <Text className="font-semibold text-gray-900">View</Text>
+                      <Text className="font-semibold text-gray-900">
+                        Documents
+                      </Text>
+                    </Center>
+                  </VStack>
                 </Pressable>
-              </VStack>
+
+                <Pressable
+                  onPress={() => router.push(`../manage-activity/${id}`)}
+                  className="flex-shink-0 flex-1"
+                >
+                  <VStack className="items-center justify-center gap-2 rounded-3xl border border-gray-200 px-6 py-4">
+                    <Center className="rounded-full bg-red-100 p-2">
+                      <Icon
+                        as={ScrollTextIcon}
+                        className="!size-5 text-red-600"
+                      />
+                    </Center>
+                    <Center>
+                      <Text className="font-semibold text-gray-900">
+                        Manage
+                      </Text>
+                      <Text className="font-semibold text-gray-900">
+                        Activity
+                      </Text>
+                    </Center>
+                  </VStack>
+                </Pressable>
+              </HStack>
             </AnimatedCard>
+
+            {isBookingDateToday && (
+              <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
+                <VStack space="xl">
+                  <HStack space="xl">
+                    <Pressable
+                      className="flex-1 flex-shrink-0"
+                      onPress={() => router.push(`../scan-attendance/${id}`)}
+                    >
+                      <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
+                        <Icon
+                          as={ScanQrCodeIcon}
+                          className="!size-5 text-red-600"
+                        />
+                        <Text className="font-semibold text-red-600">
+                          Scan QR
+                        </Text>
+                      </HStack>
+                    </Pressable>
+                    <Pressable
+                      className="flex-1 flex-shrink-0"
+                      onPress={() => router.push(`../scan-attendance/${id}`)}
+                    >
+                      <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
+                        <Icon
+                          as={QrCodeIcon}
+                          className="!size-5 text-red-600"
+                        />
+                        <Text className="font-semibold text-red-600">
+                          Register Walk-In
+                        </Text>
+                      </HStack>
+                    </Pressable>
+                  </HStack>
+                  <Pressable onPress={handlepOpenBookingSheet}>
+                    <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
+                      {/* <Icon as={UserPenIcon} className="text-white !size-5" /> */}
+                      <Text className="font-semibold text-white">
+                        Generate QR
+                      </Text>
+                    </HStack>
+                  </Pressable>
+                </VStack>
+              </AnimatedCard>
+            )}
           </AnimatedCard>
         )}
 

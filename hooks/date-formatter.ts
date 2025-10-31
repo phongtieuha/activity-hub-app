@@ -147,8 +147,8 @@ export function getTimeUntilEvent(
   currentDate: DateTime
 ): string[] {
   // Ensure both dates are in Singapore timezone
-  const eventSGT = eventDate.setZone("Asia/Singapore");
-  const currentSGT = currentDate.setZone("Asia/Singapore");
+  const eventSGT = eventDate;
+  const currentSGT = currentDate;
 
   // Check if event has passed (regardless of date)
   if (eventSGT <= currentSGT) {
