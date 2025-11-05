@@ -3,8 +3,9 @@ import { RefreshControl, StyleSheet } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedRef,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
-  useScrollViewOffset,
+  useSharedValue,
 } from "react-native-reanimated";
 
 // import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
@@ -29,7 +30,14 @@ export default function ParallaxScrollView({
 }: Props) {
   // const colorScheme = useColorScheme() ?? "light";
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
+  const scrollOffset = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollOffset.value = event.contentOffset.y;
+    },
+  });
+
   const bottom = 0; //useBottomTabOverflow();
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -56,7 +64,8 @@ export default function ParallaxScrollView({
     // <View style={styles.container}>
     <Animated.ScrollView
       ref={scrollRef}
-      scrollEventThrottle={0}
+      onScroll={scrollHandler}
+      scrollEventThrottle={16}
       scrollIndicatorInsets={{ bottom }}
       contentContainerStyle={{ paddingBottom: bottom }}
       contentContainerClassName={contentContainerClassName}

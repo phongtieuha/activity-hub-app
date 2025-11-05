@@ -14,7 +14,6 @@ import { TabBarProvider } from "@/hooks/useTabBar";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
 import { Image, Platform, StatusBar, StyleSheet } from "react-native";
-import "react-native-reanimated";
 
 export const ColorModeContext = React.createContext({});
 

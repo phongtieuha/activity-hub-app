@@ -36,14 +36,8 @@ import {
   User2Icon,
 } from "lucide-react-native";
 import React, { useEffect, useRef } from "react";
-import {
-  Animated,
-  Dimensions,
-  Keyboard,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-} from "react-native";
+import { Keyboard, StyleSheet, TextInput } from "react-native";
+import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 
 // OTP Input Component
 const OTPInput = ({
@@ -161,8 +155,7 @@ export default function Index() {
   const [loggedInAs, setLoggedInAs] = React.useState<
     "participant" | "manager"
   >();
-  const [isKeyboardVisible, setIsKeyboardVisible] = React.useState(false);
-  const marginAnim = useRef(new Animated.Value(0)).current;
+  const containerTranslateY = useSharedValue(0);
 
   // --- Effects ---
   useEffect(() => {
@@ -231,43 +224,32 @@ export default function Index() {
   };
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
+    const keyboardWillShowListener = Keyboard.addListener(
       "keyboardWillShow",
-      () => setIsKeyboardVisible(true)
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        containerTranslateY.value = withSpring(-keyboardHeight);
+      }
     );
-    const keyboardDidHideListener = Keyboard.addListener(
+    const keyboardWillHideListener = Keyboard.addListener(
       "keyboardWillHide",
-      () => setIsKeyboardVisible(false)
+      () => {
+        containerTranslateY.value = withSpring(0);
+      }
     );
     return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
     };
-  }, []);
-
-  useEffect(() => {
-    Animated.timing(marginAnim, {
-      toValue: isKeyboardVisible ? 30 : 60,
-      duration: 250,
-      useNativeDriver: false, // must be false for margin
-    }).start();
-  }, [isKeyboardVisible, marginAnim]);
-
-  const screenHeight = Dimensions.get("window").height;
-  const heroImageHeight = marginAnim.interpolate({
-    inputRange: [30, 60],
-    outputRange: [0.3 * screenHeight, 0.6 * screenHeight], // 30% to 60% of screen height
-  });
+  }, [containerTranslateY]);
 
   return (
-    <ScrollView
+    <Animated.ScrollView
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ flexGrow: 1 }}
+      contentContainerClassName="flex-grow"
+      style={{ transform: [{ translateY: containerTranslateY }] }}
     >
-      <Animated.View
-        style={{ height: heroImageHeight, width: "100%" }}
-        className="overflow-hidden rounded-tl-3xl rounded-tr-3xl"
-      >
+      <Animated.View className="w-full flex-1 overflow-hidden rounded-tl-3xl rounded-tr-3xl">
         <Center style={{ flex: 1 }}>
           <ImageBackground
             source={require("@/assets/images/bg-login.png")}
@@ -286,17 +268,14 @@ export default function Index() {
                   height: 160,
                   marginBottom: 0,
                 }}
-                resizeMode="contain"
+                contentFit="contain"
               />
             </Center>
           </ImageBackground>
         </Center>
       </Animated.View>
 
-      <AnimatedCard
-        key={"chooseLogin"}
-        className="-mt-7 flex-1 gap-4 rounded-3xl bg-white p-4"
-      >
+      <AnimatedCard className="-mt-8 h-2/5 gap-4 rounded-3xl bg-white px-4 pb-8 pt-4">
         <Divider className="h-1 bg-transparent" />
         {!loggedInAs && (
           <>
@@ -348,12 +327,12 @@ export default function Index() {
               <SelectPortal>
                 <SelectBackdrop />
 
-                <SelectContent>
+                <SelectContent className="max-h-[75%]">
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
 
-                  <SelectScrollView className="pt-12">
+                  <SelectScrollView>
                     {participantUsers.map((user) => (
                       <SelectItem
                         key={user.nric}
@@ -405,12 +384,12 @@ export default function Index() {
               <SelectPortal>
                 <SelectBackdrop />
 
-                <SelectContent>
+                <SelectContent className="max-h-[75%]">
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
 
-                  <SelectScrollView className="pt-12">
+                  <SelectScrollView>
                     {managerUsers.map((user) => (
                       <SelectItem
                         key={user.nric}
@@ -519,11 +498,7 @@ export default function Index() {
             </VStack>
           </>
         )}
-
-        <Divider className="h-5 bg-transparent" />
       </AnimatedCard>
-
-      {isKeyboardVisible && <Divider className="h-1/3 bg-transparent" />}
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
