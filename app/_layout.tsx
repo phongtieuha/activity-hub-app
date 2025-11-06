@@ -12,10 +12,16 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { NotificationProvider } from "@/hooks/useNotification";
 import { TabBarProvider } from "@/hooks/useTabBar";
 import { Stack, useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import { Image, Platform, StatusBar, StyleSheet } from "react-native";
 
 export const ColorModeContext = React.createContext({});
+
+SplashScreen.setOptions({
+  duration: 600,
+  fade: true,
+});
 
 // Component to initialize axios with notification context
 const AxiosInitializer = () => {
@@ -86,11 +92,16 @@ export default function RootLayout() {
                   />
                   <Stack.Screen
                     name="(manager)/view-activity/[id]"
-                    options={{ headerShown: false }}
+                    options={{
+                      headerShown: false,
+                    }}
                   />
                   <Stack.Screen
                     name="(manager)/scan-attendance/[id]"
-                    options={{ headerShown: false }}
+                    options={{
+                      headerShown: false,
+                      animation: "fade_from_bottom",
+                    }}
                   />
                   <Stack.Screen
                     name="(manager)/update-attendance/[id]"
@@ -115,7 +126,10 @@ export default function RootLayout() {
                   />
                   <Stack.Screen
                     name="(participant)/scan-attendance/[id]"
-                    options={{ headerShown: false }}
+                    options={{
+                      headerShown: false,
+                      animation: "fade_from_bottom",
+                    }}
                   />
                 </Stack>
               </NotificationProvider>

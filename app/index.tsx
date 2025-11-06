@@ -6,7 +6,6 @@ import AnimatedCard from "@/components/ui/AnimatedCard";
 import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Center } from "@/components/ui/center";
-import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -25,6 +24,11 @@ import {
 } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import {
+  AnimatedView,
+  LayoutEntering,
+  LayoutEnteringLonger,
+} from "@/constants/animation";
 import { participantUsers } from "@/constants/loginUsers";
 import { managerUsers } from "@/constants/loginUsers-managers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -176,6 +180,7 @@ export default function Index() {
   // --- Handlers ---
   const handleParticipantPress = async () => {
     Keyboard.dismiss();
+    containerTranslateY.value = withSpring(0);
     // setLoggedInAs("participant");
     if (isOTPShown) {
       const result = await verifyLogin({
@@ -249,7 +254,10 @@ export default function Index() {
       contentContainerClassName="flex-grow"
       style={{ transform: [{ translateY: containerTranslateY }] }}
     >
-      <Animated.View className="w-full flex-1 overflow-hidden rounded-tl-3xl rounded-tr-3xl">
+      <Animated.View
+        entering={LayoutEntering}
+        className="w-full flex-1 overflow-hidden rounded-tl-3xl rounded-tr-3xl"
+      >
         <Center style={{ flex: 1 }}>
           <ImageBackground
             source={require("@/assets/images/bg-login.png")}
@@ -275,230 +283,278 @@ export default function Index() {
         </Center>
       </Animated.View>
 
-      <AnimatedCard className="-mt-8 h-2/5 gap-4 rounded-3xl bg-white px-4 pb-8 pt-4">
-        <Divider className="h-1 bg-transparent" />
+      <Animated.View
+        entering={LayoutEnteringLonger}
+        className="-mt-8 h-2/5 rounded-3xl bg-white px-4 py-8"
+      >
         {!loggedInAs && (
-          <>
-            <Heading size="lg">OneNS. Supporting Your NS Experience.</Heading>
-            <Text>
-              Get practical support and reliable information to help you through
-              every stage of your NS journey.
-            </Text>
+          <AnimatedCard className="flex-1 gap-4">
+            <AnimatedView>
+              <Heading size="lg">OneNS. Supporting Your NS Experience.</Heading>
+              <Text>
+                Get practical support and reliable information to help you
+                through every stage of your NS journey.
+              </Text>
+            </AnimatedView>
 
             <HStack space="xl" className="mt-auto">
-              <Pressable
-                onPress={() => setLoggedInAs("participant")}
-                className="flex flex-1 flex-col items-center justify-center gap-3 rounded-3xl border border-gray-300 p-4"
-              >
-                <Center className="rounded-full bg-red-600 p-2">
-                  <User2Icon color="white" />
-                </Center>
-                <Text className="font-semibold">Login as Participant</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setLoggedInAs("manager")}
-                className="flex flex-1 flex-col items-center justify-center gap-3 rounded-3xl border border-gray-300 p-4"
-              >
-                <Center className="rounded-full bg-red-600 p-2">
-                  <SquareUserRoundIcon color="white" />
-                </Center>
-                <Text className="font-semibold">Login as Manager</Text>
-              </Pressable>
+              <AnimatedView delay={100} className="flex-1">
+                <Pressable
+                  onPress={() => setLoggedInAs("participant")}
+                  className="flex  flex-col items-center justify-center gap-3 rounded-3xl border border-gray-300 p-4"
+                >
+                  <Center className="rounded-full bg-red-600 p-2">
+                    <User2Icon color="white" />
+                  </Center>
+                  <Text className="font-semibold">Login as Participant</Text>
+                </Pressable>
+              </AnimatedView>
+              <AnimatedView delay={200} className="flex-1">
+                <Pressable
+                  onPress={() => setLoggedInAs("manager")}
+                  className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-gray-300 p-4"
+                >
+                  <Center className="rounded-full bg-red-600 p-2">
+                    <SquareUserRoundIcon color="white" />
+                  </Center>
+                  <Text className="font-semibold">Login as Manager</Text>
+                </Pressable>
+              </AnimatedView>
             </HStack>
-          </>
+          </AnimatedCard>
         )}
 
         {!isOTPShown && loggedInAs === "participant" && (
-          <>
-            <Heading size="lg">Login as Participant</Heading>
-            <Text>Manage your national service matters.</Text>
+          <AnimatedCard className="flex-1 gap-4">
+            <AnimatedView>
+              <Heading size="lg">Login as Participant</Heading>
+              <Text>Manage your national service matters.</Text>
+            </AnimatedView>
 
-            <Select
-              selectedValue={selectedUser}
-              onValueChange={(nric) => {
-                setSelectedUser(nric);
-              }}
-              className="mt-auto"
-            >
-              <SelectTrigger variant="outline" size="md" className="bg-white">
-                <SelectInput placeholder="Select option" />
-                <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
+            <AnimatedView className="mt-auto" delay={100}>
+              <Select
+                selectedValue={selectedUser}
+                onValueChange={(nric) => {
+                  setSelectedUser(nric);
+                }}
+              >
+                <SelectTrigger variant="outline" size="md" className="bg-white">
+                  <SelectInput placeholder="Select option" />
+                  <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
+                </SelectTrigger>
+                <SelectPortal>
+                  <SelectBackdrop />
 
-                <SelectContent className="max-h-[75%]">
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
+                  <SelectContent className="max-h-[75%]">
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
 
-                  <SelectScrollView>
-                    {participantUsers.map((user) => (
-                      <SelectItem
-                        key={user.nric}
-                        label={`${user.email} (${user.nric})`}
-                        value={user.nric}
-                      />
-                    ))}
-                  </SelectScrollView>
-                </SelectContent>
-              </SelectPortal>
-            </Select>
+                    <SelectScrollView>
+                      {participantUsers.map((user) => (
+                        <SelectItem
+                          key={user.nric}
+                          label={`${user.email} (${user.nric})`}
+                          value={user.nric}
+                        />
+                      ))}
+                    </SelectScrollView>
+                  </SelectContent>
+                </SelectPortal>
+              </Select>
+            </AnimatedView>
 
             <VStack space="xl" className="mt-auto">
-              <Button
-                variant="solid"
-                action="negative"
-                size="xl"
-                onPress={handleParticipantPress}
-              >
-                <ButtonText className="text-center">Login</ButtonText>
-              </Button>
-
-              <Button
-                variant="solid"
-                action="default"
-                size="xl"
-                onPress={() => setLoggedInAs(undefined)}
-              >
-                <ButtonText>Back</ButtonText>
-              </Button>
+              <AnimatedView delay={200}>
+                <Button
+                  variant="solid"
+                  action={selectedUser ? "negative" : "secondary"}
+                  size="xl"
+                  onPress={handleParticipantPress}
+                  disabled={!selectedUser}
+                >
+                  <ButtonText className="text-center">Login</ButtonText>
+                </Button>
+              </AnimatedView>
+              <AnimatedView delay={300}>
+                <Button
+                  variant="solid"
+                  action="default"
+                  size="xl"
+                  onPress={() => setLoggedInAs(undefined)}
+                >
+                  <ButtonText>Back</ButtonText>
+                </Button>
+              </AnimatedView>
             </VStack>
-          </>
+          </AnimatedCard>
         )}
 
         {!isOTPShown && loggedInAs === "manager" && (
-          <>
-            <Heading size="lg">Login as Manager</Heading>
-            <Text>Manage your national service matters.</Text>
+          <AnimatedCard className="flex-1 gap-4">
+            <AnimatedView>
+              <Heading size="lg">Login as Manager</Heading>
+              <Text>Manage your national service matters.</Text>
+            </AnimatedView>
 
-            <Select
-              selectedValue={selectedManager}
-              onValueChange={(nric) => setSelectedManager(nric)}
-              className="mt-auto"
-            >
-              <SelectTrigger variant="outline" size="md" className="bg-white">
-                <SelectInput placeholder="Select option" />
-                <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
+            <AnimatedView className="mt-auto" delay={100}>
+              <Select
+                selectedValue={selectedManager}
+                onValueChange={(nric) => setSelectedManager(nric)}
+              >
+                <SelectTrigger variant="outline" size="md" className="bg-white">
+                  <SelectInput placeholder="Select option" />
+                  <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
+                </SelectTrigger>
+                <SelectPortal>
+                  <SelectBackdrop />
 
-                <SelectContent className="max-h-[75%]">
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
+                  <SelectContent className="max-h-[75%]">
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
 
-                  <SelectScrollView>
-                    {managerUsers.map((user) => (
-                      <SelectItem
-                        key={user.nric}
-                        label={`${user.email} (${user.nric})`}
-                        value={user.nric}
-                      />
-                    ))}
-                  </SelectScrollView>
-                </SelectContent>
-              </SelectPortal>
-            </Select>
+                    <SelectScrollView>
+                      {managerUsers.map((user) => (
+                        <SelectItem
+                          key={user.nric}
+                          label={`${user.email} (${user.nric})`}
+                          value={user.nric}
+                        />
+                      ))}
+                    </SelectScrollView>
+                  </SelectContent>
+                </SelectPortal>
+              </Select>
+            </AnimatedView>
 
             <VStack space="xl" className="mt-auto">
-              <Button
-                variant="solid"
-                action="negative"
-                size="xl"
-                onPress={handleManagerPress}
-              >
-                <ButtonText>Login</ButtonText>
-              </Button>
+              <AnimatedView delay={200}>
+                <Button
+                  variant="solid"
+                  action={selectedManager ? "negative" : "secondary"}
+                  size="xl"
+                  onPress={handleManagerPress}
+                  disabled={!selectedManager}
+                >
+                  <ButtonText>Login</ButtonText>
+                </Button>
+              </AnimatedView>
 
-              <Button
-                variant="solid"
-                action="default"
-                size="xl"
-                onPress={() => setLoggedInAs(undefined)}
-              >
-                <ButtonText>Back</ButtonText>
-              </Button>
+              <AnimatedView delay={300}>
+                <Button
+                  variant="solid"
+                  action="default"
+                  size="xl"
+                  onPress={() => setLoggedInAs(undefined)}
+                >
+                  <ButtonText>Back</ButtonText>
+                </Button>
+              </AnimatedView>
             </VStack>
-          </>
+          </AnimatedCard>
         )}
 
         {isOTPShown && loggedInAs === "participant" && (
-          <>
-            <Heading size="lg">Verify OTP</Heading>
-            <Box>
-              <Text className="m-0 p-0">
-                We sent an OTP to{" "}
-                <Text className="font-bold">{selectedUser}</Text>.
-              </Text>
-              <Text>Enter it below to continue.</Text>
-            </Box>
+          <AnimatedCard className="flex-1 gap-4">
+            <AnimatedView>
+              <Heading size="lg">Verify OTP</Heading>
+            </AnimatedView>
 
-            <OTPInput
-              value={selectedOTP}
-              onChangeText={setSelectedOTP}
-              length={6}
-              className="mt-auto"
-            />
+            <AnimatedView delay={100}>
+              <Box>
+                <Text className="m-0 p-0">
+                  We sent an OTP to{" "}
+                  <Text className="font-bold">{selectedUser}</Text>.
+                </Text>
+                <Text>Enter it below to continue.</Text>
+              </Box>
+            </AnimatedView>
+
+            <AnimatedView delay={200} className="mt-auto">
+              <OTPInput
+                value={selectedOTP}
+                onChangeText={setSelectedOTP}
+                length={6}
+              />
+            </AnimatedView>
 
             <VStack space="xl" className="mt-auto">
-              <Button
-                variant="solid"
-                action="negative"
-                size="xl"
-                onPress={handleParticipantPress}
-              >
-                <ButtonText>Verify</ButtonText>
-              </Button>
-              <Button
-                variant="solid"
-                action="default"
-                size="xl"
-                onPress={handleBack}
-              >
-                <ButtonText>Back</ButtonText>
-              </Button>
+              <AnimatedView delay={300}>
+                <Button
+                  variant="solid"
+                  action="negative"
+                  size="xl"
+                  onPress={handleParticipantPress}
+                >
+                  <ButtonText>Verify</ButtonText>
+                </Button>
+              </AnimatedView>
+
+              <AnimatedView delay={400}>
+                <Button
+                  variant="solid"
+                  action="default"
+                  size="xl"
+                  onPress={handleBack}
+                >
+                  <ButtonText>Back</ButtonText>
+                </Button>
+              </AnimatedView>
             </VStack>
-          </>
+          </AnimatedCard>
         )}
+
         {isOTPShown && loggedInAs === "manager" && (
-          <>
-            <Heading size="lg">Verify OTP</Heading>
-            <Box>
-              <Text className="m-0 p-0">
-                We sent an OTP to{" "}
-                <Text className="font-bold">{selectedManager}</Text>.
-              </Text>
-              <Text>Enter it below to continue.</Text>
-            </Box>
-            <OTPInput
-              value={selectedOTP}
-              onChangeText={setSelectedOTP}
-              length={6}
-              className="mt-auto"
-            />
+          <AnimatedCard className="flex-1 gap-4">
+            <AnimatedView>
+              <Heading size="lg">Verify OTP</Heading>
+            </AnimatedView>
+
+            <AnimatedView delay={100}>
+              <Box>
+                <Text className="m-0 p-0">
+                  We sent an OTP to{" "}
+                  <Text className="font-bold">{selectedManager}</Text>.
+                </Text>
+                <Text>Enter it below to continue.</Text>
+              </Box>
+            </AnimatedView>
+
+            <AnimatedView className="mt-auto" delay={200}>
+              <OTPInput
+                value={selectedOTP}
+                onChangeText={setSelectedOTP}
+                length={6}
+              />
+            </AnimatedView>
+
             <VStack space="xl" className="mt-auto">
-              <Button
-                variant="solid"
-                action="negative"
-                size="xl"
-                onPress={handleManagerPress}
-              >
-                <ButtonText>Verify</ButtonText>
-              </Button>
-              <Button
-                variant="solid"
-                action="default"
-                size="xl"
-                onPress={handleBack}
-              >
-                <ButtonText>Back</ButtonText>
-              </Button>
+              <AnimatedView delay={300}>
+                <Button
+                  variant="solid"
+                  action="negative"
+                  size="xl"
+                  onPress={handleManagerPress}
+                >
+                  <ButtonText>Verify</ButtonText>
+                </Button>
+              </AnimatedView>
+
+              <AnimatedView delay={400}>
+                <Button
+                  variant="solid"
+                  action="default"
+                  size="xl"
+                  onPress={handleBack}
+                >
+                  <ButtonText>Back</ButtonText>
+                </Button>
+              </AnimatedView>
             </VStack>
-          </>
+          </AnimatedCard>
         )}
-      </AnimatedCard>
+      </Animated.View>
     </Animated.ScrollView>
   );
 }
