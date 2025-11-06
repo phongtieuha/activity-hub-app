@@ -5,6 +5,7 @@ import {
   ActivityResponseDto,
   ActivitySlotDto,
 } from "@/__generated-client/http-client-integration";
+import { AnimatedView } from "@/constants/animation";
 import {
   formatDayInWord,
   formatShortDate,
@@ -35,39 +36,41 @@ const DetailsNowCardForManager: React.FC<React.PropsWithChildren<IProps>> = (
 
   return (
     <>
-      <Badge action="error" size="lg" className="justify-center">
-        <BadgeText className="text-center">
-          This activity is {props.activityDetails.participationType}
-        </BadgeText>
-      </Badge>
-      <Divider className="h-1 bg-transparent" />
+      <AnimatedView>
+        <Badge action="error" size="lg" className="justify-center">
+          <BadgeText className="text-center">
+            This activity is {props.activityDetails.participationType}
+          </BadgeText>
+        </Badge>
+        <Divider className="h-1 bg-transparent" />
 
-      <HStack className="items-center justify-between">
-        <HStack space="sm" className="items-center text-typography-300">
-          <Box className="mx-1 size-2 rounded-full bg-blue-600" />
-          <Text size="md" className="font-bold tracking-wide text-blue-600">
-            NOW
-          </Text>
+        <HStack className="items-center justify-between">
+          <HStack space="sm" className="items-center text-typography-300">
+            <Box className="mx-1 size-2 rounded-full bg-blue-600" />
+            <Text size="md" className="font-bold tracking-wide text-blue-600">
+              NOW
+            </Text>
+          </HStack>
         </HStack>
-      </HStack>
 
-      <Heading size="xl" className="font-extrabold">
-        {props.activityDetails.name}
-      </Heading>
-      <Divider className="h-1 bg-transparent" />
-      <HStack className="items-start justify-between">
-        <HStack space="sm" className="items-center text-typography-300">
-          <Icon as={MapPinIcon} className="text-typography-400" />
-          <Text>{props.activityDetails.location || "-"}</Text>
-          <Badge variant="solid" action="success">
-            <BadgeText>{props.activityDetails.zone || "-"}</BadgeText>
-          </Badge>
+        <Heading size="xl" className="font-extrabold">
+          {props.activityDetails.name}
+        </Heading>
+        <Divider className="h-1 bg-transparent" />
+        <HStack className="items-start justify-between">
+          <HStack space="sm" className="items-center text-typography-300">
+            <Icon as={MapPinIcon} className="text-typography-400" />
+            <Text>{props.activityDetails.location || "-"}</Text>
+            <Badge variant="solid" action="success">
+              <BadgeText>{props.activityDetails.zone || "-"}</BadgeText>
+            </Badge>
+          </HStack>
         </HStack>
-      </HStack>
-      <Divider className="h-6 bg-transparent" />
+        <Divider className="h-6 bg-transparent" />
+      </AnimatedView>
 
       {bookedSlots.length === 0 && (
-        <>
+        <AnimatedView delay={100}>
           <Divider className="h-2 bg-transparent" />
           <Card className="gap-3 rounded-3xl border border-gray-200 p-4">
             <HStack className="justify-between">
@@ -105,33 +108,36 @@ const DetailsNowCardForManager: React.FC<React.PropsWithChildren<IProps>> = (
               </VStack>
             </HStack>
           </Card>
-        </>
+        </AnimatedView>
       )}
 
       <Divider className="h-6 bg-transparent" />
 
-      <VStack space="md">
-        <HStack className="justify-between">
-          <HStack space="sm" className="items-center text-typography-300">
-            <Icon as={ShirtIcon} className="text-typography-400" />
-            <Text>Attire</Text>
+      <AnimatedView delay={200}>
+        <VStack space="md">
+          <HStack className="justify-between">
+            <HStack space="sm" className="items-center text-typography-300">
+              <Icon as={ShirtIcon} className="text-typography-400" />
+              <Text>Attire</Text>
+            </HStack>
+            <Text className="font-semibold text-typography-900">
+              {ServerAttireToDisplayMapping[props.activityDetails.attire!] ||
+                "-"}
+            </Text>
           </HStack>
-          <Text className="font-semibold text-typography-900">
-            {ServerAttireToDisplayMapping[props.activityDetails.attire!] || "-"}
-          </Text>
-        </HStack>
-        <HStack className="justify-between">
-          <HStack space="sm" className="items-center text-typography-300">
-            <Icon as={NotebookTextIcon} className="text-typography-400" />
-            <Text>Remarks</Text>
+          <HStack className="justify-between">
+            <HStack space="sm" className="items-center text-typography-300">
+              <Icon as={NotebookTextIcon} className="text-typography-400" />
+              <Text>Remarks</Text>
+            </HStack>
+            <Text className="font-semibold text-typography-900">
+              {props.activityDetails.remarks || "-"}
+            </Text>
           </HStack>
-          <Text className="font-semibold text-typography-900">
-            {props.activityDetails.remarks || "-"}
-          </Text>
-        </HStack>
 
-        {props.children}
-      </VStack>
+          {props.children}
+        </VStack>
+      </AnimatedView>
     </>
   );
 };

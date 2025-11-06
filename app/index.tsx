@@ -26,8 +26,8 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
-  LayoutEntering,
-  LayoutEnteringLonger,
+  LayoutEnteringFadeInDown,
+  LayoutEnteringLongerFadeInDown,
 } from "@/constants/animation";
 import { participantUsers } from "@/constants/loginUsers";
 import { managerUsers } from "@/constants/loginUsers-managers";
@@ -202,6 +202,7 @@ export default function Index() {
 
   const handleManagerPress = async () => {
     Keyboard.dismiss();
+    containerTranslateY.value = withSpring(0);
     // setLoggedInAs("manager");
     if (isOTPShown) {
       const result = await verifyLogin({
@@ -255,7 +256,7 @@ export default function Index() {
       style={{ transform: [{ translateY: containerTranslateY }] }}
     >
       <Animated.View
-        entering={LayoutEntering}
+        entering={LayoutEnteringFadeInDown}
         className="w-full flex-1 overflow-hidden rounded-tl-3xl rounded-tr-3xl"
       >
         <Center style={{ flex: 1 }}>
@@ -284,7 +285,7 @@ export default function Index() {
       </Animated.View>
 
       <Animated.View
-        entering={LayoutEnteringLonger}
+        entering={LayoutEnteringLongerFadeInDown}
         className="-mt-8 h-2/5 rounded-3xl bg-white px-4 py-8"
       >
         {!loggedInAs && (

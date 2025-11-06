@@ -13,6 +13,7 @@ import {
   ActivityResponseDto,
   ActivitySlotDto,
 } from "@/__generated-client/http-client-integration";
+import { AnimatedView } from "@/constants/animation";
 import {
   formatDayInWord,
   formatShortDate,
@@ -117,150 +118,160 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
   }
   return (
     <>
-      <Badge action="error" size="lg" className="justify-center">
-        <BadgeText className="text-center">
-          This activity is {props.activityDetails.participationType}
-        </BadgeText>
-      </Badge>
-      <Divider className="h-1 bg-transparent" />
+      <AnimatedView>
+        <Badge action="error" size="lg" className="justify-center">
+          <BadgeText className="text-center">
+            This activity is {props.activityDetails.participationType}
+          </BadgeText>
+        </Badge>
+        <Divider className="h-1 bg-transparent" />
 
-      <HStack className="items-center justify-between">
-        <HStack space="sm" className="items-center text-typography-300">
-          <Box className="mx-1 size-2 rounded-full bg-blue-600" />
-          <Text size="md" className="font-bold tracking-wide text-blue-600">
-            {props.activityDetails.timeline}
-          </Text>
+        <HStack className="items-center justify-between">
+          <HStack space="sm" className="items-center text-typography-300">
+            <Box className="mx-1 size-2 rounded-full bg-blue-600" />
+            <Text size="md" className="font-bold tracking-wide text-blue-600">
+              {props.activityDetails.timeline}
+            </Text>
+          </HStack>
+
+          <Pressable className="rounded-full border border-gray-300 p-2.5">
+            <Icon as={CalendarPlus} className="text-gray-600"></Icon>
+          </Pressable>
         </HStack>
 
-        <Pressable className="rounded-full border border-gray-300 p-2.5">
-          <Icon as={CalendarPlus} className="text-gray-600"></Icon>
-        </Pressable>
-      </HStack>
-
-      <Heading size="xl" className="font-extrabold">
-        {props.activityDetails.name}
-      </Heading>
-      <Divider className="h-1 bg-transparent" />
-      <HStack className="items-start justify-between">
-        <HStack space="sm" className="items-center text-typography-300">
-          <Icon as={MapPinIcon} className="text-typography-400" />
-          <Text>{props.activityDetails.location || "-"}</Text>
-          <Badge variant="solid" action="success">
-            <BadgeText>{props.activityDetails.zone || "-"}</BadgeText>
-          </Badge>
+        <Heading size="xl" className="font-extrabold">
+          {props.activityDetails.name}
+        </Heading>
+        <Divider className="h-1 bg-transparent" />
+        <HStack className="items-start justify-between">
+          <HStack space="sm" className="items-center text-typography-300">
+            <Icon as={MapPinIcon} className="text-typography-400" />
+            <Text>{props.activityDetails.location || "-"}</Text>
+            <Badge variant="solid" action="success">
+              <BadgeText>{props.activityDetails.zone || "-"}</BadgeText>
+            </Badge>
+          </HStack>
         </HStack>
-      </HStack>
-      <Divider className="h-6 bg-transparent" />
+        <Divider className="h-6 bg-transparent" />
+      </AnimatedView>
 
       {bookedSlots.length === 0 && (
-        <VStack space="lg">
-          {props.activityDetails.participationType === "ELECTIVE" && (
-            <Badge action="warning" className="gap-2 py-3">
-              <BadgeIcon as={BadgeAlertIcon} className="!size-6" />
-              <BadgeText className="text-base">
-                You are required to book your slot during the booking window.
-              </BadgeText>
-            </Badge>
-          )}
-
-          <Card className="gap-3 rounded-3xl border border-gray-200 p-4">
-            {props.activityDetails.participationType === "COMPULSORY" && (
-              <>
-                <HStack className="justify-between">
-                  <Text className="font-semibold">Booking Required</Text>
-                  {props.activityDetails.participationType === "COMPULSORY" && (
-                    <Badge action="success">
-                      <BadgeText>No</BadgeText>
-                    </Badge>
-                  )}
-                </HStack>
-                <Divider className="border border-dashed border-gray-200 bg-transparent" />
-              </>
-            )}
-
+        <AnimatedView delay={100}>
+          <VStack space="lg">
             {props.activityDetails.participationType === "ELECTIVE" && (
-              <>
-                {isBookingStartDateSameAsEndDate
-                  ? bookingSameDatesBlock(
-                      props.activityDetails.bookingWindowStartDate!,
-                      props.activityDetails.bookingWindowEndDate!
-                    )
-                  : bookingDateRangeBlock(
-                      props.activityDetails.bookingWindowStartDate!,
-                      props.activityDetails.bookingWindowEndDate!
-                    )}
-              </>
+              <Badge action="warning" className="gap-2 py-3">
+                <BadgeIcon as={BadgeAlertIcon} className="!size-6" />
+                <BadgeText className="text-base">
+                  You are required to book your slot during the booking window.
+                </BadgeText>
+              </Badge>
             )}
-          </Card>
-        </VStack>
+
+            <Card className="gap-3 rounded-3xl border border-gray-200 p-4">
+              {props.activityDetails.participationType === "COMPULSORY" && (
+                <>
+                  <HStack className="justify-between">
+                    <Text className="font-semibold">Booking Required</Text>
+                    {props.activityDetails.participationType ===
+                      "COMPULSORY" && (
+                      <Badge action="success">
+                        <BadgeText>No</BadgeText>
+                      </Badge>
+                    )}
+                  </HStack>
+                  <Divider className="border border-dashed border-gray-200 bg-transparent" />
+                </>
+              )}
+
+              {props.activityDetails.participationType === "ELECTIVE" && (
+                <>
+                  {isBookingStartDateSameAsEndDate
+                    ? bookingSameDatesBlock(
+                        props.activityDetails.bookingWindowStartDate!,
+                        props.activityDetails.bookingWindowEndDate!
+                      )
+                    : bookingDateRangeBlock(
+                        props.activityDetails.bookingWindowStartDate!,
+                        props.activityDetails.bookingWindowEndDate!
+                      )}
+                </>
+              )}
+            </Card>
+          </VStack>
+        </AnimatedView>
       )}
 
       {props.showBookedSlots && bookedSlots.length > 0 && (
-        <VStack space="lg">
-          <Badge action="success" className="items-start gap-2 px-6 py-3">
-            <VStack space="sm" className="w-full">
-              <BadgeText className="mt-0.5 text-lg">
-                Your booking below has been confirmed.
-              </BadgeText>
-              {bookedSlots.map((slot) => (
-                <VStack space="xs" key={slot.activitySlotId}>
-                  <HStack space="md" className="items-center">
-                    <BadgeIcon as={Calendar1Icon} className="!size-5" />
-                    <BadgeText className="text-xl font-bold">
-                      {formatDayInWord(slot.startDate)},{" "}
-                      {formatShortDate(slot.startDate)}
-                    </BadgeText>
-                  </HStack>
+        <AnimatedView delay={100}>
+          <VStack space="lg">
+            <Badge action="success" className="items-start gap-2 px-6 py-3">
+              <VStack space="sm" className="w-full">
+                <BadgeText className="mt-0.5 text-lg">
+                  Your booking below has been confirmed.
+                </BadgeText>
+                {bookedSlots.map((slot) => (
+                  <VStack space="xs" key={slot.activitySlotId}>
+                    <HStack space="md" className="items-center">
+                      <BadgeIcon as={Calendar1Icon} className="!size-5" />
+                      <BadgeText className="text-xl font-bold">
+                        {formatDayInWord(slot.startDate)},{" "}
+                        {formatShortDate(slot.startDate)}
+                      </BadgeText>
+                    </HStack>
 
-                  <HStack space="md" className="items-center">
-                    <BadgeIcon as={ClockIcon} className="!size-5" />
-                    <BadgeText className="text-xl font-bold">
-                      {formatSlotTime(slot.startDate)} -{" "}
-                      {formatSlotTime(slot.endDate)}
-                    </BadgeText>
-                  </HStack>
+                    <HStack space="md" className="items-center">
+                      <BadgeIcon as={ClockIcon} className="!size-5" />
+                      <BadgeText className="text-xl font-bold">
+                        {formatSlotTime(slot.startDate)} -{" "}
+                        {formatSlotTime(slot.endDate)}
+                      </BadgeText>
+                    </HStack>
 
-                  {props.showCancelButton && (
-                    <Button
-                      variant="outline"
-                      action="negative"
-                      className="mt-3 w-full"
-                      onPress={() => handleCancelBooking(slot)}
-                    >
-                      <ButtonText>Cancel Booking</ButtonText>
-                    </Button>
-                  )}
-                </VStack>
-              ))}
-            </VStack>
-          </Badge>
-        </VStack>
+                    {props.showCancelButton && (
+                      <Button
+                        variant="outline"
+                        action="negative"
+                        className="mt-3 w-full"
+                        onPress={() => handleCancelBooking(slot)}
+                      >
+                        <ButtonText>Cancel Booking</ButtonText>
+                      </Button>
+                    )}
+                  </VStack>
+                ))}
+              </VStack>
+            </Badge>
+          </VStack>
+        </AnimatedView>
       )}
 
       <Divider className="h-6 bg-transparent" />
 
-      <VStack space="md">
-        <HStack className="justify-between">
-          <HStack space="sm" className="items-center text-typography-300">
-            <Icon as={ShirtIcon} className="text-typography-400" />
-            <Text>Attire</Text>
+      <AnimatedView delay={200}>
+        <VStack space="md">
+          <HStack className="justify-between">
+            <HStack space="sm" className="items-center text-typography-300">
+              <Icon as={ShirtIcon} className="text-typography-400" />
+              <Text>Attire</Text>
+            </HStack>
+            <Text className="font-semibold text-typography-900">
+              {ServerAttireToDisplayMapping[props.activityDetails.attire!] ||
+                "-"}
+            </Text>
           </HStack>
-          <Text className="font-semibold text-typography-900">
-            {ServerAttireToDisplayMapping[props.activityDetails.attire!] || "-"}
-          </Text>
-        </HStack>
-        <HStack className="justify-between">
-          <HStack space="sm" className="items-center text-typography-300">
-            <Icon as={NotebookTextIcon} className="text-typography-400" />
-            <Text>Remarks</Text>
+          <HStack className="justify-between">
+            <HStack space="sm" className="items-center text-typography-300">
+              <Icon as={NotebookTextIcon} className="text-typography-400" />
+              <Text>Remarks</Text>
+            </HStack>
+            <Text className="font-semibold text-typography-900">
+              {props.activityDetails.remarks || "-"}
+            </Text>
           </HStack>
-          <Text className="font-semibold text-typography-900">
-            {props.activityDetails.remarks || "-"}
-          </Text>
-        </HStack>
 
-        {props.children}
-      </VStack>
+          {props.children}
+        </VStack>
+      </AnimatedView>
 
       {/* Confirmation Modal */}
       <Actionsheet isOpen={showConfirmModal} onClose={handleCancelModal}>

@@ -26,6 +26,7 @@ import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { AnimatedView, ElementEnteringFadeInLeft } from "@/constants/animation";
 import { formatDateTime } from "@/hooks/date-formatter";
 import { useNotification } from "@/hooks/useNotification";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -184,12 +185,18 @@ const ScanAttendance = () => {
     <>
       <View className="relative" style={{ minHeight: screenHeight }}>
         <QrScanPreview onQrScanned={onQrScanned} />
-        <Pressable
+        <AnimatedView
+          entering={ElementEnteringFadeInLeft}
+          delay={200}
           className="absolute left-4 top-16"
-          onPress={() => router.back()}
         >
-          <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
-        </Pressable>
+          <Pressable
+            className="absolute left-4 top-16"
+            onPress={() => router.back()}
+          >
+            <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
+          </Pressable>
+        </AnimatedView>
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}

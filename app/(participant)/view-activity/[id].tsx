@@ -50,6 +50,11 @@ import { Text } from "@/components/ui/text";
 
 import { VStack } from "@/components/ui/vstack";
 import {
+  AnimatedView,
+  ElementEnteringFadeInLeft,
+  ElementExitingFadeOutDown,
+} from "@/constants/animation";
+import {
   DATEPICKER_FORMAT,
   differenceInMinutes,
   formatDate,
@@ -377,12 +382,15 @@ const ViewActivity = () => {
         refreshing={refreshing}
         onRefresh={onRefresh}
       >
-        <Pressable
+        <AnimatedView
+          entering={ElementEnteringFadeInLeft}
+          delay={200}
           className="absolute left-4 top-16"
-          onPress={() => router.back()}
         >
-          <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
-        </Pressable>
+          <Pressable onPress={() => router.back()}>
+            <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
+          </Pressable>
+        </AnimatedView>
 
         <Image
           source={require("@/assets/images/soliders-outdoor-dark-bg.png")}
@@ -395,8 +403,8 @@ const ViewActivity = () => {
           }}
         />
 
-        {activityDetails && (
-          <AnimatedCard
+        {!isFetchingData && activityDetails && (
+          <AnimatedView
             style={styles.contentCard}
             className="flex-1 rounded-3xl bg-white p-4 pb-8"
           >
@@ -411,43 +419,41 @@ const ViewActivity = () => {
             />
 
             {!alreadyRegistered && (
-              <>
-                <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
-                  <VStack space="xl">
-                    {isBookingDateToday && (
-                      <Pressable onPress={handlepGenerateQROpenBookingSheet}>
-                        <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
-                          <Text className="font-semibold text-red-600">
-                            Generate QR
-                          </Text>
-                        </HStack>
-                      </Pressable>
-                    )}
-                    <Pressable onPress={handlepOpenBookingSheet}>
-                      <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
-                        <Text className="font-semibold text-white">
-                          Book a Slot
+              <AnimatedView delay={cardFadeDelay} className="mt-auto w-full">
+                <VStack space="xl">
+                  {isBookingDateToday && (
+                    <Pressable onPress={handlepGenerateQROpenBookingSheet}>
+                      <HStack className="items-center justify-center gap-2 rounded-3xl border border-red-600 px-6 py-4">
+                        <Text className="font-semibold text-red-600">
+                          Generate QR
                         </Text>
                       </HStack>
                     </Pressable>
-                  </VStack>
-                </AnimatedCard>
-              </>
+                  )}
+                  <Pressable onPress={handlepOpenBookingSheet}>
+                    <HStack className="items-center justify-center gap-2 rounded-3xl bg-red-700/95 px-6 py-4">
+                      <Text className="font-semibold text-white">
+                        Book a Slot
+                      </Text>
+                    </HStack>
+                  </Pressable>
+                </VStack>
+              </AnimatedView>
             )}
 
             {hasAttendanceTaken && (
-              <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
+              <AnimatedView delay={cardFadeDelay} className="mt-auto w-full">
                 <Badge action="success" className="gap-2 px-4 py-3 shadow-sm">
                   <BadgeIcon as={CheckCircleIcon} className="!size-6" />
                   <BadgeText className="text-lg">
                     Attendance has been taken.
                   </BadgeText>
                 </Badge>
-              </AnimatedCard>
+              </AnimatedView>
             )}
 
             {alreadyRegistered && !hasAttendanceTaken && (
-              <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
+              <AnimatedView delay={cardFadeDelay} className="mt-auto w-full">
                 {isBookingDateToday ? (
                   <VStack space="xl">
                     <Pressable
@@ -478,19 +484,20 @@ const ViewActivity = () => {
                     </Pressable>
                   </VStack>
                 )}
-              </AnimatedCard>
+              </AnimatedView>
             )}
-          </AnimatedCard>
+          </AnimatedView>
         )}
 
         {isFetchingData && (
-          <AnimatedCard
+          <AnimatedView
+            exiting={ElementExitingFadeOutDown}
             style={styles.contentCard}
             className="flex-1 gap-5 rounded-3xl bg-white p-4 pb-8"
           >
             <Skeleton className="h-[100px] rounded-3xl" />
             <SkeletonText _lines={10} className="h-5 rounded-3xl" />
-          </AnimatedCard>
+          </AnimatedView>
         )}
       </ParallaxScrollView>
 
@@ -618,7 +625,7 @@ const ViewActivity = () => {
                     })()}
                   />
                   {selectedBookingDate && (
-                    <>
+                    <AnimatedView>
                       <Divider className="h-4 bg-transparent" />
                       <Text size="md" className="bg-white py-2 font-bold ">
                         {formatDayInWord(selectedBookingDate!)},{" "}
@@ -662,7 +669,7 @@ const ViewActivity = () => {
                           />
                         </RadioGroup>
                       )}
-                    </>
+                    </AnimatedView>
                   )}
                 </ScrollView>
 

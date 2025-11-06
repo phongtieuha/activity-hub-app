@@ -16,7 +16,6 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
-import AnimatedCard, { cardFadeDelay } from "@/components/ui/AnimatedCard";
 import { Box } from "@/components/ui/box";
 import {
   Button,
@@ -34,6 +33,11 @@ import { RadioGroup } from "@/components/ui/radio";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import {
+  AnimatedView,
+  ElementEnteringFadeInLeft,
+  ElementExitingFadeOutDown,
+} from "@/constants/animation";
 import {
   DATEPICKER_FORMAT,
   differenceInMinutes,
@@ -236,12 +240,15 @@ const ViewActivity = () => {
         refreshing={refreshing}
         onRefresh={onRefresh}
       >
-        <Pressable
+        <AnimatedView
+          entering={ElementEnteringFadeInLeft}
+          delay={200}
           className="absolute left-4 top-16"
-          onPress={() => router.back()}
         >
-          <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
-        </Pressable>
+          <Pressable onPress={() => router.back()}>
+            <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
+          </Pressable>
+        </AnimatedView>
 
         <Image
           source={require("@/assets/images/soliders-outdoor-dark-bg.png")}
@@ -254,8 +261,8 @@ const ViewActivity = () => {
           }}
         />
 
-        {activityDetails && (
-          <AnimatedCard
+        {!isFetchingData && activityDetails && (
+          <AnimatedView
             style={styles.contentCard}
             className="flex-1 rounded-3xl bg-white p-4 pb-8"
           >
@@ -270,7 +277,7 @@ const ViewActivity = () => {
 
             <Divider className="h-8 bg-transparent" />
 
-            <AnimatedCard delay={cardFadeDelay}>
+            <AnimatedView delay={300}>
               <HStack space="xl" className="justify-start">
                 <Pressable
                   onPress={() => router.push(`../update-attendance/${id}`)}
@@ -333,10 +340,10 @@ const ViewActivity = () => {
                   </VStack>
                 </Pressable>
               </HStack>
-            </AnimatedCard>
+            </AnimatedView>
 
             {isBookingDateToday && (
-              <AnimatedCard delay={cardFadeDelay} className="mt-auto w-full">
+              <AnimatedView delay={400} className="mt-auto w-full">
                 <VStack space="xl">
                   <HStack space="xl">
                     <Pressable
@@ -377,19 +384,20 @@ const ViewActivity = () => {
                     </HStack>
                   </Pressable>
                 </VStack>
-              </AnimatedCard>
+              </AnimatedView>
             )}
-          </AnimatedCard>
+          </AnimatedView>
         )}
 
         {isFetchingData && (
-          <AnimatedCard
+          <AnimatedView
+            exiting={ElementExitingFadeOutDown}
             style={styles.contentCard}
             className="flex-1 gap-5 rounded-3xl bg-white p-4 pb-8"
           >
             <Skeleton className="h-[100px] rounded-3xl" />
             <SkeletonText _lines={10} className="h-5 rounded-3xl" />
-          </AnimatedCard>
+          </AnimatedView>
         )}
       </ParallaxScrollView>
 
