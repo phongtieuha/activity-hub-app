@@ -1,5 +1,5 @@
-import React, { forwardRef } from "react";
 import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
+import React, { forwardRef } from "react";
 import { Animated, Easing, Platform, View } from "react-native";
 import { skeletonStyle, skeletonTextStyle } from "./styles";
 
@@ -45,7 +45,7 @@ const Skeleton = forwardRef<
       useNativeDriver: Platform.OS !== "web",
     }),
     Animated.timing(pulseAnim, {
-      toValue: 0.75,
+      toValue: 0.45,
       duration: animationDuration / 2, // Third of the animation duration
       easing: customTimingFunction,
       useNativeDriver: Platform.OS !== "web",

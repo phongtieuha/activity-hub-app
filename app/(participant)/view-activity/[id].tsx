@@ -38,6 +38,7 @@ import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Icon } from "@/components/ui/icon";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Pressable } from "@/components/ui/pressable";
 import {
   Radio,
@@ -51,6 +52,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
+  AnimatedViewList,
   ElementEnteringFadeInLeft,
   ElementExitingFadeOutDown,
 } from "@/constants/animation";
@@ -108,6 +110,7 @@ const ViewActivity = () => {
     React.useState<string>();
   const [bookingStep, setBookingStep] = React.useState<"select" | "success">();
   const [bookingMode, setBookingMode] = React.useState<"slot" | "qr">("slot");
+  const [isBookingInProgress, setIsBookingInProgress] = React.useState(false);
 
   const bookingSlotsGroupedByDateOrderedByDateKey = React.useMemo(() => {
     if (activityDetails?.participationType === "ELECTIVE") {
@@ -189,6 +192,7 @@ const ViewActivity = () => {
   };
 
   const handleBookBookingSheet = async () => {
+    setIsBookingInProgress(true);
     try {
       const existingBooking = activityDetails?.slots?.find(
         (slot) => slot.bookedByMe
@@ -209,6 +213,8 @@ const ViewActivity = () => {
       await fetchData();
     } catch (error: any) {
       showNotification(error.message, "error");
+    } finally {
+      setIsBookingInProgress(false);
     }
   };
 
@@ -522,12 +528,37 @@ const ViewActivity = () => {
               </Text>
               <Divider className="my-4 bg-transparent" />
               <Box className="relative">
-                <Image
-                  source={{
-                    uri: qrBase64String,
-                  }}
-                  style={styles.qrImage}
-                />
+                {isQrRefreshing ? (
+                  <VStack space="md" style={styles.qrImage}>
+                    <AnimatedViewList>
+                      <Skeleton className="h-8 w-full rounded-lg" />
+                      <Skeleton className="h-8 w-full rounded-lg" />
+                      <Skeleton className="h-8 w-full rounded-lg" />
+                      <HStack space="md" className="flex-1">
+                        <Skeleton className="h-full flex-1 rounded-lg" />
+                        <Skeleton className="h-full flex-1 rounded-lg" />
+                      </HStack>
+                      <HStack space="md">
+                        <Skeleton className="h-8 flex-1 rounded-lg" />
+                        <Skeleton className="h-8 flex-1 rounded-lg" />
+                        <Skeleton className="h-8 flex-1 rounded-lg" />
+                      </HStack>
+                      <Skeleton className="h-8 w-full rounded-lg" />
+                      <Skeleton className="h-8 w-full rounded-lg" />
+                    </AnimatedViewList>
+                  </VStack>
+                ) : (
+                  <AnimatedView>
+                    <Image
+                      source={{
+                        uri: qrBase64String,
+                      }}
+                      style={styles.qrImage}
+                      className=""
+                    />
+                  </AnimatedView>
+                )}
+
                 {qrExpiry?.includes("-") && (
                   <>
                     <Box className="absolute inset-0 bg-white/90"></Box>
@@ -675,15 +706,18 @@ const ViewActivity = () => {
 
                 <VStack space="md" className="mt-auto">
                   {bookingMode === "slot" && (
-                    <Button
+                    <LoadingButton
                       size="lg"
                       variant="solid"
                       action={!selectedSlots ? "secondary" : "negative"}
                       onPress={handleBookBookingSheet}
                       disabled={!selectedSlots?.activitySlotId}
+                      loading={isBookingInProgress}
+                      loadingText="Booking"
+                      loadingCssClass="text-white"
                     >
-                      <ButtonText className="">Book</ButtonText>
-                    </Button>
+                      Book
+                    </LoadingButton>
                   )}
                   {bookingMode === "qr" && (
                     <Button

@@ -36,6 +36,7 @@ import {
   SearchIcon,
 } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Pressable } from "@/components/ui/pressable";
 import {
   Radio,
@@ -103,6 +104,7 @@ const UpdateAttendance = () => {
   const [selectedAttendanceStatusTab, setSelectedAttendanceStatusTab] =
     React.useState<AttendanceStatus>(AttendanceStatus.UNMARKED);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [isUpdatingInProgress, setIsUpdatingInProgress] = React.useState(false);
 
   // Animated values for smooth sticky behavior
   const scrollY = useSharedValue(0);
@@ -191,25 +193,22 @@ const UpdateAttendance = () => {
         .map((item) => item.id),
       newStatus: payloadAttendanceStatus!,
     };
-    await editAttendance(payload);
-    await fetchData();
 
-    // filteredAttendanceRecords
-    //   .filter((item) => item.isChecked)
-    //   .forEach((record) => {
-    //     if (isAttendanceRecordMarkable(record)) {
-    //       record.attendanceStatus = selectedAttendanceStatusRadio!;
-    //     }
-    //   });
-    // setAttendantRecords([...attendantRecords]);
+    setIsUpdatingInProgress(true);
+    try {
+      await editAttendance(payload);
+      await fetchData();
 
-    showNotification("Participant updated successfully", "success");
+      showNotification("Participant updated successfully", "success");
 
-    setSelectedAttendanceStatusRadio(undefined);
+      clearTUpdateAttendanceRecords();
 
-    clearTUpdateAttendanceRecords();
-
-    handlepCloseUpdateAttendance();
+      handlepCloseUpdateAttendance();
+    } finally {
+      setTimeout(() => {
+        setIsUpdatingInProgress(false);
+      }, 3000);
+    }
   };
 
   const clearTUpdateAttendanceRecords = () => {
@@ -654,7 +653,7 @@ const UpdateAttendance = () => {
               <Divider className="my-4 bg-transparent" />
 
               <VStack space="md">
-                <Button
+                <LoadingButton
                   size="lg"
                   variant="solid"
                   action={
@@ -662,9 +661,12 @@ const UpdateAttendance = () => {
                   }
                   onPress={handleUpdateAttendance}
                   isDisabled={!selectedAttendanceStatusRadio}
+                  loading={isUpdatingInProgress}
+                  loadingText="Updating"
+                  loadingCssClass="text-white"
                 >
-                  <ButtonText className="text-white">Update</ButtonText>
-                </Button>
+                  Update
+                </LoadingButton>
                 <Button
                   size="lg"
                   variant="outline"

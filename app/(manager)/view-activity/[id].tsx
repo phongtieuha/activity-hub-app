@@ -35,6 +35,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
+  AnimatedViewList,
   ElementEnteringFadeInLeft,
   ElementExitingFadeOutDown,
 } from "@/constants/animation";
@@ -419,7 +420,37 @@ const ViewActivity = () => {
             </Text>
             <Divider className="my-4 bg-transparent" />
             <Box className="relative">
-              <Image source={{ uri: qrBase64String }} style={styles.qrImage} />
+              {isQrRefreshing ? (
+                <VStack space="md" style={styles.qrImage}>
+                  <AnimatedViewList>
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                    <HStack space="md" className="flex-1">
+                      <Skeleton className="h-full flex-1 rounded-lg" />
+                      <Skeleton className="h-full flex-1 rounded-lg" />
+                    </HStack>
+                    <HStack space="md">
+                      <Skeleton className="h-8 flex-1 rounded-lg" />
+                      <Skeleton className="h-8 flex-1 rounded-lg" />
+                      <Skeleton className="h-8 flex-1 rounded-lg" />
+                    </HStack>
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                  </AnimatedViewList>
+                </VStack>
+              ) : (
+                <AnimatedView>
+                  <Image
+                    source={{
+                      uri: qrBase64String,
+                    }}
+                    style={styles.qrImage}
+                    className=""
+                  />
+                </AnimatedView>
+              )}
+
               {qrExpiry?.includes("-") && (
                 <>
                   <Box className="absolute inset-0 bg-white/90"></Box>
