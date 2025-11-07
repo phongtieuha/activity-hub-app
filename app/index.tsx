@@ -8,6 +8,7 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Center } from "@/components/ui/center";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Pressable } from "@/components/ui/pressable";
 import {
   Select,
@@ -42,6 +43,7 @@ import React, { useEffect, useRef } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from "react-native";
 import Animated, {
   Easing,
+  LayoutAnimationConfig,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -157,6 +159,7 @@ export default function Index() {
 
   // --- State ---
   const [isOTPShown, setIsOTPShown] = React.useState(false);
+  const [isActionInProgress, setIsActionInProgress] = React.useState(false);
   const [selectedOTP, setSelectedOTP] = React.useState("");
   const [selectedUser, setSelectedUser] = React.useState("");
   const [selectedManager, setSelectedManager] = React.useState("");
@@ -178,45 +181,53 @@ export default function Index() {
   const handleParticipantPress = async () => {
     Keyboard.dismiss();
     containerTranslateY.value = withSpring(0);
+    setIsActionInProgress(true);
     // setLoggedInAs("participant");
-    if (isOTPShown) {
-      const result = await verifyLogin({
-        loginAttemptId: loginAttemptId,
-        code: selectedOTP,
-      });
-      await AsyncStorage.setItem("AUTH_TOKEN", result?.accessToken ?? "");
-      await AsyncStorage.setItem("LOGGED_IN_AS", "participant");
-      router.replace("./(participant)/(tabs)");
-    } else {
-      const result = await login({
-        nric: selectedUser,
-        clientType: "MOBILE",
-      });
-      setLoginAttemptId(result?.loginAttemptId ?? "");
-      setIsOTPShown(true);
-    }
+    try {
+      if (isOTPShown) {
+        const result = await verifyLogin({
+          loginAttemptId: loginAttemptId,
+          code: selectedOTP,
+        });
+        await AsyncStorage.setItem("AUTH_TOKEN", result?.accessToken ?? "");
+        await AsyncStorage.setItem("LOGGED_IN_AS", "participant");
+        router.replace("./(participant)/(tabs)");
+      } else {
+        const result = await login({
+          nric: selectedUser,
+          clientType: "MOBILE",
+        });
+        setLoginAttemptId(result?.loginAttemptId ?? "");
+        setIsOTPShown(true);
+      }
+    } catch (error) {}
+    setIsActionInProgress(false);
   };
 
   const handleManagerPress = async () => {
     Keyboard.dismiss();
     containerTranslateY.value = withSpring(0);
-    // setLoggedInAs("manager");
-    if (isOTPShown) {
-      const result = await verifyLogin({
-        loginAttemptId: loginAttemptId,
-        code: selectedOTP,
-      });
-      await AsyncStorage.setItem("AUTH_TOKEN", result?.accessToken ?? "");
-      await AsyncStorage.setItem("LOGGED_IN_AS", "manager");
-      router.replace("./(manager)/(tabs)");
-    } else {
-      const result = await login({
-        nric: selectedManager,
-        clientType: "MOBILE",
-      });
-      setLoginAttemptId(result?.loginAttemptId ?? "");
-      setIsOTPShown(true);
-    }
+
+    setIsActionInProgress(true);
+    try {
+      if (isOTPShown) {
+        const result = await verifyLogin({
+          loginAttemptId: loginAttemptId,
+          code: selectedOTP,
+        });
+        await AsyncStorage.setItem("AUTH_TOKEN", result?.accessToken ?? "");
+        await AsyncStorage.setItem("LOGGED_IN_AS", "manager");
+        router.replace("./(manager)/(tabs)");
+      } else {
+        const result = await login({
+          nric: selectedManager,
+          clientType: "MOBILE",
+        });
+        setLoginAttemptId(result?.loginAttemptId ?? "");
+        setIsOTPShown(true);
+      }
+    } catch (error) {}
+    setIsActionInProgress(false);
   };
 
   const handleBack = () => {
@@ -345,234 +356,262 @@ export default function Index() {
         )}
 
         {!isOTPShown && loggedInAs === "participant" && (
-          <AnimatedCard className="flex-1 gap-4">
-            <AnimatedView>
-              <Heading size="lg">Login as Participant</Heading>
-              <Text>Manage your national service matters.</Text>
-            </AnimatedView>
-
-            <AnimatedView className="mt-auto" delay={100}>
-              <Select
-                selectedValue={selectedUser}
-                onValueChange={(nric) => {
-                  setSelectedUser(nric);
-                }}
-              >
-                <SelectTrigger variant="outline" size="md" className="bg-white">
-                  <SelectInput placeholder="Select option" />
-                  <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
-                </SelectTrigger>
-                <SelectPortal>
-                  <SelectBackdrop />
-
-                  <SelectContent className="max-h-[75%]">
-                    <SelectDragIndicatorWrapper>
-                      <SelectDragIndicator />
-                    </SelectDragIndicatorWrapper>
-
-                    <SelectScrollView>
-                      {participantUsers.map((user) => (
-                        <SelectItem
-                          key={user.nric}
-                          label={`${user.email} (${user.nric})`}
-                          value={user.nric}
-                        />
-                      ))}
-                    </SelectScrollView>
-                  </SelectContent>
-                </SelectPortal>
-              </Select>
-            </AnimatedView>
-
-            <VStack space="xl" className="mt-auto">
-              <AnimatedView delay={200}>
-                <Button
-                  variant="solid"
-                  action={selectedUser ? "negative" : "secondary"}
-                  size="xl"
-                  onPress={handleParticipantPress}
-                  disabled={!selectedUser}
-                >
-                  <ButtonText className="text-center">Login</ButtonText>
-                </Button>
+          <LayoutAnimationConfig skipExiting>
+            <AnimatedCard className="flex-1 gap-4">
+              <AnimatedView>
+                <Heading size="lg">Login as Participant</Heading>
+                <Text>Manage your national service matters.</Text>
               </AnimatedView>
-              <AnimatedView delay={300}>
-                <Button
-                  variant="solid"
-                  action="default"
-                  size="xl"
-                  onPress={() => setLoggedInAs(undefined)}
+
+              <AnimatedView className="mt-auto" delay={100}>
+                <Select
+                  selectedValue={selectedUser}
+                  onValueChange={(nric) => {
+                    setSelectedUser(nric);
+                  }}
                 >
-                  <ButtonText>Back</ButtonText>
-                </Button>
+                  <SelectTrigger
+                    variant="outline"
+                    size="md"
+                    className="bg-white"
+                  >
+                    <SelectInput placeholder="Select option" />
+                    <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
+                  </SelectTrigger>
+                  <SelectPortal>
+                    <SelectBackdrop />
+
+                    <SelectContent className="max-h-[75%]">
+                      <SelectDragIndicatorWrapper>
+                        <SelectDragIndicator />
+                      </SelectDragIndicatorWrapper>
+
+                      <SelectScrollView>
+                        {participantUsers.map((user) => (
+                          <SelectItem
+                            key={user.nric}
+                            label={`${user.email} (${user.nric})`}
+                            value={user.nric}
+                          />
+                        ))}
+                      </SelectScrollView>
+                    </SelectContent>
+                  </SelectPortal>
+                </Select>
               </AnimatedView>
-            </VStack>
-          </AnimatedCard>
+
+              <VStack space="xl" className="mt-auto">
+                <AnimatedView delay={200}>
+                  <LoadingButton
+                    variant="solid"
+                    action={selectedUser ? "negative" : "secondary"}
+                    size="xl"
+                    onPress={handleParticipantPress}
+                    disabled={!selectedUser}
+                    loading={isActionInProgress}
+                    loadingText="Logging in"
+                    loadingCssClass="text-white"
+                  >
+                    <ButtonText className="text-center">Login</ButtonText>
+                  </LoadingButton>
+                </AnimatedView>
+                <AnimatedView delay={300}>
+                  <Button
+                    variant="solid"
+                    action="default"
+                    size="xl"
+                    onPress={() => setLoggedInAs(undefined)}
+                  >
+                    <ButtonText>Back</ButtonText>
+                  </Button>
+                </AnimatedView>
+              </VStack>
+            </AnimatedCard>
+          </LayoutAnimationConfig>
         )}
 
         {!isOTPShown && loggedInAs === "manager" && (
-          <AnimatedCard className="flex-1 gap-4">
-            <AnimatedView>
-              <Heading size="lg">Login as Manager</Heading>
-              <Text>Manage your national service matters.</Text>
-            </AnimatedView>
-
-            <AnimatedView className="mt-auto" delay={100}>
-              <Select
-                selectedValue={selectedManager}
-                onValueChange={(nric) => setSelectedManager(nric)}
-              >
-                <SelectTrigger variant="outline" size="md" className="bg-white">
-                  <SelectInput placeholder="Select option" />
-                  <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
-                </SelectTrigger>
-                <SelectPortal>
-                  <SelectBackdrop />
-
-                  <SelectContent className="max-h-[75%]">
-                    <SelectDragIndicatorWrapper>
-                      <SelectDragIndicator />
-                    </SelectDragIndicatorWrapper>
-
-                    <SelectScrollView>
-                      {managerUsers.map((user) => (
-                        <SelectItem
-                          key={user.nric}
-                          label={`${user.email} (${user.nric})`}
-                          value={user.nric}
-                        />
-                      ))}
-                    </SelectScrollView>
-                  </SelectContent>
-                </SelectPortal>
-              </Select>
-            </AnimatedView>
-
-            <VStack space="xl" className="mt-auto">
-              <AnimatedView delay={200}>
-                <Button
-                  variant="solid"
-                  action={selectedManager ? "negative" : "secondary"}
-                  size="xl"
-                  onPress={handleManagerPress}
-                  disabled={!selectedManager}
-                >
-                  <ButtonText>Login</ButtonText>
-                </Button>
+          <LayoutAnimationConfig skipExiting>
+            <AnimatedCard className="flex-1 gap-4">
+              <AnimatedView>
+                <Heading size="lg">Login as Manager</Heading>
+                <Text>Manage your national service matters.</Text>
               </AnimatedView>
 
-              <AnimatedView delay={300}>
-                <Button
-                  variant="solid"
-                  action="default"
-                  size="xl"
-                  onPress={() => setLoggedInAs(undefined)}
+              <AnimatedView className="mt-auto" delay={100}>
+                <Select
+                  selectedValue={selectedManager}
+                  onValueChange={(nric) => setSelectedManager(nric)}
                 >
-                  <ButtonText>Back</ButtonText>
-                </Button>
+                  <SelectTrigger
+                    variant="outline"
+                    size="md"
+                    className="bg-white"
+                  >
+                    <SelectInput placeholder="Select option" />
+                    <SelectIcon className="ml-auto mr-2" as={ChevronDownIcon} />
+                  </SelectTrigger>
+                  <SelectPortal>
+                    <SelectBackdrop />
+
+                    <SelectContent className="max-h-[75%]">
+                      <SelectDragIndicatorWrapper>
+                        <SelectDragIndicator />
+                      </SelectDragIndicatorWrapper>
+
+                      <SelectScrollView>
+                        {managerUsers.map((user) => (
+                          <SelectItem
+                            key={user.nric}
+                            label={`${user.email} (${user.nric})`}
+                            value={user.nric}
+                          />
+                        ))}
+                      </SelectScrollView>
+                    </SelectContent>
+                  </SelectPortal>
+                </Select>
               </AnimatedView>
-            </VStack>
-          </AnimatedCard>
+
+              <VStack space="xl" className="mt-auto">
+                <AnimatedView delay={200}>
+                  <LoadingButton
+                    variant="solid"
+                    action={selectedManager ? "negative" : "secondary"}
+                    size="xl"
+                    onPress={handleManagerPress}
+                    disabled={!selectedManager}
+                    loading={isActionInProgress}
+                    loadingText="Logging in"
+                    loadingCssClass="text-white"
+                  >
+                    <ButtonText>Login</ButtonText>
+                  </LoadingButton>
+                </AnimatedView>
+
+                <AnimatedView delay={300}>
+                  <Button
+                    variant="solid"
+                    action="default"
+                    size="xl"
+                    onPress={() => setLoggedInAs(undefined)}
+                  >
+                    <ButtonText>Back</ButtonText>
+                  </Button>
+                </AnimatedView>
+              </VStack>
+            </AnimatedCard>
+          </LayoutAnimationConfig>
         )}
 
         {isOTPShown && loggedInAs === "participant" && (
-          <AnimatedCard className="flex-1 gap-4">
-            <AnimatedView>
-              <Heading size="lg">Verify OTP</Heading>
-            </AnimatedView>
-
-            <AnimatedView delay={100}>
-              <Box>
-                <Text className="m-0 p-0">
-                  We sent an OTP to{" "}
-                  <Text className="font-bold">{selectedUser}</Text>.
-                </Text>
-                <Text>Enter it below to continue.</Text>
-              </Box>
-            </AnimatedView>
-
-            <AnimatedView delay={200} className="mt-auto">
-              <OTPInput
-                value={selectedOTP}
-                onChangeText={setSelectedOTP}
-                length={6}
-              />
-            </AnimatedView>
-
-            <VStack space="xl" className="mt-auto">
-              <AnimatedView delay={300}>
-                <Button
-                  variant="solid"
-                  action="negative"
-                  size="xl"
-                  onPress={handleParticipantPress}
-                >
-                  <ButtonText>Verify</ButtonText>
-                </Button>
+          <LayoutAnimationConfig skipExiting>
+            <AnimatedCard className="flex-1 gap-4">
+              <AnimatedView>
+                <Heading size="lg">Verify OTP</Heading>
               </AnimatedView>
 
-              <AnimatedView delay={400}>
-                <Button
-                  variant="solid"
-                  action="default"
-                  size="xl"
-                  onPress={handleBack}
-                >
-                  <ButtonText>Back</ButtonText>
-                </Button>
+              <AnimatedView delay={100}>
+                <Box>
+                  <Text className="m-0 p-0">
+                    We sent an OTP to{" "}
+                    <Text className="font-bold">{selectedUser}</Text>.
+                  </Text>
+                  <Text>Enter it below to continue.</Text>
+                </Box>
               </AnimatedView>
-            </VStack>
-          </AnimatedCard>
+
+              <AnimatedView delay={200} className="mt-auto">
+                <OTPInput
+                  value={selectedOTP}
+                  onChangeText={setSelectedOTP}
+                  length={6}
+                />
+              </AnimatedView>
+
+              <VStack space="xl" className="mt-auto">
+                <AnimatedView delay={300}>
+                  <LoadingButton
+                    variant="solid"
+                    action="negative"
+                    size="xl"
+                    onPress={handleParticipantPress}
+                    loading={isActionInProgress}
+                    loadingText="Verifying"
+                    loadingCssClass="text-white"
+                  >
+                    <ButtonText>Verify</ButtonText>
+                  </LoadingButton>
+                </AnimatedView>
+
+                <AnimatedView delay={400}>
+                  <Button
+                    variant="solid"
+                    action="default"
+                    size="xl"
+                    onPress={handleBack}
+                  >
+                    <ButtonText>Back</ButtonText>
+                  </Button>
+                </AnimatedView>
+              </VStack>
+            </AnimatedCard>
+          </LayoutAnimationConfig>
         )}
 
         {isOTPShown && loggedInAs === "manager" && (
-          <AnimatedCard className="flex-1 gap-4">
-            <AnimatedView>
-              <Heading size="lg">Verify OTP</Heading>
-            </AnimatedView>
-
-            <AnimatedView delay={100}>
-              <Box>
-                <Text className="m-0 p-0">
-                  We sent an OTP to{" "}
-                  <Text className="font-bold">{selectedManager}</Text>.
-                </Text>
-                <Text>Enter it below to continue.</Text>
-              </Box>
-            </AnimatedView>
-
-            <AnimatedView className="mt-auto" delay={200}>
-              <OTPInput
-                value={selectedOTP}
-                onChangeText={setSelectedOTP}
-                length={6}
-              />
-            </AnimatedView>
-
-            <VStack space="xl" className="mt-auto">
-              <AnimatedView delay={300}>
-                <Button
-                  variant="solid"
-                  action="negative"
-                  size="xl"
-                  onPress={handleManagerPress}
-                >
-                  <ButtonText>Verify</ButtonText>
-                </Button>
+          <LayoutAnimationConfig skipExiting>
+            <AnimatedCard className="flex-1 gap-4">
+              <AnimatedView>
+                <Heading size="lg">Verify OTP</Heading>
               </AnimatedView>
 
-              <AnimatedView delay={400}>
-                <Button
-                  variant="solid"
-                  action="default"
-                  size="xl"
-                  onPress={handleBack}
-                >
-                  <ButtonText>Back</ButtonText>
-                </Button>
+              <AnimatedView delay={100}>
+                <Box>
+                  <Text className="m-0 p-0">
+                    We sent an OTP to{" "}
+                    <Text className="font-bold">{selectedManager}</Text>.
+                  </Text>
+                  <Text>Enter it below to continue.</Text>
+                </Box>
               </AnimatedView>
-            </VStack>
-          </AnimatedCard>
+
+              <AnimatedView className="mt-auto" delay={200}>
+                <OTPInput
+                  value={selectedOTP}
+                  onChangeText={setSelectedOTP}
+                  length={6}
+                />
+              </AnimatedView>
+
+              <VStack space="xl" className="mt-auto">
+                <AnimatedView delay={300}>
+                  <LoadingButton
+                    variant="solid"
+                    action="negative"
+                    size="xl"
+                    onPress={handleManagerPress}
+                    loading={isActionInProgress}
+                    loadingText="Verifying"
+                    loadingCssClass="text-white"
+                  >
+                    <ButtonText>Verify</ButtonText>
+                  </LoadingButton>
+                </AnimatedView>
+
+                <AnimatedView delay={400}>
+                  <Button
+                    variant="solid"
+                    action="default"
+                    size="xl"
+                    onPress={handleBack}
+                  >
+                    <ButtonText>Back</ButtonText>
+                  </Button>
+                </AnimatedView>
+              </VStack>
+            </AnimatedCard>
+          </LayoutAnimationConfig>
         )}
       </Animated.View>
     </Animated.ScrollView>

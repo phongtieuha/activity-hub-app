@@ -206,6 +206,7 @@ export default function HomeScreen() {
           (x) => !actionsRequiredActivities.includes(x)
         ),
       ]);
+    } catch (error) {
     } finally {
       setIsFetchingData(false);
     }

@@ -86,6 +86,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+import { LayoutAnimationConfig } from "react-native-reanimated";
 
 const ViewActivity = () => {
   // --- Navigation & Utilities ---
@@ -110,7 +111,8 @@ const ViewActivity = () => {
     React.useState<string>();
   const [bookingStep, setBookingStep] = React.useState<"select" | "success">();
   const [bookingMode, setBookingMode] = React.useState<"slot" | "qr">("slot");
-  const [isBookingInProgress, setIsBookingInProgress] = React.useState(false);
+  const [isActionInProgress, setIsActionInProgress] = React.useState(false);
+  const [isCancelling, setIsCancelling] = React.useState(false);
 
   const bookingSlotsGroupedByDateOrderedByDateKey = React.useMemo(() => {
     if (activityDetails?.participationType === "ELECTIVE") {
@@ -165,6 +167,9 @@ const ViewActivity = () => {
 
   const handleGenerateQRBookingSheet = async () => {
     setIsQrRefreshing(true);
+    setShowBookingSheet(false);
+    setShowQRActionsheet(true);
+
     try {
       const qrResp = await generateQr({
         type: "WALK_IN_REGISTRATION",
@@ -178,8 +183,7 @@ const ViewActivity = () => {
           getSGTDate(qrResp.expiryDateTime!)
         ) + "M"
       );
-      setShowBookingSheet(false);
-      setShowQRActionsheet(true);
+
       // const qrData = await decodeQrFromBase64(`${qrResp.imageStr}`);
 
       // if (qrData) {
@@ -192,7 +196,7 @@ const ViewActivity = () => {
   };
 
   const handleBookBookingSheet = async () => {
-    setIsBookingInProgress(true);
+    setIsActionInProgress(true);
     try {
       const existingBooking = activityDetails?.slots?.find(
         (slot) => slot.bookedByMe
@@ -214,16 +218,19 @@ const ViewActivity = () => {
     } catch (error: any) {
       showNotification(error.message, "error");
     } finally {
-      setIsBookingInProgress(false);
+      setIsActionInProgress(false);
     }
   };
 
   const handleCancelBookingSheet = async (slot: ActivitySlotDto) => {
+    setIsCancelling(true);
     try {
       await cancelBooking(slot?.myBookingId!);
       await fetchData();
     } catch (error: any) {
       showNotification(error.message, "error");
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -240,6 +247,8 @@ const ViewActivity = () => {
 
   const handleRegisterAttendance = async () => {
     setIsQrRefreshing(true);
+    setShowQRActionsheet(true);
+
     try {
       const qrResp = await generateQr({
         type: "PARTICIPANT",
@@ -254,7 +263,6 @@ const ViewActivity = () => {
           getSGTDate(qrResp.expiryDateTime!)
         ) + "M"
       );
-      setShowQRActionsheet(true);
     } finally {
       setIsQrRefreshing(false);
     }
@@ -422,6 +430,7 @@ const ViewActivity = () => {
                 !hasAttendanceTaken
               }
               onCancelBookingPress={handleCancelBookingSheet}
+              isCancelling={isCancelling}
             />
 
             {!alreadyRegistered && (
@@ -607,139 +616,142 @@ const ViewActivity = () => {
           <ActionsheetBackdrop />
 
           {bookingStep !== "success" ? (
-            <ActionsheetContent className="p-0">
-              <ActionsheetDragIndicatorWrapper>
-                <ActionsheetDragIndicator />
-              </ActionsheetDragIndicatorWrapper>
+            <LayoutAnimationConfig skipExiting>
+              <ActionsheetContent className="p-0">
+                <ActionsheetDragIndicatorWrapper>
+                  <ActionsheetDragIndicator />
+                </ActionsheetDragIndicatorWrapper>
 
-              <VStack
-                className="w-full px-6 py-4"
-                space="xl"
-                style={{ height: screenHeight * 0.85 }}
-              >
-                <Heading size="xl" className="font-bold">
-                  Select a Slot
-                </Heading>
-                <ScrollView
-                  className="flex-1"
-                  contentContainerStyle={{ flexGrow: 1 }}
-                  showsVerticalScrollIndicator={true}
+                <VStack
+                  className="w-full px-6 py-4"
+                  space="xl"
+                  style={{ height: screenHeight * 0.85 }}
                 >
-                  <CalendarScreen
-                    enabledDates={enabledDates}
-                    selectedDate={selectedBookingDate}
-                    onDateSelected={onBookingDateSelected}
-                    highAvailabilityDates={[enabledDates[0]]}
-                    lowAvailabilityDates={[enabledDates[1]]}
-                    minDate={(() => {
-                      const keys = Object.keys(
-                        bookingSlotsGroupedByDateOrderedByDateKey
-                      );
-                      if (keys.length === 0) return undefined;
-                      const firstDate = keys[0];
-                      return (
-                        DateTime.fromISO(firstDate)
-                          .startOf("month")
-                          .toISODate() || undefined
-                      );
-                    })()}
-                    maxDate={(() => {
-                      const keys = Object.keys(
-                        bookingSlotsGroupedByDateOrderedByDateKey
-                      );
-                      if (keys.length === 0) return undefined;
-                      const lastDate = keys[keys.length - 1];
-                      return (
-                        DateTime.fromISO(lastDate).endOf("month").toISODate() ||
-                        undefined
-                      );
-                    })()}
-                  />
-                  {selectedBookingDate && (
-                    <AnimatedView>
-                      <Divider className="h-4 bg-transparent" />
-                      <Text size="md" className="bg-white py-2 font-bold ">
-                        {formatDayInWord(selectedBookingDate!)},{" "}
-                        {formatDate(selectedBookingDate!)}
-                      </Text>
+                  <Heading size="xl" className="font-bold">
+                    Select a Slot
+                  </Heading>
+                  <ScrollView
+                    className="flex-1"
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    showsVerticalScrollIndicator={true}
+                  >
+                    <CalendarScreen
+                      enabledDates={enabledDates}
+                      selectedDate={selectedBookingDate}
+                      onDateSelected={onBookingDateSelected}
+                      highAvailabilityDates={[enabledDates[0]]}
+                      lowAvailabilityDates={[enabledDates[1]]}
+                      minDate={(() => {
+                        const keys = Object.keys(
+                          bookingSlotsGroupedByDateOrderedByDateKey
+                        );
+                        if (keys.length === 0) return undefined;
+                        const firstDate = keys[0];
+                        return (
+                          DateTime.fromISO(firstDate)
+                            .startOf("month")
+                            .toISODate() || undefined
+                        );
+                      })()}
+                      maxDate={(() => {
+                        const keys = Object.keys(
+                          bookingSlotsGroupedByDateOrderedByDateKey
+                        );
+                        if (keys.length === 0) return undefined;
+                        const lastDate = keys[keys.length - 1];
+                        return (
+                          DateTime.fromISO(lastDate)
+                            .endOf("month")
+                            .toISODate() || undefined
+                        );
+                      })()}
+                    />
+                    {selectedBookingDate && (
+                      <AnimatedView>
+                        <Divider className="h-4 bg-transparent" />
+                        <Text size="md" className="bg-white py-2 font-bold ">
+                          {formatDayInWord(selectedBookingDate!)},{" "}
+                          {formatDate(selectedBookingDate!)}
+                        </Text>
 
-                      <Divider className="h-4 bg-transparent" />
-                      {bookingSlotsGroupedByDateOrderedByDateKey[
-                        selectedBookingDate!
-                      ].length === 1 && (
-                        <RadioGroup value={selectedSlots?.activitySlotId}>
-                          {bookingSlotsGroupedByDateOrderedByDateKey[
-                            selectedBookingDate!
-                          ]
-                            .map((slot) => ({
-                              start: slot.startDate,
-                              end: slot.endDate,
-                              ...slot,
-                            }))
-                            .map((slot, index) =>
-                              renderBookingSlot(slot, index)
-                            )}
-                        </RadioGroup>
-                      )}
-
-                      {bookingSlotsGroupedByDateOrderedByDateKey[
-                        selectedBookingDate!
-                      ].length > 1 && (
-                        <RadioGroup value={selectedSlots?.activitySlotId}>
-                          <MinimalTimeline<ActivitySlotDto>
-                            events={bookingSlotsGroupedByDateOrderedByDateKey[
+                        <Divider className="h-4 bg-transparent" />
+                        {bookingSlotsGroupedByDateOrderedByDateKey[
+                          selectedBookingDate!
+                        ].length === 1 && (
+                          <RadioGroup value={selectedSlots?.activitySlotId}>
+                            {bookingSlotsGroupedByDateOrderedByDateKey[
                               selectedBookingDate!
-                            ].map((slot) => ({
-                              start: slot.startDate,
-                              end: slot.endDate,
-                              ...slot,
-                            }))}
-                            renderEvent={(slot, index) =>
-                              renderBookingSlot(slot, index, true)
-                            }
-                          />
-                        </RadioGroup>
-                      )}
-                    </AnimatedView>
-                  )}
-                </ScrollView>
+                            ]
+                              .map((slot) => ({
+                                start: slot.startDate,
+                                end: slot.endDate,
+                                ...slot,
+                              }))
+                              .map((slot, index) =>
+                                renderBookingSlot(slot, index)
+                              )}
+                          </RadioGroup>
+                        )}
 
-                <VStack space="md" className="mt-auto">
-                  {bookingMode === "slot" && (
-                    <LoadingButton
-                      size="lg"
-                      variant="solid"
-                      action={!selectedSlots ? "secondary" : "negative"}
-                      onPress={handleBookBookingSheet}
-                      disabled={!selectedSlots?.activitySlotId}
-                      loading={isBookingInProgress}
-                      loadingText="Booking"
-                      loadingCssClass="text-white"
-                    >
-                      Book
-                    </LoadingButton>
-                  )}
-                  {bookingMode === "qr" && (
+                        {bookingSlotsGroupedByDateOrderedByDateKey[
+                          selectedBookingDate!
+                        ].length > 1 && (
+                          <RadioGroup value={selectedSlots?.activitySlotId}>
+                            <MinimalTimeline<ActivitySlotDto>
+                              events={bookingSlotsGroupedByDateOrderedByDateKey[
+                                selectedBookingDate!
+                              ].map((slot) => ({
+                                start: slot.startDate,
+                                end: slot.endDate,
+                                ...slot,
+                              }))}
+                              renderEvent={(slot, index) =>
+                                renderBookingSlot(slot, index, true)
+                              }
+                            />
+                          </RadioGroup>
+                        )}
+                      </AnimatedView>
+                    )}
+                  </ScrollView>
+
+                  <VStack space="md" className="mt-auto">
+                    {bookingMode === "slot" && (
+                      <LoadingButton
+                        size="lg"
+                        variant="solid"
+                        action={!selectedSlots ? "secondary" : "negative"}
+                        onPress={handleBookBookingSheet}
+                        disabled={!selectedSlots?.activitySlotId}
+                        loading={isActionInProgress}
+                        loadingText="Booking"
+                        loadingCssClass="text-white"
+                      >
+                        Book
+                      </LoadingButton>
+                    )}
+                    {bookingMode === "qr" && (
+                      <Button
+                        size="lg"
+                        variant="solid"
+                        action={!selectedSlots ? "secondary" : "negative"}
+                        onPress={handleGenerateQRBookingSheet}
+                        disabled={!selectedSlots?.activitySlotId}
+                      >
+                        <ButtonText className="">Generate QR</ButtonText>
+                      </Button>
+                    )}
                     <Button
                       size="lg"
-                      variant="solid"
-                      action={!selectedSlots ? "secondary" : "negative"}
-                      onPress={handleGenerateQRBookingSheet}
-                      disabled={!selectedSlots?.activitySlotId}
+                      action="default"
+                      onPress={handlepCloseBookingSheet}
                     >
-                      <ButtonText className="">Generate QR</ButtonText>
+                      <ButtonText>Cancel</ButtonText>
                     </Button>
-                  )}
-                  <Button
-                    size="lg"
-                    action="default"
-                    onPress={handlepCloseBookingSheet}
-                  >
-                    <ButtonText>Cancel</ButtonText>
-                  </Button>
+                  </VStack>
                 </VStack>
-              </VStack>
-            </ActionsheetContent>
+              </ActionsheetContent>
+            </LayoutAnimationConfig>
           ) : (
             <ActionsheetContent className="border-0 bg-green-600">
               <ActionsheetDragIndicatorWrapper>

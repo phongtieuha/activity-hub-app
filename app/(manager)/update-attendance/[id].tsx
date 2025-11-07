@@ -204,10 +204,9 @@ const UpdateAttendance = () => {
       clearTUpdateAttendanceRecords();
 
       handlepCloseUpdateAttendance();
+    } catch {
     } finally {
-      setTimeout(() => {
-        setIsUpdatingInProgress(false);
-      }, 3000);
+      setIsUpdatingInProgress(false);
     }
   };
 

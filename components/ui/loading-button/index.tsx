@@ -24,7 +24,7 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
   ...buttonProps
 }) => {
   return (
-    <Button {...buttonProps}>
+    <Button {...buttonProps} disabled={loading || buttonProps.disabled}>
       {loading ? (
         <AnimatedView
           key="loading"

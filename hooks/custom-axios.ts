@@ -71,20 +71,20 @@ export const useAxiosWithRouter = () => {
 
 // ---- Global loading integration ----
 let pendingRequests = 0;
-const LOADING_HEADER = "x-disable-global-loading";
+export const LOADING_HEADER = "x-disable-global-loading";
 
 AXIOS_INSTANCE.interceptors.request.use(
   async (config) => {
-    const method = (config.method || "get").toLowerCase();
-    const disableGlobal =
-      (config.headers as any)?.[LOADING_HEADER] === true ||
-      (config.headers as any)?.[LOADING_HEADER] === "true";
-    if (method !== "get" && !disableGlobal) {
-      pendingRequests += 1;
-      if (pendingRequests === 1) {
-        GlobalLoadingBridge.api?.show();
-      }
-    }
+    // const method = (config.method || "get").toLowerCase();
+    // const disableGlobal =
+    //   (config.headers as any)?.[LOADING_HEADER] === true ||
+    //   (config.headers as any)?.[LOADING_HEADER] === "true";
+    // if (method !== "get" && !disableGlobal) {
+    //   pendingRequests += 1;
+    //   if (pendingRequests === 1) {
+    //     GlobalLoadingBridge.api?.show();
+    //   }
+    // }
     return config;
   },
   (error) => Promise.reject(error)

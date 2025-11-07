@@ -1,4 +1,5 @@
 import { Heading } from "@/components/ui/heading";
+import { AnimatedView } from "@/constants/animation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -12,7 +13,7 @@ export default function Index() {
       // Redirect to your desired initial route
       router.replace("/");
     };
-    logout();
+    setTimeout(logout, 1000);
   }, [router]);
 
   return (
@@ -24,7 +25,9 @@ export default function Index() {
         gap: 40,
       }}
     >
-      <Heading size="4xl">Goodbye for now!</Heading>
+      <AnimatedView>
+        <Heading size="4xl">Goodbye for now!</Heading>
+      </AnimatedView>
     </View>
   );
 }

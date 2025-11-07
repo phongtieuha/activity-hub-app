@@ -151,6 +151,8 @@ const ViewActivity = () => {
   const handleCloseQRActionsheet = () => setShowQRActionsheet(false);
   const handleRegisterAttendance = async () => {
     setIsQrRefreshing(true);
+    setShowBookingSheet(false);
+    setShowQRActionsheet(true);
     try {
       const qrResp = await generateQr({
         type: "MANAGER",
@@ -165,8 +167,6 @@ const ViewActivity = () => {
           getSGTDate(qrResp.expiryDateTime!)
         ) + "M"
       );
-      setShowBookingSheet(false);
-      setShowQRActionsheet(true);
     } finally {
       setIsQrRefreshing(false);
     }

@@ -36,6 +36,7 @@ import { Divider } from "../ui/divider";
 import { Heading } from "../ui/heading";
 import { HStack } from "../ui/hstack";
 import { Icon } from "../ui/icon";
+import { LoadingButton } from "../ui/loading-button";
 import { Pressable } from "../ui/pressable";
 import { Text } from "../ui/text";
 import { VStack } from "../ui/vstack";
@@ -46,6 +47,7 @@ interface IProps {
   onCancelBookingPress?: (slot: ActivitySlotDto) => void;
   showBookedSlots?: boolean;
   showCancelButton?: boolean;
+  isCancelling?: boolean;
 }
 
 const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
@@ -228,14 +230,16 @@ const DetailsCard: React.FC<React.PropsWithChildren<IProps>> = (props) => {
                     </HStack>
 
                     {props.showCancelButton && (
-                      <Button
+                      <LoadingButton
                         variant="outline"
                         action="negative"
                         className="mt-3 w-full"
                         onPress={() => handleCancelBooking(slot)}
+                        loading={props.isCancelling}
+                        loadingText="Cancelling"
                       >
                         <ButtonText>Cancel Booking</ButtonText>
-                      </Button>
+                      </LoadingButton>
                     )}
                   </VStack>
                 ))}
