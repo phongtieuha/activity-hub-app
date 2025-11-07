@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/heading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -22,6 +23,8 @@ export default function Index() {
         alignItems: "center",
         gap: 40,
       }}
-    ></View>
+    >
+      <Heading size="4xl">Goodbye for now!</Heading>
+    </View>
   );
 }

@@ -84,7 +84,14 @@ export default function RootLayout() {
                 <AxiosInitializer />
                 <Stack screenOptions={{ animation: "slide_from_right" }}>
                   <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen name="+not-found" />
+                  <Stack.Screen
+                    name="logout"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="+not-found"
+                    options={{ headerShown: false }}
+                  />
 
                   <Stack.Screen
                     name="(manager)/(tabs)"

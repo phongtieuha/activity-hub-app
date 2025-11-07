@@ -46,6 +46,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
+  View,
 } from "react-native";
 
 type ActivityListItemDtoExtended = ActivityListItemDto & {
@@ -214,334 +215,342 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#e11d36"
-          colors={["#e11d36", "#fff"]}
-          progressBackgroundColor="#222"
-        />
-      }
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-    >
-      <StatusBar barStyle={"default"} backgroundColor="#fff" />
+    <>
+      <View className="absolute inset-0 bg-gray-100"></View>
 
-      <Divider className={`h-16 bg-transparent`} />
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#e11d36"
+            colors={["#e11d36", "#fff"]}
+            progressBackgroundColor="#222"
+          />
+        }
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
+        <StatusBar barStyle={"default"} backgroundColor="#fff" />
 
-      <HStack space="lg" className="items-center px-4">
-        <Image
-          source={require("@/assets/images/splash-icon.png")}
-          style={{
-            width: 100,
-            height: 50,
-          }}
-          contentFit="cover"
-        />
+        <Divider className={`h-16 bg-transparent`} />
 
-        <Button
-          variant="link"
-          action="secondary"
-          className="ml-auto rounded-full bg-white/90 px-2"
-        >
-          <ButtonIcon
-            size="xl"
-            as={SearchIcon}
-            className="!size-6"
-          ></ButtonIcon>
-        </Button>
+        <HStack space="lg" className="items-center px-4">
+          <Image
+            source={require("@/assets/images/splash-icon.png")}
+            style={{
+              width: 100,
+              height: 50,
+            }}
+            contentFit="cover"
+          />
 
-        <Button
-          variant="link"
-          action="secondary"
-          className="rounded-full bg-white/90 px-2"
-        >
-          <Box className="relative">
-            <ButtonIcon as={BellIcon} className="!size-6"></ButtonIcon>
-            <Box className="absolute right-1 top-0 h-1/5 w-1/5 rounded-full bg-red-600"></Box>
-          </Box>
-        </Button>
-      </HStack>
-
-      <Divider className={`h-4 bg-transparent`} />
-
-      <Box className="relative mx-4 overflow-hidden rounded-3xl">
-        <Image
-          source={require("@/assets/images/solider-background.png")}
-          style={styles.reactLogo}
-          contentFit="cover"
-          contentPosition={{ top: -100, left: 0 }}
-        />
-        <Box className="absolute inset-0 size-full bg-black/30"></Box>
-        <Box className="absolute left-8 top-4">
-          <Heading size="lg" className="text-red-600">
-            HELLO!
-          </Heading>
-          <Heading size="xl" className="text-white">
-            {loggedInDetails?.name?.split(" ")[0]},
-          </Heading>
-          <Heading size="xl" className="text-white">
-            {loggedInDetails?.name?.split(" ").slice(1).join(" ")}
-          </Heading>
-        </Box>
-
-        <HStack className=" absolute bottom-4 left-0 w-full justify-around">
           <Button
-            size="sm"
             variant="link"
             action="secondary"
-            className="flex h-full flex-col "
+            className="ml-auto rounded-full bg-white/90 px-2"
           >
-            <Image
-              source={require("@/assets/images/icon-helmet.png")}
-              style={{
-                height: 36,
-                width: 36,
-              }}
-            />
-            <ButtonText className="text-gray-300">ICT</ButtonText>
+            <ButtonIcon
+              size="xl"
+              as={SearchIcon}
+              className="!size-6"
+            ></ButtonIcon>
           </Button>
+
           <Button
-            size="sm"
             variant="link"
             action="secondary"
-            className="flex h-full flex-col"
+            className="rounded-full bg-white/90 px-2"
           >
-            <Image
-              source={require("@/assets/images/icon-running.png")}
-              style={{
-                height: 36,
-                width: 36,
-              }}
-            />
-            <ButtonText className="text-gray-300">IPPT/NS FIT</ButtonText>
-          </Button>
-          <Button
-            size="sm"
-            variant="link"
-            action="secondary"
-            className="flex h-full flex-col"
-          >
-            <Image
-              source={require("@/assets/images/icon-gun.png")}
-              style={{
-                height: 36,
-                width: 36,
-              }}
-            />
-            <ButtonText className="text-gray-300">Manning</ButtonText>
-          </Button>
-          <Button
-            size="sm"
-            variant="link"
-            action="secondary"
-            className="flex h-full flex-col"
-          >
-            <Image
-              source={require("@/assets/images/icon-sockets.png")}
-              style={{
-                height: 36,
-                width: 36,
-              }}
-            />
-            <ButtonText className="text-gray-300">eMart</ButtonText>
+            <Box className="relative">
+              <ButtonIcon as={BellIcon} className="!size-6"></ButtonIcon>
+              <Box className="absolute right-1 top-0 h-1/5 w-1/5 rounded-full bg-red-600"></Box>
+            </Box>
           </Button>
         </HStack>
-      </Box>
 
-      <Divider className={`h-4 bg-transparent`} />
+        <Divider className={`h-4 bg-transparent`} />
 
-      {isFetchingData ? (
-        <VStack space="lg">
-          <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
-            <SkeletonText _lines={7} className="h-5 rounded-3xl" />
-          </Card>
+        <Box className="relative mx-4 overflow-hidden rounded-3xl">
+          <Image
+            source={require("@/assets/images/solider-background.png")}
+            style={styles.reactLogo}
+            contentFit="cover"
+            contentPosition={{ top: -100, left: 0 }}
+          />
+          <Box className="absolute inset-0 size-full bg-black/30"></Box>
+          <Box className="absolute left-8 top-4">
+            <Heading size="lg" className="text-red-600">
+              HELLO!
+            </Heading>
+            <Heading size="xl" className="text-white">
+              {loggedInDetails?.name?.split(" ")[0]},
+            </Heading>
+            <Heading size="xl" className="text-white">
+              {loggedInDetails?.name?.split(" ").slice(1).join(" ")}
+            </Heading>
+          </Box>
 
-          <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
-            <SkeletonText _lines={7} className="h-5 rounded-3xl" />
-          </Card>
-        </VStack>
-      ) : (
-        <>
-          {actionRequiredActivities.length > 0 ? (
-            <VStack
-              space="md"
-              className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
+          <HStack className=" absolute bottom-4 left-0 w-full justify-around">
+            <Button
+              size="sm"
+              variant="link"
+              action="secondary"
+              className="flex h-full flex-col "
             >
-              <HStack space="md" className="items-center">
-                <Heading size="lg">Actions required</Heading>
-                <Badge action="error" size="lg">
-                  <BadgeText>{actionRequiredActivities.length}</BadgeText>
-                </Badge>
-                <Button
-                  action="negative"
-                  variant="link"
-                  className="ml-auto"
-                  size="sm"
-                  onPress={handleToggleActionRequired}
-                >
-                  <ButtonText>
-                    {showAllActionRequired ? "Show Less" : "See All"}
-                  </ButtonText>
-                  <ButtonIcon as={ChevronRightIcon} />
-                </Button>
-              </HStack>
-
-              {displayedActionRequiredActivities.map((activity, index) => (
-                <AnimatedCard
-                  key={"actioncard" + activity.activityId + index}
-                  delay={cardFadeDelay}
-                >
-                  <HStack className="items-start" space="md">
-                    <Center className="w-[60px] rounded-3xl bg-gray-50 py-2">
-                      {activity.timeUntilEventDisplay &&
-                      activity.timeUntilEventDisplay.length < 3 ? (
-                        <Text className="text-base font-bold text-red-600">
-                          {activity.timeUntilEventDisplay.join(" ")}
-                        </Text>
-                      ) : activity.timeUntilEventDisplay ? (
-                        <>
-                          <Text className="text-sm font-bold text-gray-900">
-                            {activity.timeUntilEventDisplay[0]}
-                          </Text>
-                          <Text className="text-3xl font-extrabold text-red-600">
-                            {activity.timeUntilEventDisplay[1]}
-                          </Text>
-                          <Text className="text-sm font-bold text-gray-900">
-                            {activity.timeUntilEventDisplay[2]}
-                          </Text>
-                        </>
-                      ) : null}
-                    </Center>
-
-                    {/* <DotIcon style={{ marginTop: 10 }} color="#4b5563" /> */}
-
-                    <VStack space="xl" className="flex-1">
-                      <ActionRequiredCard
-                        actionText="Manage attendance"
-                        activity={activity}
-                        onPress={() =>
-                          router.push(`../view-activity/${activity.activityId}`)
-                        }
-                      />
-                      {index ===
-                      displayedActionRequiredActivities.length - 1 ? null : (
-                        <Divider
-                          className="bg-transparent"
-                          style={{ height: 1 }}
-                        />
-                      )}
-                    </VStack>
-                  </HStack>
-
-                  {index ===
-                  displayedActionRequiredActivities.length - 1 ? null : (
-                    <Divider className="" style={{ height: 1 }} />
-                  )}
-                </AnimatedCard>
-              ))}
-            </VStack>
-          ) : (
-            <Badge
-              action="muted"
-              size="lg"
-              className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
+              <Image
+                source={require("@/assets/images/icon-helmet.png")}
+                style={{
+                  height: 36,
+                  width: 36,
+                }}
+              />
+              <ButtonText className="text-gray-300">ICT</ButtonText>
+            </Button>
+            <Button
+              size="sm"
+              variant="link"
+              action="secondary"
+              className="flex h-full flex-col"
             >
-              <BadgeText>No activities that require your attention!</BadgeText>
-            </Badge>
-          )}
+              <Image
+                source={require("@/assets/images/icon-running.png")}
+                style={{
+                  height: 36,
+                  width: 36,
+                }}
+              />
+              <ButtonText className="text-gray-300">IPPT/NS FIT</ButtonText>
+            </Button>
+            <Button
+              size="sm"
+              variant="link"
+              action="secondary"
+              className="flex h-full flex-col"
+            >
+              <Image
+                source={require("@/assets/images/icon-gun.png")}
+                style={{
+                  height: 36,
+                  width: 36,
+                }}
+              />
+              <ButtonText className="text-gray-300">Manning</ButtonText>
+            </Button>
+            <Button
+              size="sm"
+              variant="link"
+              action="secondary"
+              className="flex h-full flex-col"
+            >
+              <Image
+                source={require("@/assets/images/icon-sockets.png")}
+                style={{
+                  height: 36,
+                  width: 36,
+                }}
+              />
+              <ButtonText className="text-gray-300">eMart</ButtonText>
+            </Button>
+          </HStack>
+        </Box>
 
-          <Divider className={`h-4 bg-transparent`} />
+        <Divider className={`h-4 bg-transparent`} />
 
-          {!!scheduledActivities.length ? (
-            <AnimatedCard delay={cardFadeDelay * 3}>
+        {isFetchingData ? (
+          <VStack space="lg">
+            <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
+              <SkeletonText _lines={7} className="h-5 rounded-3xl" />
+            </Card>
+
+            <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
+              <SkeletonText _lines={7} className="h-5 rounded-3xl" />
+            </Card>
+          </VStack>
+        ) : (
+          <>
+            {actionRequiredActivities.length > 0 ? (
               <VStack
-                space="xl"
+                space="md"
                 className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
               >
                 <HStack space="md" className="items-center">
-                  <Heading size="lg">Scheduled</Heading>
-                  <Badge action="error" size="lg" className="rounded-full">
-                    <BadgeText>{scheduledActivities.length}</BadgeText>
+                  <Heading size="lg">Actions required</Heading>
+                  <Badge action="error" size="lg">
+                    <BadgeText>{actionRequiredActivities.length}</BadgeText>
                   </Badge>
                   <Button
                     action="negative"
                     variant="link"
                     className="ml-auto"
                     size="sm"
-                    onPress={() => setShowAllScheduled(!showAllScheduled)}
+                    onPress={handleToggleActionRequired}
                   >
                     <ButtonText>
-                      {showAllScheduled ? "Show Less" : "See All"}
+                      {showAllActionRequired ? "Show Less" : "See All"}
                     </ButtonText>
                     <ButtonIcon as={ChevronRightIcon} />
                   </Button>
                 </HStack>
 
-                {Object.entries(displayedScheduledActivitiesGrouped).map(
-                  ([date, activities], i) => (
-                    <VStack space="xl" key={date}>
-                      <HStack className="items-start" space="md">
-                        <VStack space="xs">
-                          <Box className="py-3">
-                            <VStack className="items-start justify-start">
-                              <Text className="text-base font-bold text-gray-900">
-                                {formatDay(date)} {formatMonth(date)}
-                              </Text>
-                              <Text className="text-center text-gray-600">
-                                {formatDayInWord(date)}
-                              </Text>
-                            </VStack>
-                          </Box>
-                        </VStack>
+                {displayedActionRequiredActivities.map((activity, index) => (
+                  <AnimatedCard
+                    key={"actioncard" + activity.activityId + index}
+                    delay={cardFadeDelay}
+                  >
+                    <HStack className="items-start" space="md">
+                      <Center className="w-[60px] rounded-3xl bg-gray-50 py-2">
+                        {activity.timeUntilEventDisplay &&
+                        activity.timeUntilEventDisplay.length < 3 ? (
+                          <Text className="text-base font-bold text-red-600">
+                            {activity.timeUntilEventDisplay.join(" ")}
+                          </Text>
+                        ) : activity.timeUntilEventDisplay ? (
+                          <>
+                            <Text className="text-sm font-bold text-gray-900">
+                              {activity.timeUntilEventDisplay[0]}
+                            </Text>
+                            <Text className="text-3xl font-extrabold text-red-600">
+                              {activity.timeUntilEventDisplay[1]}
+                            </Text>
+                            <Text className="text-sm font-bold text-gray-900">
+                              {activity.timeUntilEventDisplay[2]}
+                            </Text>
+                          </>
+                        ) : null}
+                      </Center>
 
-                        <DotIcon style={{ marginTop: 18 }} color="#4b5563" />
+                      {/* <DotIcon style={{ marginTop: 10 }} color="#4b5563" /> */}
 
-                        <VStack space="xl" className="flex-1">
-                          {activities.map((activity, index) => (
-                            <ScheduledCard
-                              key={
-                                "scheduledcard" + activity.activityId + index
-                              }
-                              activity={activity}
-                              onPress={() =>
-                                router.push(
-                                  `../view-activity/${activity.activityId}`
-                                )
-                              }
-                            ></ScheduledCard>
-                          ))}
-                        </VStack>
-                      </HStack>
+                      <VStack space="xl" className="flex-1">
+                        <ActionRequiredCard
+                          actionText="Manage attendance"
+                          activity={activity}
+                          onPress={() =>
+                            router.push(
+                              `../view-activity/${activity.activityId}`
+                            )
+                          }
+                        />
+                        {index ===
+                        displayedActionRequiredActivities.length - 1 ? null : (
+                          <Divider
+                            className="bg-transparent"
+                            style={{ height: 1 }}
+                          />
+                        )}
+                      </VStack>
+                    </HStack>
 
-                      {i ===
-                      Object.entries(displayedScheduledActivitiesGrouped)
-                        .length -
-                        1 ? null : (
-                        <Divider className="" style={{ height: 1 }} />
-                      )}
-                    </VStack>
-                  )
-                )}
+                    {index ===
+                    displayedActionRequiredActivities.length - 1 ? null : (
+                      <Divider className="" style={{ height: 1 }} />
+                    )}
+                  </AnimatedCard>
+                ))}
               </VStack>
-            </AnimatedCard>
-          ) : (
-            <Badge
-              action="muted"
-              size="lg"
-              className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
-            >
-              <BadgeText>No scheduled activities!</BadgeText>
-            </Badge>
-          )}
-        </>
-      )}
+            ) : (
+              <Badge
+                action="muted"
+                size="lg"
+                className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
+              >
+                <BadgeText>
+                  No activities that require your attention!
+                </BadgeText>
+              </Badge>
+            )}
 
-      <Divider className={`bg-transparent`} style={{ height: 100 }} />
-    </ScrollView>
+            <Divider className={`h-4 bg-transparent`} />
+
+            {!!scheduledActivities.length ? (
+              <AnimatedCard delay={cardFadeDelay * 3}>
+                <VStack
+                  space="xl"
+                  className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
+                >
+                  <HStack space="md" className="items-center">
+                    <Heading size="lg">Scheduled</Heading>
+                    <Badge action="error" size="lg" className="rounded-full">
+                      <BadgeText>{scheduledActivities.length}</BadgeText>
+                    </Badge>
+                    <Button
+                      action="negative"
+                      variant="link"
+                      className="ml-auto"
+                      size="sm"
+                      onPress={() => setShowAllScheduled(!showAllScheduled)}
+                    >
+                      <ButtonText>
+                        {showAllScheduled ? "Show Less" : "See All"}
+                      </ButtonText>
+                      <ButtonIcon as={ChevronRightIcon} />
+                    </Button>
+                  </HStack>
+
+                  {Object.entries(displayedScheduledActivitiesGrouped).map(
+                    ([date, activities], i) => (
+                      <VStack space="xl" key={date}>
+                        <HStack className="items-start" space="md">
+                          <VStack space="xs">
+                            <Box className="py-3">
+                              <VStack className="items-start justify-start">
+                                <Text className="text-base font-bold text-gray-900">
+                                  {formatDay(date)} {formatMonth(date)}
+                                </Text>
+                                <Text className="text-center text-gray-600">
+                                  {formatDayInWord(date)}
+                                </Text>
+                              </VStack>
+                            </Box>
+                          </VStack>
+
+                          <DotIcon style={{ marginTop: 18 }} color="#4b5563" />
+
+                          <VStack space="xl" className="flex-1">
+                            {activities.map((activity, index) => (
+                              <ScheduledCard
+                                key={
+                                  "scheduledcard" + activity.activityId + index
+                                }
+                                activity={activity}
+                                onPress={() =>
+                                  router.push(
+                                    `../view-activity/${activity.activityId}`
+                                  )
+                                }
+                              ></ScheduledCard>
+                            ))}
+                          </VStack>
+                        </HStack>
+
+                        {i ===
+                        Object.entries(displayedScheduledActivitiesGrouped)
+                          .length -
+                          1 ? null : (
+                          <Divider className="" style={{ height: 1 }} />
+                        )}
+                      </VStack>
+                    )
+                  )}
+                </VStack>
+              </AnimatedCard>
+            ) : (
+              <Badge
+                action="muted"
+                size="lg"
+                className="mx-4 overflow-hidden rounded-3xl bg-white p-4"
+              >
+                <BadgeText>No scheduled activities!</BadgeText>
+              </Badge>
+            )}
+          </>
+        )}
+
+        <Divider className={`bg-transparent`} style={{ height: 100 }} />
+      </ScrollView>
+    </>
   );
 }
 

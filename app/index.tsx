@@ -26,7 +26,6 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
-  LayoutEnteringFadeInDown,
   LayoutEnteringLongerFadeInDown,
 } from "@/constants/animation";
 import { participantUsers } from "@/constants/loginUsers";
@@ -40,8 +39,14 @@ import {
   User2Icon,
 } from "lucide-react-native";
 import React, { useEffect, useRef } from "react";
-import { Keyboard, StyleSheet, TextInput } from "react-native";
-import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+import { Keyboard, StyleSheet, TextInput, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 // OTP Input Component
 const OTPInput = ({
@@ -160,22 +165,14 @@ export default function Index() {
     "participant" | "manager"
   >();
   const containerTranslateY = useSharedValue(0);
+  const imageScale = useSharedValue(1.3);
 
-  // --- Effects ---
-  useEffect(() => {
-    // Redirect to your desired initial route
-    // router.replace("/(tabs)");
-    const navIfLoggedIn = async () => {
-      const token = await AsyncStorage.getItem("AUTH_TOKEN");
-      const loggedInAs = await AsyncStorage.getItem("LOGGED_IN_AS");
-      if (token && loggedInAs === "participant") {
-        router.replace("./(participant)/(tabs)");
-      } else if (token && loggedInAs === "manager") {
-        router.replace("./(manager)/(tabs)");
-      }
+  // Scale animation for background image
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: imageScale.value }],
     };
-    navIfLoggedIn();
-  }, [router]);
+  });
 
   // --- Handlers ---
   const handleParticipantPress = async () => {
@@ -249,40 +246,62 @@ export default function Index() {
     };
   }, [containerTranslateY]);
 
+  React.useEffect(() => {
+    imageScale.value = withTiming(1, {
+      duration: 800,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [imageScale]);
+
+  // --- Effects ---
+  useEffect(() => {
+    // Redirect to your desired initial route
+    // router.replace("/(tabs)");
+    const navIfLoggedIn = async () => {
+      const token = await AsyncStorage.getItem("AUTH_TOKEN");
+      const loggedInAs = await AsyncStorage.getItem("LOGGED_IN_AS");
+      if (token && loggedInAs === "participant") {
+        router.replace("./(participant)/(tabs)");
+      } else if (token && loggedInAs === "manager") {
+        router.replace("./(manager)/(tabs)");
+      }
+    };
+    navIfLoggedIn();
+  }, [router]);
+
   return (
     <Animated.ScrollView
       keyboardShouldPersistTaps="handled"
       contentContainerClassName="flex-grow"
       style={{ transform: [{ translateY: containerTranslateY }] }}
     >
-      <Animated.View
-        entering={LayoutEnteringFadeInDown}
-        className="w-full flex-1 overflow-hidden rounded-tl-3xl rounded-tr-3xl"
-      >
+      <View className="w-full flex-1 overflow-hidden rounded-tl-3xl rounded-tr-3xl">
         <Center style={{ flex: 1 }}>
-          <ImageBackground
-            source={require("@/assets/images/bg-login.png")}
-            style={{
-              width: "100%",
-              height: "100%",
-            }}
-            className="h-2/3"
-            contentFit="cover"
-          >
-            <Center className="flex-1">
-              <Image
-                source={require("@/assets/images/full_logo_white.svg")}
-                style={{
-                  width: 160,
-                  height: 160,
-                  marginBottom: 0,
-                }}
-                contentFit="contain"
-              />
-            </Center>
-          </ImageBackground>
+          <Animated.View style={[imageAnimatedStyle]} className="h-full w-full">
+            <ImageBackground
+              source={require("@/assets/images/bg-login.png")}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              className="h-2/3"
+              contentFit="cover"
+            >
+              <Center className="flex-1">
+                <Image
+                  source={require("@/assets/images/full_logo_white.svg")}
+                  style={{
+                    width: 160,
+                    height: 160,
+                    marginBottom: 0,
+                  }}
+                  contentFit="contain"
+                />
+              </Center>
+            </ImageBackground>
+          </Animated.View>
         </Center>
-      </Animated.View>
+      </View>
 
       <Animated.View
         entering={LayoutEnteringLongerFadeInDown}

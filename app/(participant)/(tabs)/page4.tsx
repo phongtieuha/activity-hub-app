@@ -30,6 +30,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -126,6 +127,7 @@ export default function TabFourScreen() {
 
   return (
     <>
+      <View className="absolute inset-0 bg-gray-100"></View>
       <SafeAreaView className="px-4">
         <Card className="rounded-3xl">
           <ActionsheetSectionList
