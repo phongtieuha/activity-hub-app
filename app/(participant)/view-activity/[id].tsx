@@ -46,7 +46,7 @@ import {
   RadioIcon,
   RadioIndicator,
 } from "@/components/ui/radio";
-import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 
 import { VStack } from "@/components/ui/vstack";
@@ -80,6 +80,7 @@ import {
 import { DateTime } from "luxon";
 import React, { useCallback, useEffect } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
@@ -508,10 +509,11 @@ const ViewActivity = () => {
           <AnimatedView
             exiting={ElementExitingFadeOutDown}
             style={styles.contentCard}
-            className="flex-1 gap-5 rounded-3xl bg-white p-4 pb-8"
+            className="flex flex-1 items-center justify-center gap-5 rounded-3xl bg-white p-4 pb-8"
           >
-            <Skeleton className="h-[100px] rounded-3xl" />
-            <SkeletonText _lines={10} className="h-5 rounded-3xl" />
+            <ActivityIndicator size={Platform.OS === "ios" ? "large" : 48} />
+            {/* <Skeleton className="h-[100px] rounded-3xl" />
+            <SkeletonText _lines={10} className="h-5 rounded-3xl" /> */}
           </AnimatedView>
         )}
       </ParallaxScrollView>

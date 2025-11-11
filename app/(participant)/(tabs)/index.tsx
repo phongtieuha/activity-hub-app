@@ -11,12 +11,10 @@ import AnimatedCard, { cardFadeDelay } from "@/components/ui/AnimatedCard";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Box } from "@/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Center } from "@/components/ui/center";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import { SkeletonText } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { AnimatedView } from "@/constants/animation";
@@ -41,9 +39,11 @@ import {
 } from "lucide-react-native";
 import React, { useDeferredValue, useRef } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -378,14 +378,15 @@ export default function HomeScreen() {
         <Divider className={`h-4 bg-transparent`} />
 
         {isFetchingData ? (
-          <VStack space="lg">
-            <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
+          <VStack space="lg" className="flex-1 items-center justify-center">
+            <ActivityIndicator size={Platform.OS === "ios" ? "large" : 48} />
+            {/* <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
               <SkeletonText _lines={7} className="h-5 rounded-3xl" />
             </Card>
 
             <Card className="mx-4 overflow-hidden rounded-3xl bg-white p-4">
               <SkeletonText _lines={7} className="h-5 rounded-3xl" />
-            </Card>
+            </Card> */}
           </VStack>
         ) : (
           <>
