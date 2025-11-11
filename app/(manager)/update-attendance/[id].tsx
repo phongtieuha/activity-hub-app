@@ -27,14 +27,7 @@ import {
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import {
-  CheckIcon,
-  ChevronLeftIcon,
-  CircleIcon,
-  DownloadIcon,
-  Icon,
-  SearchIcon,
-} from "@/components/ui/icon";
+import { CheckIcon, CircleIcon, Icon, SearchIcon } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Pressable } from "@/components/ui/pressable";
@@ -49,7 +42,6 @@ import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
   AnimatedViewList,
-  ElementEnteringFadeInLeft,
   LayoutEnteringFadeInDown,
 } from "@/constants/animation";
 import { useNotification } from "@/hooks/useNotification";
@@ -59,6 +51,7 @@ import {
   AttendanceStatusValues,
   TUpdateAttendanceRecord,
 } from "@/models/update-attendance";
+import { useHeaderHeight } from "@react-navigation/elements";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -89,6 +82,7 @@ const UpdateAttendance = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { showNotification } = useNotification();
+  const headerHeight = useHeaderHeight();
 
   // 2) State
   const [attendanceSummary, setAttendanceSummary] =
@@ -385,6 +379,7 @@ const UpdateAttendance = () => {
         contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: 80, // Add space for sticky button
+          paddingTop: headerHeight,
         }}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -398,9 +393,8 @@ const UpdateAttendance = () => {
           />
         }
       >
-        <SafeAreaView className="">
-          <VStack space="4xl">
-            <HStack className="justify-between px-4">
+        <VStack space="2xl" className="mb-8 mt-4">
+          {/* <HStack className="justify-between px-4">
               <AnimatedView entering={ElementEnteringFadeInLeft} delay={200}>
                 <Pressable className="" onPress={() => router.back()}>
                   <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
@@ -414,53 +408,49 @@ const UpdateAttendance = () => {
                   <Icon as={DownloadIcon} className="!size-8 text-white" />
                 </Pressable>
               </AnimatedView>
-            </HStack>
-
-            <VStack space="lg" className="px-4">
-              <AnimatedView delay={200}>
-                <VStack className="gap-1">
-                  <Text className="text-white">TOTAL</Text>
-                  <Heading size="3xl" className="text-white">
-                    {attendanceSummary?.totalParticipants}
-                  </Heading>
-                </VStack>
-              </AnimatedView>
-
-              <HStack space="lg">
-                <AnimatedViewList
-                  childrenDelayStart={300}
-                  childrenCssClasses="flex-1"
-                >
-                  <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
-                    <Text size="2xl" className="font-semibold text-green-600">
-                      {attendanceSummary?.attendanceCounts?.["PRESENT"] ?? 0}
-                    </Text>
-                    <Text className="text-white">PRESENT</Text>
-                  </VStack>
-                  <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
-                    <Text size="2xl" className="font-semibold text-white">
-                      {attendanceSummary?.attendanceCounts?.["ABSENT"] ?? 0}
-                    </Text>
-                    <Text className="text-white">ABSENT</Text>
-                  </VStack>
-                  <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
-                    <Text size="2xl" className="font-semibold text-white">
-                      {attendanceSummary?.attendanceCounts?.["FALLOUT"] ?? 0}
-                    </Text>
-                    <Text className="text-white">FALL OUT</Text>
-                  </VStack>
-                  <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
-                    <Text size="2xl" className="font-semibold text-white">
-                      {attendanceSummary?.attendanceCounts?.["EXCUSED"] ?? 0}
-                    </Text>
-                    <Text className="text-white">EXCUSED</Text>
-                  </VStack>
-                </AnimatedViewList>
-              </HStack>
+            </HStack> */}
+          <AnimatedView delay={200}>
+            <VStack className="gap-1 px-6">
+              <Text className="text-white">TOTAL</Text>
+              <Heading size="3xl" className="text-white">
+                {attendanceSummary?.totalParticipants}
+              </Heading>
             </VStack>
-          </VStack>
-          <Divider className="my-4 bg-transparent" />
-        </SafeAreaView>
+          </AnimatedView>
+
+          <HStack space="lg" className="px-4">
+            <AnimatedViewList
+              childrenDelayStart={300}
+              childrenCssClasses="flex-1"
+            >
+              <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
+                <Text size="2xl" className="font-semibold text-green-600">
+                  {attendanceSummary?.attendanceCounts?.["PRESENT"] ?? 0}
+                </Text>
+                <Text className="text-white">PRESENT</Text>
+              </VStack>
+              <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
+                <Text size="2xl" className="font-semibold text-white">
+                  {attendanceSummary?.attendanceCounts?.["ABSENT"] ?? 0}
+                </Text>
+                <Text className="text-white">ABSENT</Text>
+              </VStack>
+              <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
+                <Text size="2xl" className="font-semibold text-white">
+                  {attendanceSummary?.attendanceCounts?.["FALLOUT"] ?? 0}
+                </Text>
+                <Text className="text-white">FALL OUT</Text>
+              </VStack>
+              <VStack className="items-center rounded-3xl bg-gray-900/90 p-3">
+                <Text size="2xl" className="font-semibold text-white">
+                  {attendanceSummary?.attendanceCounts?.["EXCUSED"] ?? 0}
+                </Text>
+                <Text className="text-white">EXCUSED</Text>
+              </VStack>
+            </AnimatedViewList>
+          </HStack>
+        </VStack>
+
         <AnimatedView
           delay={400}
           entering={LayoutEnteringFadeInDown}

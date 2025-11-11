@@ -1,6 +1,5 @@
 import {
   ActivityAttendedDtoAttendanceStatus,
-  ActivityResponseDto,
   ActivitySlotDto,
   bookForSelf,
   cancelBooking,
@@ -53,7 +52,6 @@ import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
   AnimatedViewList,
-  ElementEnteringFadeInLeft,
   ElementExitingFadeOutDown,
 } from "@/constants/animation";
 import {
@@ -71,12 +69,7 @@ import { useNotification } from "@/hooks/useNotification";
 import * as Brightness from "expo-brightness";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  CheckCircleIcon,
-  ChevronLeftIcon,
-  CircleIcon,
-  LoaderIcon,
-} from "lucide-react-native";
+import { CheckCircleIcon, CircleIcon, LoaderIcon } from "lucide-react-native";
 import { DateTime } from "luxon";
 import React, { useCallback, useEffect } from "react";
 import {
@@ -88,18 +81,19 @@ import {
   StyleSheet,
 } from "react-native";
 import { LayoutAnimationConfig } from "react-native-reanimated";
+import { useParticipantContext } from "../context";
 
 const ViewActivity = () => {
   // --- Navigation & Utilities ---
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { showNotification } = useNotification();
+  const { activityDetails, setActivityDetails } = useParticipantContext();
+  console.log("activityDetails", activityDetails);
 
   // --- State ---
   const [showQRActionsheet, setShowQRActionsheet] = React.useState(false);
   const [qrBase64String, setQrBase64String] = React.useState("");
-  const [activityDetails, setActivityDetails] =
-    React.useState<ActivityResponseDto>();
   const [userDetails, setUserDetails] = React.useState<UserDto>();
   const [refreshing, setRefreshing] = React.useState(false);
   const [isFetchingData, setIsFetchingData] = React.useState(false);
@@ -397,7 +391,7 @@ const ViewActivity = () => {
         refreshing={refreshing}
         onRefresh={onRefresh}
       >
-        <AnimatedView
+        {/* <AnimatedView
           entering={ElementEnteringFadeInLeft}
           delay={200}
           className="absolute left-4 top-16"
@@ -405,7 +399,7 @@ const ViewActivity = () => {
           <Pressable onPress={() => router.back()}>
             <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
           </Pressable>
-        </AnimatedView>
+        </AnimatedView> */}
 
         <Image
           source={require("@/assets/images/soliders-outdoor-dark-bg.png")}

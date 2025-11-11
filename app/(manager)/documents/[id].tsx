@@ -2,6 +2,7 @@ import { Divider } from "@/components/ui/divider";
 import { HStack } from "@/components/ui/hstack";
 import { DownloadIcon, Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useHeaderHeight } from "@react-navigation/elements";
 import { Pressable, ScrollView } from "react-native";
 
 type TDocument = {
@@ -30,8 +31,9 @@ const DocumentRecords: TDocument[] = [
 ];
 
 const Documents = () => {
+  const headerHeight = useHeaderHeight();
   return (
-    <ScrollView>
+    <ScrollView style={{ marginTop: headerHeight }}>
       {DocumentRecords.map((item) => (
         <Pressable key={item.id}>
           <HStack className="items-center gap-5 px-4 pt-4">

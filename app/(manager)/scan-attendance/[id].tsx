@@ -22,11 +22,8 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import { ChevronLeftIcon, Icon } from "@/components/ui/icon";
-import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { AnimatedView, ElementEnteringFadeInLeft } from "@/constants/animation";
 import { formatDateTime } from "@/hooks/date-formatter";
 import { useNotification } from "@/hooks/useNotification";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -185,7 +182,7 @@ const ScanAttendance = () => {
     <>
       <View className="relative" style={{ minHeight: screenHeight }}>
         <QrScanPreview onQrScanned={onQrScanned} />
-        <AnimatedView
+        {/* <AnimatedView
           entering={ElementEnteringFadeInLeft}
           delay={200}
           className="absolute left-4 top-16"
@@ -196,7 +193,7 @@ const ScanAttendance = () => {
           >
             <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
           </Pressable>
-        </AnimatedView>
+        </AnimatedView> */}
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}

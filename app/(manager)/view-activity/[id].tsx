@@ -36,7 +36,6 @@ import { VStack } from "@/components/ui/vstack";
 import {
   AnimatedView,
   AnimatedViewList,
-  ElementEnteringFadeInLeft,
   ElementExitingFadeOutDown,
 } from "@/constants/animation";
 import {
@@ -53,7 +52,6 @@ import * as Brightness from "expo-brightness";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  ChevronLeftIcon,
   FileIcon,
   LoaderIcon,
   PencilLineIcon,
@@ -241,16 +239,6 @@ const ViewActivity = () => {
         refreshing={refreshing}
         onRefresh={onRefresh}
       >
-        <AnimatedView
-          entering={ElementEnteringFadeInLeft}
-          delay={200}
-          className="absolute left-4 top-16"
-        >
-          <Pressable onPress={() => router.back()}>
-            <Icon as={ChevronLeftIcon} className="!size-8 text-white" />
-          </Pressable>
-        </AnimatedView>
-
         <Image
           source={require("@/assets/images/soliders-outdoor-dark-bg.png")}
           style={{
