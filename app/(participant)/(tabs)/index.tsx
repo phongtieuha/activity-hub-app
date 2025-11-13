@@ -173,6 +173,9 @@ export default function HomeScreen() {
           getCurrentSGTDate()
         );
         activity.timeUntilEventDisplay = timeUntilEventDisplay;
+
+        const result = await getById(activity.activityId!);
+        activity.bookedASlot = result.data?.slots?.some((x) => x.bookedByMe);
       }
 
       const todayActivities = scheduledActivities.filter((x) =>
@@ -184,10 +187,14 @@ export default function HomeScreen() {
         ...todayActivities,
       ];
 
-      for (const activity of scheduledActivities) {
-        const result = await getById(activity.activityId!);
-        activity.bookedASlot = result.data?.slots?.some((x) => x.bookedByMe);
-      }
+      // for (const activity of [
+      //   ...scheduledActivities,
+      //   ...actionRequiredActivities,
+      // ]) {
+      //   const result = await getById(activity.activityId!);
+      //   activity.bookedASlot = result.data?.slots?.some((x) => x.bookedByMe);
+      //   console.log("activity", activity);
+      // }
 
       const notBookedActivities = scheduledActivities.filter(
         (x) => x.bookingWindowRequired && !x.bookedASlot

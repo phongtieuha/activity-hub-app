@@ -22,9 +22,9 @@ const getHeaderBackButton = () => ({
   headerShown: true,
   headerTitle: "",
   headerTransparent: true,
-  headerStyle: {
-    backgroundColor: "transparent",
-  },
+  //   headerStyle: {
+  //     backgroundColor: "transparent",
+  //   },
   // headerLeft: () => <CustomBackButton />,
 });
 

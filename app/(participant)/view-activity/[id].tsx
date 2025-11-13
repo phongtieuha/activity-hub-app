@@ -88,8 +88,12 @@ const ViewActivity = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { showNotification } = useNotification();
-  const { activityDetails, setActivityDetails } = useParticipantContext();
-  console.log("activityDetails", activityDetails);
+  const {
+    activityDetails,
+    setActivityDetails,
+    activityAttendance,
+    setActivityAttendance,
+  } = useParticipantContext();
 
   // --- State ---
   const [showQRActionsheet, setShowQRActionsheet] = React.useState(false);
@@ -122,7 +126,13 @@ const ViewActivity = () => {
     return Object.keys(bookingSlotsGroupedByDateOrderedByDateKey);
   }, [bookingSlotsGroupedByDateOrderedByDateKey]);
 
-  const [hasAttendanceTaken, setHasAttendanceTaken] = React.useState(false);
+  const hasAttendanceTaken =
+    activityAttendance?.some(
+      (x) =>
+        x.activityId === id &&
+        (x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.PRESENT ||
+          x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.LATE)
+    ) ?? false;
 
   const alreadyRegistered = React.useMemo(
     () => activityDetails?.slots?.find((slot) => slot.bookedByMe) ?? false,
@@ -270,21 +280,14 @@ const ViewActivity = () => {
       setActivityDetails(detailResp?.data);
 
       const attendanceRecordsResp = await listActivitiesAttended();
-
-      const hasAttendanceTaken = attendanceRecordsResp.data?.some(
-        (x) =>
-          x.activityId === id &&
-          (x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.PRESENT ||
-            x.attendanceStatus === ActivityAttendedDtoAttendanceStatus.LATE)
-      );
-      setHasAttendanceTaken(hasAttendanceTaken ?? false);
+      setActivityAttendance(attendanceRecordsResp.data || []);
 
       const userResp = await getMe();
       setUserDetails(userResp);
     } finally {
       setIsFetchingData(false);
     }
-  }, [id]);
+  }, [id, setActivityAttendance, setActivityDetails]);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);

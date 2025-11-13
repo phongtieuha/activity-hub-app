@@ -1,5 +1,6 @@
 import {
   getById,
+  listActivitiesAttended,
   scanAndAttend,
   ScanAndAttendRequestDto,
   ScanAndAttendResponseDto,
@@ -31,7 +32,7 @@ const ScanAttendance = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { showNotification } = useNotification();
-  const { setActivityDetails } = useParticipantContext();
+  const { setActivityDetails, setActivityAttendance } = useParticipantContext();
 
   // 2) State
   const [showActionsheet, setShowActionsheet] = React.useState(false);
@@ -128,6 +129,11 @@ const ScanAttendance = () => {
                     onPress={async () => {
                       const detailResp = await getById(id as string);
                       setActivityDetails(detailResp?.data);
+
+                      const attendanceRecordsResp =
+                        await listActivitiesAttended();
+                      setActivityAttendance(attendanceRecordsResp.data || []);
+
                       router.back();
                     }}
                     size="lg"

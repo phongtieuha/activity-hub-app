@@ -1,6 +1,7 @@
 import { GlobalLoadingBridge } from "@/components/GlobalLoading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { type AxiosRequestConfig } from "axios";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { serializeToQueryString } from "./forms";
@@ -111,6 +112,12 @@ AXIOS_INSTANCE.interceptors.response.use(
     // if (!response?.data?.isSuccess && response?.data?.message?.includes('Exception of type')) {
     //   response.data.message = 'Unexpected error.'
     // }
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setTimeout(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }, 80);
+
     return response;
   },
 
