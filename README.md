@@ -4,7 +4,7 @@ A React Native (Expo) proof-of-concept mobile app for booking national service a
 
 ## Demo
 
-- **Demo link:** _TBD_ <!-- add URL here -->
+- **Demo link:** [Google Drive demo folder](https://drive.google.com/drive/folders/18ddajeCurJb5dyKmfMphpXnuZ0Xv2Vl8?usp=sharing)
 
 ## Features
 
